@@ -55,7 +55,7 @@ Localizados = un valor por idioma (`en` por defecto, `es`). El resto se sincroni
 | `product` | `slug`, `order`, `price`, `featured`, `image`, `imageUrl`, `gallery` | `title`, `description`, `details` (Markdown) |
 | `site-setting` (single) | `email`, `phone`, `whatsapp` (solo digitos), `instagram`, `facebook`, `tiktok`, `youtube`, `linkedin`, `google`, `tripadvisor`, `legalName`, `ruc`, `brandName`, `legalYear`, `shareImage`, `shareImageUrl` | - |
 | `theme-setting` (single) | `light`, `dark` (`theme.palette`), `fontSans`, `fontHeading` (enum: `radio-canada`, `inter`, `poppins`, `montserrat`, `dm-sans`, `playfair-display`, `lora`, `merriweather`, `system`), `radius` (enum: `none`, `small`, `medium`, `large`, `full`), `headerSize` (enum: `compact`, `standard`, `tall`), `introEnabled`, `introAccent` (hex), `introRestScale`, `introFailsafeMs` | - |
-| `booking-setting` (single) | `depositRate` (0..1), `adultsMin`, `adultsDefault`, `childrenMin`, `childrenDefault`, `peopleMax`, `currencyCode` | `assurances[]` (`shared.feature`) |
+| `booking-setting` (single) | `depositRate` (0..1, **obsoleto**, ver abajo), `availabilityMonths` (1..12, 3 por defecto), `adultsMin`, `adultsDefault`, `childrenMin`, `childrenDefault`, `peopleMax`, `currencyCode` | `assurances[]` (`shared.feature`) |
 | `form-setting` (single) | `nameMin`, `nameMax`, `emailMax`, `messageMax` | - |
 | `navigation` (single) | - | `headerLinks[]`, `footerBrandLinks[]`, `footerLegalLinks[]` (`shared.nav-link`), `planTripLabel`, `planTripPath` |
 | `reservation` (solo `create`, **legado**, ver abajo) | `tourSlug`, `tourTitle`, `date`, `language`, `format`, `adults`, `children`, `payment`, `amount`, `locale`, `name`, `email`, `phone`, `notes`, `status` | - |
@@ -90,7 +90,7 @@ El frontend renderiza todas sus rutas por peticion y lee el CMS con una cache de
 
 ## Cambios que requiere el mapper de `desertica-web`
 
-Todo lo siguiente es nuevo, aditivo y vacio por defecto (`null` / `[]`); el frontend actual no se rompe si lo ignora. El mapper (`src/app/core/cms/`) lo incorporara en otra sesion.
+Para esta ola: leer `availabilityMonths` (ya lo hace) y dejar de leer `depositRate` cuando el flujo legado desaparezca; el deposito sale del API. Todo lo siguiente es nuevo, aditivo y vacio por defecto (`null` / `[]`); el frontend actual no se rompe si lo ignora. El mapper (`src/app/core/cms/`) lo incorporara en otra sesion.
 
 Campos nuevos de `tour`:
 
@@ -103,6 +103,14 @@ Campos nuevos de `tour`:
 | `faqs[]` | componente repetible `shared.faq` {`question`, `answer`} | si | `populate[faqs]=true` | para la ficha y para datos estructurados (`FAQPage`) |
 
 `meeting` sigue siendo el texto del punto de encuentro. Los campos planos nuevos se devuelven sin populate (con `fields[]` explicito hay que listarlos); solo `faqs` necesita `populate[faqs]=true` (el componente no contiene medios).
+
+Campo nuevo de `booking-setting` (single type, no localizado, sin populate; aparece en `/api/booking-setting?locale=`):
+
+| Campo | Tipo | Notas |
+| --- | --- | --- |
+| `availabilityMonths` | entero 1..12, por defecto 3 | cuantos meses de calendario muestra la web. Las bases nuevas lo traen en 3; en una base existente puede venir `null` hasta que alguien guarde `Booking rules`, y la web usa 3. El mapper actual ya lo lee (`booking-defaults.ts` lo limita a 1..12) |
+
+`booking-setting.depositRate` esta **obsoleto**: ignorado por el motor de reservas nuevo; se retira cuando la web deje de leerlo. El deposito lo decide el API (`Setting.depositPercent`). No se borra ni se renombra. Hoy lo leen en `desertica-web`: `src/app/core/cms/cms-mapper.ts` (`mapBooking`), `booking-defaults.ts` (`withBookingDefaults`/`DEFAULT_BOOKING`) y `src/app/features/tours/detail/tour-book.ts` (`TOUR_DEPOSIT_RATE`, `tourDuePrice`, formulario de reserva legado). El flujo nuevo (`booking-panel`, `checkout*`) usa `depositCents` del API y no lo lee.
 
 Paginas nuevas (colección `pages`, mismo populate `heroImage`): `cancellation` y `cookies` (ver abajo). No hay cambios en el resto de endpoints.
 
@@ -121,6 +129,16 @@ El API (`desertica-api`) guarda un snapshot del texto de cada version al publica
 Otras paginas existentes: `complaints`, `legal-mincetur` (el slug real es con guion, no `legal/mincetur`), `products`, `blog`. El texto va en `body` (Markdown) y es localizado (`en`, `es`); el snapshot debe leerse con `?locale=` y `status=published`.
 
 `cancellation` y `cookies` no estan en `seed/catalog.json` (generado, no se edita a mano). Al arrancar, `ensureExtraPages` en `src/index.ts` crea ambas, solo una vez por base de datos (marca en el store `plugin_desertica_extra-pages`), con titulo en `en`/`es`, cuerpo vacio y **en borrador**: no aparecen en la API publica hasta que alguien escriba el texto y pulse `Publish` en cada idioma. Si se borran a proposito no se recrean. Para crearlas a mano: `Pages — Page` > `Create new entry`, slug `cancellation` o `cookies`, titulo y cuerpo en `en` y `es`, `Publish`. Si el slug no esta publicado el API debe tratarlo como "documento sin texto" y no publicar una version vacia.
+
+## Descargo de los tours (`waiverBody`)
+
+Cada cambio **publicado** del `waiverBody` genera una version nueva en el API (que guarda el snapshot) y los pasajeros firman el texto vigente al reservar. El CMS no versiona: guardar un borrador no cambia nada para los pasajeros. La ayuda del campo en el admin lo explica.
+
+## Paginas legales en el admin
+
+Las siete paginas legales (`terms`, `privacy`, `cancellation`, `cookies`, `conduct`, `complaints`, `legal-mincetur`) son del mismo tipo `page` y comparten campos (`title`, `lead`, `body`, SEO). En `Pages — Page` la lista va ordenada por `slug` (columnas `title`, `slug`, `updatedAt`, mas el estado de Strapi); comparte lista con las paginas hub `blog` y `products`. No hay cambios de contrato.
+
+Textos de ejemplo NO LEGALES para desarrollo: `docs/DEV-LEGAL-SAMPLES.md`.
 
 ## `reservation` es legado
 
