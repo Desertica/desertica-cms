@@ -35,22 +35,30 @@ La primera vez, `/admin` pide crear el usuario administrador. Para produccion: `
 
 | Tipo | i18n | Draft/Publish | Campos |
 | --- | --- | --- | --- |
-| `destination` | si | si | no localizados: `slug`, `order`, `imageUrl`, `image`; localizados: `title`, `lead`, `allLabel`; relacion `tours` |
-| `tour` | si | si | no localizados: `slug`, `order`, `durationHours`, `priceFrom`, `featured`, `format`, `languages`, `imageUrl`, `image`, `galleryUrls`, `gallery`, `itineraryFile`, `itineraryFileUrl`, `destination`; localizados: `title`, `description`, `lead`, `meeting`, `termsSummary`, `paragraphs`, `expandedParagraphs` (`shared.list-item`), `practices` (`shared.feature`), `itinerary` (`shared.stop`: `image`, `imageUrl`, `title`, `body`, `expandedBody`), `videos` (`shared.video`: `poster`/`posterUrl`, `webm`/`webmUrl`, `mp4`/`mp4Url`), `included`, `excluded`, `pack`, `notes` (`shared.list-item`) |
+| `destination` | si | si | no localizados: `slug`, `order`, `footerOrder`, `showInFooter`, `imageUrl`, `image`; localizados: `title`, `lead`, `allLabel`; relacion `tours` |
+| `tour` | si | si | no localizados: `slug`, `order`, `durationHours`, `priceFrom`, `featured`, `format`, `languages`, `imageUrl`, `image`, `galleryUrls`, `gallery`, `itineraryFile`, `itineraryFileUrl`, `destination`; localizados: `title`, `description`, `lead`, `meeting`, `termsSummary`, `seoTitle`, `seoDescription`, `assurances` (`shared.feature`, opcional: sustituye las de `booking-setting`), `paragraphs`, `expandedParagraphs` (`shared.list-item`), `practices` (`shared.feature`), `itinerary` (`shared.stop`: `image`, `imageUrl`, `title`, `body`, `expandedBody`), `videos` (`shared.video`: `poster`/`posterUrl`, `webm`/`webmUrl`, `mp4`/`mp4Url`), `included`, `excluded`, `pack`, `notes` (`shared.list-item`) |
 | `reservation` | no | no | `tourSlug`, `tourTitle`, `date`, `language`, `format`, `adults`, `children`, `payment`, `amount`, `locale`, `name`, `email`, `phone`, `status`, `notes` |
 | `contact-message` | no | no | `name`, `email`, `whatsapp`, `country`, `message`, `locale`, `handled` |
-| `site-setting` (single) | no | no | `email`, `phone`, `whatsapp`, redes (`instagram`, `facebook`, `tiktok`, `youtube`, `linkedin`, `google`, `tripadvisor`), `legalName`, `ruc` |
-| `translation` | si | no | no localizados: `key`, `group`; localizado: `value` (todas las cadenas de `src/locales/{en,es}.json`) |
-| `media-slot` | si | no | no localizados: `key`, `image`/`imageUrl`, `video`/`videoUrl`/`videoWebmUrl`, `poster`/`posterUrl`; localizado: `alt` |
+| `site-setting` (single) | no | no | `email`, `phone`, `whatsapp`, redes (`instagram`, `facebook`, `tiktok`, `youtube`, `linkedin`, `google`, `tripadvisor`), `legalName`, `ruc`, `brandName`, `legalYear`, `shareImage`/`shareImageUrl` |
+| `theme-setting` (single) | no | no | `light`, `dark` (componente `theme.palette`, 22 colores), `radius`, `fontSans`, `fontHeading`, `headerHeightSm/Md/Lg`, `introEnabled`, `introAccent`, `introRestScale`, `introFailsafeMs` |
+| `booking-setting` (single) | si | no | no localizados: `depositRate` (0..1), `adultsMin`, `adultsDefault`, `childrenMin`, `childrenDefault`, `peopleMax`, `currencyCode`; localizado: `assurances` (`shared.feature`) |
+| `form-setting` (single) | no | no | `nameMin`, `nameMax`, `emailMax`, `messageMax` |
+| `navigation` (single) | si | no | localizados: `headerLinks`, `footerBrandLinks`, `footerLegalLinks` (`shared.nav-link`: `label`, `path`, `fragment`, `kind` = `link`/`tours-menu`), `planTripLabel`, `planTripPath` |
+| `translation` | si | no | no localizados: `key`, `group`, `page`, `section`, `label`, `note`, `kind` (`short`/`long`); localizado: `value` (cadenas de interfaz de `src/locales/{en,es}.json`, sin las claves de tours y destinos) |
+| `media-slot` | si | no | no localizados: `key`, `page`, `section`, `description`, `image`/`imageUrl`, `video`/`videoUrl`/`videoWebmUrl`, `poster`/`posterUrl`; localizado: `alt` |
 | `page` | si | si | no localizados: `slug`, `heroImage`, `heroImageUrl`; localizados: `title`, `lead`, `body` (Markdown), `seoTitle`, `seoDescription` |
 | `blog-post` | si | si | no localizados: `slug`, `publishedDate`, `cover`, `coverUrl`, `featured`; localizados: `title`, `category`, `excerpt`, `content` (Markdown), `seoDescription` |
 | `product` | si | si | no localizados: `slug`, `order`, `price`, `featured`, `image`, `imageUrl`, `gallery`; localizados: `title`, `description`, `details` (Markdown) |
 
 Las imagenes pueden venir de `imageUrl`/`galleryUrls`/`itineraryFileUrl` (URLs externas, p. ej. Unsplash) o de los campos media (`image`, `gallery`, `itineraryFile`, `itinerary[].image`, `videos[].poster/webm/mp4`) subidos a la libreria de medios; la app debe preferir el media si existe.
 
+## Organizacion del admin
+
+El Content Manager agrupa por area gracias al `displayName` (orden alfabetico): `Site — ...` (Settings, Theme, Booking rules, Forms, Navigation), `Catalog — ...` (Destination, Tour), `Copy — Translation`, `Media — Slot`, `Pages — Page`, `Blog — Post`, `Shop — Product`, `Inbox — ...` (Reservation, Contact message). `singularName`/`pluralName`/uid no cambian (las rutas de la API son las mismas). En el bootstrap (una sola vez, marcado en el store `plugin_desertica_content-manager-config`; subir `CM_CONFIG_VERSION` en `src/index.ts` para reaplicar) se configuran columnas, orden y tamano de pagina de las listas y las ayudas por campo. Limite de Strapi: el orden por defecto admite un solo campo (traducciones y media-slots se ordenan por `page`; dentro de cada pagina, por orden de alta, que sigue el orden alfabetico de `key`).
+
 ## Seed
 
-Al arrancar (idempotente) el bootstrap: crea el locale `es`, concede permisos publicos y, si no hay destinos y `SEED_ON_EMPTY` no es `false`, carga `seed/catalog.json` (3 destinos, 15 tours, 267 traducciones, 22 media-slots, 7 paginas, ambos idiomas, publicados) y los datos de `site-setting`. Un fallo del seed se registra y no impide el arranque. Los datos de contacto de `site-setting` son marcadores (`XXXX`): editarlos desde el admin.
+Al arrancar (idempotente) el bootstrap: crea el locale `es`, concede permisos publicos y, si no hay destinos y `SEED_ON_EMPTY` no es `false`, carga `seed/catalog.json` (3 destinos, 15 tours, 184 traducciones, 22 media-slots, 7 paginas, ambos idiomas, publicados) y los single types (`site-setting`, `theme-setting`, `form-setting`, `booking-setting`, `navigation`; cada uno una sola vez). Las 83 claves de `src/locales` que son contenido de tours y destinos (`nav.<tour>`, `nav.<tour>Desc`, `footer.<destino>*`, `pages.<destino>Lead`, `tour.meetingIca`, `tours.*`) no se siembran como traducciones: viven en `tour`/`destination`. Un fallo del seed se registra y no impide el arranque. Los datos de contacto de `site-setting` son marcadores (`XXXX`): editarlos desde el admin.
 
 `seed/catalog.json` es la fuente del seed y se versiona aqui. Se genero desde el catalogo estatico de la app Angular y sus `src/locales/{en,es}.json` con `scripts/build-cms-seed.mjs`, que vive en el repo del frontend (`desertica-web`):
 
@@ -65,16 +73,20 @@ Para resembrar, borrar `.tmp/data.db` (solo desarrollo) y reiniciar.
 
 ## Permisos publicos
 
-El rol Public solo recibe: `destination` find/findOne, `tour` find/findOne, `site-setting` find, `reservation` create `contact-message` create y find/findOne de `translation`, `media-slot`, `page`, `blog-post` y `product`. Las altas (`create`) tienen limite por IP (`global::rate-limit`): 10 reservas y 5 mensajes cada 10 minutos (en memoria, por instancia).
+El rol Public solo recibe: `destination` find/findOne, `tour` find/findOne, `site-setting`, `theme-setting`, `booking-setting`, `form-setting` y `navigation` find, `reservation` create `contact-message` create y find/findOne de `translation`, `media-slot`, `page`, `blog-post` y `product`. Las altas (`create`) tienen limite por IP (`global::rate-limit`): 10 reservas y 5 mensajes cada 10 minutos (en memoria, por instancia).
 
 ## Consumo desde Angular
 
 La app usa `STRAPI_URL` y estos endpoints:
 
 - `GET /api/destinations?locale=es`
-- `GET /api/tours?locale=es&populate[destination][fields][0]=slug&populate[image]=true&populate[gallery]=true&populate[itineraryFile]=true&populate[practices]=true&populate[paragraphs]=true&populate[expandedParagraphs]=true&populate[termsSummary]=true&populate[itinerary][populate]=image&populate[videos][populate]=poster,webm,mp4&populate[included]=true&populate[excluded]=true&populate[pack]=true&populate[notes]=true`
-- `GET /api/site-setting`
-- `GET /api/translations?locale=es&pagination[pageSize]=200&pagination[page]=1&fields[0]=key&fields[1]=value` (2 paginas, 267 claves)
+- `GET /api/tours?locale=es&populate[destination][fields][0]=slug&populate[image]=true&populate[gallery]=true&populate[itineraryFile]=true&populate[practices]=true&populate[paragraphs]=true&populate[expandedParagraphs]=true&populate[termsSummary]=true&populate[itinerary][populate]=image&populate[videos][populate]=poster,webm,mp4&populate[included]=true&populate[excluded]=true&populate[pack]=true&populate[notes]=true&populate[assurances]=true`
+- `GET /api/site-setting?populate[shareImage]=true`
+- `GET /api/theme-setting?populate[light]=true&populate[dark]=true`
+- `GET /api/booking-setting?locale=es&populate[assurances]=true`
+- `GET /api/form-setting`
+- `GET /api/navigation?locale=es&populate[headerLinks]=true&populate[footerBrandLinks]=true&populate[footerLegalLinks]=true`
+- `GET /api/translations?locale=es&pagination[pageSize]=200&pagination[page]=1&fields[0]=key&fields[1]=value` (184 claves)
 - `GET /api/media-slots?locale=es&populate=image,video,poster`, `GET /api/pages?locale=es`, `/api/blog-posts`, `/api/products`
 - `POST /api/reservations` con `{ "data": { ... } }`
 - `POST /api/contact-messages` con `{ "data": { ... } }`

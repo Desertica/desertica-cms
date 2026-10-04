@@ -4,7 +4,8 @@
   "info": {
     "singularName": "destination",
     "pluralName": "destinations",
-    "displayName": "Destination"
+    "displayName": "Catalog — Destination",
+    "description": "Destination hubs (Nazca, Huacachina, Paracas) with their title, lead and footer placement."
   },
   "options": {
     "draftAndPublish": true
@@ -83,6 +84,24 @@
       "relation": "oneToMany",
       "target": "api::tour.tour",
       "mappedBy": "destination"
+    },
+    "footerOrder": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "integer",
+      "default": 0
+    },
+    "showInFooter": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "boolean",
+      "default": true
     }
   }
 }

@@ -1,0 +1,77 @@
+{
+  "collectionName": "components_theme_palettes",
+  "info": {
+    "displayName": "Palette",
+    "icon": "brush",
+    "description": "Color tokens for one theme (light or dark). Any CSS color: oklch(), hex, hsl()."
+  },
+  "options": {},
+  "attributes": {
+    "background": {
+      "type": "string"
+    },
+    "foreground": {
+      "type": "string"
+    },
+    "card": {
+      "type": "string"
+    },
+    "cardForeground": {
+      "type": "string"
+    },
+    "popover": {
+      "type": "string"
+    },
+    "popoverForeground": {
+      "type": "string"
+    },
+    "primary": {
+      "type": "string"
+    },
+    "primaryForeground": {
+      "type": "string"
+    },
+    "secondary": {
+      "type": "string"
+    },
+    "secondaryForeground": {
+      "type": "string"
+    },
+    "muted": {
+      "type": "string"
+    },
+    "mutedForeground": {
+      "type": "string"
+    },
+    "accent": {
+      "type": "string"
+    },
+    "accentForeground": {
+      "type": "string"
+    },
+    "destructive": {
+      "type": "string"
+    },
+    "border": {
+      "type": "string"
+    },
+    "input": {
+      "type": "string"
+    },
+    "ring": {
+      "type": "string"
+    },
+    "tierra": {
+      "type": "string"
+    },
+    "tierraForeground": {
+      "type": "string"
+    },
+    "arena": {
+      "type": "string"
+    },
+    "arenaForeground": {
+      "type": "string"
+    }
+  }
+}

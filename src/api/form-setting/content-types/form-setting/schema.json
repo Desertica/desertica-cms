@@ -1,0 +1,35 @@
+{
+  "kind": "singleType",
+  "collectionName": "form_settings",
+  "info": {
+    "singularName": "form-setting",
+    "pluralName": "form-settings",
+    "displayName": "Site — Forms",
+    "description": "Validation limits of the contact form."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "nameMin": {
+      "type": "integer",
+      "min": 0,
+      "default": 2
+    },
+    "nameMax": {
+      "type": "integer",
+      "min": 1,
+      "default": 80
+    },
+    "emailMax": {
+      "type": "integer",
+      "min": 1,
+      "default": 254
+    },
+    "messageMax": {
+      "type": "integer",
+      "min": 1,
+      "default": 500
+    }
+  }
+}

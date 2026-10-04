@@ -1,0 +1,30 @@
+{
+  "collectionName": "components_shared_nav_links",
+  "info": {
+    "displayName": "Nav link",
+    "icon": "link",
+    "description": "A navigation link. Kind \"tours-menu\" marks the header item whose dropdown is built from destinations and tours."
+  },
+  "options": {},
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "path": {
+      "type": "string",
+      "required": true
+    },
+    "fragment": {
+      "type": "string"
+    },
+    "kind": {
+      "type": "enumeration",
+      "enum": [
+        "link",
+        "tours-menu"
+      ],
+      "default": "link"
+    }
+  }
+}

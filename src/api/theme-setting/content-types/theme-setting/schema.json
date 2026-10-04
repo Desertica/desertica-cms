@@ -1,0 +1,65 @@
+{
+  "kind": "singleType",
+  "collectionName": "theme_settings",
+  "info": {
+    "singularName": "theme-setting",
+    "pluralName": "theme-settings",
+    "displayName": "Site — Theme",
+    "description": "Colors (light and dark), radius, fonts, header heights and intro animation."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "light": {
+      "type": "component",
+      "repeatable": false,
+      "component": "theme.palette",
+      "required": true
+    },
+    "dark": {
+      "type": "component",
+      "repeatable": false,
+      "component": "theme.palette",
+      "required": true
+    },
+    "radius": {
+      "type": "string",
+      "default": "0.625rem"
+    },
+    "fontSans": {
+      "type": "string"
+    },
+    "fontHeading": {
+      "type": "string"
+    },
+    "headerHeightSm": {
+      "type": "string",
+      "default": "3.5rem"
+    },
+    "headerHeightMd": {
+      "type": "string",
+      "default": "4rem"
+    },
+    "headerHeightLg": {
+      "type": "string",
+      "default": "5rem"
+    },
+    "introEnabled": {
+      "type": "boolean",
+      "default": true
+    },
+    "introAccent": {
+      "type": "string",
+      "default": "#5a6b3e"
+    },
+    "introRestScale": {
+      "type": "decimal",
+      "default": 0.85
+    },
+    "introFailsafeMs": {
+      "type": "integer",
+      "default": 12000
+    }
+  }
+}

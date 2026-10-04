@@ -4,7 +4,8 @@
   "info": {
     "singularName": "translation",
     "pluralName": "translations",
-    "displayName": "Translation"
+    "displayName": "Copy — Translation",
+    "description": "Interface texts (buttons, labels, headlines, errors) per page and section. Tour and destination copy lives in Tour/Destination."
   },
   "options": {
     "draftAndPublish": false
@@ -41,6 +42,66 @@
       },
       "type": "text",
       "required": true
+    },
+    "page": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "enumeration",
+      "enum": [
+        "global",
+        "navigation",
+        "footer",
+        "home",
+        "about",
+        "contact",
+        "tours",
+        "tour-detail",
+        "booking",
+        "blog",
+        "products",
+        "legal",
+        "accessibility"
+      ]
+    },
+    "section": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "string"
+    },
+    "label": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "string"
+    },
+    "note": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "text"
+    },
+    "kind": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "enumeration",
+      "enum": [
+        "short",
+        "long"
+      ],
+      "default": "short"
     }
   }
 }

@@ -4,7 +4,8 @@
   "info": {
     "singularName": "blog-post",
     "pluralName": "blog-posts",
-    "displayName": "Blog post"
+    "displayName": "Blog — Post",
+    "description": "Blog articles with cover, excerpt and Markdown content."
   },
   "options": {
     "draftAndPublish": true

@@ -1,0 +1,100 @@
+{
+  "kind": "singleType",
+  "collectionName": "booking_settings",
+  "info": {
+    "singularName": "booking-setting",
+    "pluralName": "booking-settings",
+    "displayName": "Site — Booking rules",
+    "description": "Deposit rate, party size limits, currency and the assurances shown next to the booking form."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "depositRate": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "decimal",
+      "min": 0,
+      "max": 1,
+      "default": 0.2
+    },
+    "adultsMin": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "integer",
+      "min": 0,
+      "default": 1
+    },
+    "adultsDefault": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "integer",
+      "min": 0,
+      "default": 1
+    },
+    "childrenMin": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "integer",
+      "min": 0,
+      "default": 0
+    },
+    "childrenDefault": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "integer",
+      "min": 0,
+      "default": 0
+    },
+    "peopleMax": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "integer",
+      "min": 1,
+      "default": 12
+    },
+    "currencyCode": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "string",
+      "default": "USD"
+    },
+    "assurances": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.feature"
+    }
+  }
+}

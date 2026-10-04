@@ -4,7 +4,8 @@
   "info": {
     "singularName": "site-setting",
     "pluralName": "site-settings",
-    "displayName": "Site setting"
+    "displayName": "Site — Settings",
+    "description": "Contact details, social links, legal entity, brand name and default share image."
   },
   "options": {
     "draftAndPublish": false
@@ -44,6 +45,24 @@
       "type": "string"
     },
     "ruc": {
+      "type": "string"
+    },
+    "brandName": {
+      "type": "string",
+      "default": "Desértica"
+    },
+    "legalYear": {
+      "type": "integer",
+      "default": 2026
+    },
+    "shareImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "shareImageUrl": {
       "type": "string"
     }
   }

@@ -4,7 +4,8 @@
   "info": {
     "singularName": "product",
     "pluralName": "products",
-    "displayName": "Product"
+    "displayName": "Shop — Product",
+    "description": "Products (pisco, tejas, ceramics) with price, gallery and details."
   },
   "options": {
     "draftAndPublish": true
