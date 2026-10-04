@@ -84,6 +84,6 @@ En el servidor Angular (no en el navegador):
 
 En el CMS: `CLIENT_URLS` (CORS) debe incluir el origen del frontend, y `PUBLIC_URL` la URL publica del CMS.
 
-## Despliegue y reconstruccion
+## Publicacion de cambios
 
-Las paginas SSG del frontend fijan el contenido al construir: configurar un webhook de Strapi (Settings > Webhooks, eventos `entry.publish`/`entry.unpublish`) que dispare el despliegue del frontend. `/blog`, `/products` y los tours nuevos se leen por peticion.
+El frontend renderiza todas sus rutas por peticion y lee el CMS con una cache de servidor corta (`STRAPI_CACHE_TTL_MS`, 30 s por defecto): lo publicado se ve en menos de ese tiempo, sin webhook ni reconstruccion. Si el CMS no responde, el frontend sirve la ultima respuesta buena y, si no hay, sus valores por defecto.

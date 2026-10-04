@@ -45,7 +45,7 @@ Sin Docker: `npm ci && npm run build && NODE_ENV=production npm run start` con l
 2. Editar **Site - Settings**: email, telefono, WhatsApp (solo digitos), redes y datos legales (el seed trae marcadores `XXXX`). Revisar Theme, Booking rules, Forms y Navigation.
 3. Subir los medios en **Media Library** y asignarlos (tours: `image`, `gallery`, `itineraryFile`, `itinerary[].image`, `videos`; destinos, `media-slot`, paginas, blog, productos, `shareImage`). Publicar cada idioma (`en` y `es`). Un medio subido tiene prioridad sobre su campo `*Url`.
 4. Poner `SEED_ON_EMPTY=false` y reiniciar (evita resembrar si algun dia la base queda vacia).
-5. Settings > Webhooks: crear un webhook (eventos `entry.publish`, `entry.unpublish`, y `media.*` si se desea) hacia el despliegue del frontend, porque las paginas SSG fijan el contenido al construir.
+5. No hace falta webhook ni reconstruir el frontend: todas sus rutas se renderizan por peticion y leen el CMS con una cache corta (30 s por defecto, `STRAPI_CACHE_TTL_MS` en el frontend).
 6. Verificar: `GET https://cms.ejemplo.com/_health` (204) y `GET /api/tours?locale=es` sin credenciales.
 7. Opcional: `CMS_URL=https://cms.ejemplo.com CMS_ADMIN_EMAIL=... CMS_ADMIN_PASSWORD=... node scripts/verify-uploads.mjs` comprueba subidas, populate del frontend, URLs y Range de video (limpia lo que crea; no usar con credenciales compartidas).
 
