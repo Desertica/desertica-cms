@@ -1,0 +1,51 @@
+# Local / production-like stack: Strapi + Postgres 16.
+#   cp .env.example .env   (set the secrets and DATABASE_PASSWORD)
+#   docker compose up -d --build
+# Admin: http://localhost:${CMS_HOST_PORT:-1337}/admin
+name: ${COMPOSE_PROJECT_NAME:-desertica-cms}
+
+services:
+  cms:
+    build: .
+    image: ${CMS_IMAGE:-ghcr.io/desertica/desertica-cms:latest}
+    init: true
+    restart: unless-stopped
+    env_file:
+      - ${CMS_ENV_FILE:-.env}
+    environment:
+      # The container always listens on 1337; change the published port with CMS_HOST_PORT.
+      HOST: 0.0.0.0
+      PORT: 1337
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: ${DATABASE_NAME:-desertica}
+      DATABASE_USERNAME: ${DATABASE_USERNAME:-desertica}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:?set DATABASE_PASSWORD in .env}
+      DATABASE_SSL: "false"
+    ports:
+      - "${CMS_HOST_PORT:-1337}:1337"
+    volumes:
+      - uploads:/opt/app/public/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME:-desertica}
+      POSTGRES_USER: ${DATABASE_USERNAME:-desertica}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:?set DATABASE_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata:
+  uploads:

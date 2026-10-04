@@ -19,6 +19,12 @@ La primera vez, `/admin` pide crear el usuario administrador. Para produccion: `
 
 `.env` y `.tmp/` estan ignorados por git. Base de datos: sqlite (`.tmp/data.db`) por defecto; para Postgres usar `DATABASE_CLIENT=postgres` y las variables `DATABASE_*`.
 
+Despliegue (Docker, Postgres, S3, respaldos, seguridad): [`docs/DEPLOY.md`](docs/DEPLOY.md). Imagen: `ghcr.io/desertica/desertica-cms`.
+
+```bash
+docker compose up -d --build   # cms + postgres 16, volumenes pgdata y uploads
+```
+
 ## Variables de entorno
 
 | Variable | Uso |
@@ -30,6 +36,25 @@ La primera vez, `/admin` pide crear el usuario administrador. Para produccion: `
 | `CLIENT_URLS` | Origenes CORS (lista con comas) |
 | `SEED_ON_EMPTY` | `false` desactiva el seed inicial |
 | `STRAPI_PLUGIN_I18N_INIT_LOCALE_CODE` | Locale por defecto (`en`) |
+| `PROXY` | `true` detras de un proxy inverso con TLS |
+| `UPLOAD_PROVIDER` (`local`/`aws-s3`), `UPLOAD_MAX_FILE_SIZE_MB` (200), `S3_*`, `MEDIA_HOSTS` | Medios: proveedor, limite por archivo, bucket/credenciales/endpoint/URL publica, hosts extra de la CSP |
+| `FORMS_PROXY_SECRET` | Secreto compartido con el servidor Angular (limite de peticiones por IP real) |
+| `CMS_HOST_PORT` | Solo Docker Compose: puerto publicado |
+
+## Medios y verificacion de subidas
+
+Con el proveedor local los medios quedan en `public/uploads` y la API devuelve `url` **relativa** (`/uploads/<nombre>_<hash>.<ext>`); el frontend la resuelve con `STRAPI_PUBLIC_URL`. `PUBLIC_URL` no la vuelve absoluta; con `UPLOAD_PROVIDER=aws-s3` la URL es absoluta (`S3_PUBLIC_URL`). Los videos se sirven con `Accept-Ranges: bytes` (206 para `Range`), necesario para reproducir y buscar. El limite por archivo es `UPLOAD_MAX_FILE_SIZE_MB` (200 por defecto). Las imagenes se optimizan y generan miniaturas (`formats`: thumbnail/small/medium/large).
+
+`scripts/verify-uploads.mjs` (Node >= 20, sin dependencias) prueba todo esto contra una instancia en marcha: sube imagen, PNG, PDF, WebM y MP4 por `POST /api/upload`, los adjunta a tour `dune-buggy`, destino `huacachina`, media-slots `about.video`/`about.trio`, pagina `terms`, `site-setting`, y a un blog-post y un producto nuevos (en y es), lee la API publica con los mismos populate del frontend, descarga cada URL (estado, content-type, tamano, Range de video) y restaura/borra todo lo que toco.
+
+```bash
+CMS_URL=http://localhost:1337 CMS_ADMIN_EMAIL=tu@correo CMS_ADMIN_PASSWORD='...' \
+  node scripts/verify-uploads.mjs
+# opcionales: SAMPLES_DIR=<public de desertica-web> (medios reales), CMS_PUBLIC_URL=<prefijo esperado de las URLs>,
+#             VERIFY_BIG_MB=200 (prueba el limite de tamano), KEEP_DATA=true (no limpiar)
+```
+
+Usa una base de pruebas o local: crea y borra un token de API temporal, y el login del admin tiene limite de intentos (el script espera y reintenta una vez ante un 429). Las nuevas versiones de idioma de documentos nuevos se crean por el Content Manager porque la API REST rechaza el mismo `slug` en un segundo idioma ("This attribute must be unique").
 
 ## Modelo de contenido
 

@@ -251,7 +251,7 @@ async function seedSingles(strapi: Core.Strapi, source: string) {
 }
 
 const CM_UID = 'plugin::content-manager.content-types';
-const CM_CONFIG_VERSION = 1;
+const CM_CONFIG_VERSION = 2;
 
 type ListConfig = { fields: string[]; mainField?: string; sortBy?: string; sortOrder?: 'ASC' | 'DESC'; pageSize?: number };
 const LIST_CONFIGS: Record<string, ListConfig> = {
@@ -264,6 +264,12 @@ const LIST_CONFIGS: Record<string, ListConfig> = {
 };
 
 /** Editor-facing hints shown under fields in the edit view: uid -> field -> description. */
+/** Which field of the related entry relations display (otherwise Strapi picks the first string). */
+const RELATION_MAIN_FIELDS: Record<string, Record<string, string>> = {
+  'api::tour.tour': { destination: 'title' },
+  'api::destination.destination': { tours: 'title' },
+};
+
 const FIELD_HINTS: Record<string, Record<string, string>> = {
   'api::translation.translation': {
     key: 'Technical key used by the website. Do not change it.',
@@ -320,7 +326,11 @@ async function configureContentManager(strapi: Core.Strapi) {
   if (done?.version === CM_CONFIG_VERSION) return;
 
   const service = strapi.service(CM_UID as any) as any;
-  const uids = new Set([...Object.keys(LIST_CONFIGS), ...Object.keys(FIELD_HINTS)]);
+  const uids = new Set([
+    ...Object.keys(LIST_CONFIGS),
+    ...Object.keys(FIELD_HINTS),
+    ...Object.keys(RELATION_MAIN_FIELDS),
+  ]);
   for (const uid of uids) {
     try {
       const contentType = strapi.contentType(uid as any);
@@ -336,6 +346,16 @@ async function configureContentManager(strapi: Core.Strapi) {
         settings.defaultSortOrder = list.sortOrder ?? settings.defaultSortOrder;
         if (list.pageSize) settings.pageSize = list.pageSize;
         layouts.list = list.fields;
+      }
+      for (const [field, mainField] of Object.entries(RELATION_MAIN_FIELDS[uid] ?? {})) {
+        const meta = metadatas[field];
+        if (meta) {
+          metadatas[field] = {
+            ...meta,
+            edit: { ...meta.edit, mainField },
+            list: { ...meta.list, mainField },
+          };
+        }
       }
       for (const [field, description] of Object.entries(FIELD_HINTS[uid] ?? {})) {
         if (metadatas[field]) metadatas[field] = { ...metadatas[field], edit: { ...metadatas[field].edit, description } };
