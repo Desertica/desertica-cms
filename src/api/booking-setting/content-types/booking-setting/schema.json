@@ -5,7 +5,7 @@
     "singularName": "booking-setting",
     "pluralName": "booking-settings",
     "displayName": "Site — Booking rules",
-    "description": "Deposit rate, party size limits, currency and the assurances shown next to the booking form."
+    "description": "Calendar months shown, party size limits, currency and the assurances shown next to the booking form. The deposit is decided by the booking API."
   },
   "options": {
     "draftAndPublish": false
@@ -26,6 +26,17 @@
       "min": 0,
       "max": 1,
       "default": 0.2
+    },
+    "availabilityMonths": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "integer",
+      "min": 1,
+      "max": 12,
+      "default": 3
     },
     "adultsMin": {
       "pluginOptions": {
