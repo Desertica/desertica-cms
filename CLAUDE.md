@@ -30,3 +30,4 @@ Admin sidebar groups: `Site` (settings, theme, booking rules, forms, navigation)
 
 - The rate limiter keys on IP; behind the frontend's forms proxy it needs the same `FORMS_PROXY_SECRET` on both sides.
 - Content Manager list layouts are applied once at bootstrap (`CM_CONFIG_VERSION` in `src/index.ts`); bump it to reapply.
+- Theme colors are hex strings from the official color picker custom field (`plugin::color-picker.color`, regex `^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$`); fonts, radius and header size are enumerations. Edit-view layouts and hints for `theme-setting` and `theme.palette` live in `EDIT_LAYOUTS`/`COMPONENT_CONFIGS` in `src/index.ts`. The seed converts the frontend's oklch values to hex in `build-cms-seed.mjs`.

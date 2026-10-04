@@ -4,8 +4,8 @@
   "info": {
     "singularName": "theme-setting",
     "pluralName": "theme-settings",
-    "displayName": "Site — Theme",
-    "description": "Colors (light and dark), radius, fonts, header heights and intro animation."
+    "displayName": "Site \u2014 Theme",
+    "description": "Colors (light and dark), fonts, corner radius, header size and intro animation."
   },
   "options": {
     "draftAndPublish": false
@@ -23,35 +23,72 @@
       "component": "theme.palette",
       "required": true
     },
-    "radius": {
-      "type": "string",
-      "default": "0.625rem"
-    },
     "fontSans": {
-      "type": "string"
+      "type": "enumeration",
+      "enum": [
+        "radio-canada",
+        "inter",
+        "poppins",
+        "montserrat",
+        "dm-sans",
+        "playfair-display",
+        "lora",
+        "merriweather",
+        "system"
+      ],
+      "default": "radio-canada",
+      "required": true
     },
     "fontHeading": {
-      "type": "string"
+      "type": "enumeration",
+      "enum": [
+        "radio-canada",
+        "inter",
+        "poppins",
+        "montserrat",
+        "dm-sans",
+        "playfair-display",
+        "lora",
+        "merriweather",
+        "system"
+      ],
+      "default": "radio-canada",
+      "required": true
     },
-    "headerHeightSm": {
-      "type": "string",
-      "default": "3.5rem"
+    "radius": {
+      "type": "enumeration",
+      "enum": [
+        "none",
+        "small",
+        "medium",
+        "large",
+        "full"
+      ],
+      "default": "medium",
+      "required": true
     },
-    "headerHeightMd": {
-      "type": "string",
-      "default": "4rem"
-    },
-    "headerHeightLg": {
-      "type": "string",
-      "default": "5rem"
+    "headerSize": {
+      "type": "enumeration",
+      "enum": [
+        "compact",
+        "standard",
+        "tall"
+      ],
+      "default": "standard",
+      "required": true
     },
     "introEnabled": {
       "type": "boolean",
       "default": true
     },
     "introAccent": {
-      "type": "string",
-      "default": "#5a6b3e"
+      "type": "customField",
+      "customField": "plugin::color-picker.color",
+      "options": {
+        "format": "hex"
+      },
+      "default": "#5a6b3e",
+      "regex": "^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$"
     },
     "introRestScale": {
       "type": "decimal",

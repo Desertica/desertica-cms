@@ -13,12 +13,15 @@ import type { Core } from '@strapi/strapi';
 const config = ({ env }: Core.Config.Shared.ConfigParams) => {
   const sizeLimit = env.int('UPLOAD_MAX_FILE_SIZE_MB', 200) * 1024 * 1024;
   const provider = env('UPLOAD_PROVIDER', 'local');
+  // Color picker custom field (theme colors): plugin::color-picker.color, stores hex strings.
+  const colorPicker = { 'color-picker': { enabled: true } };
 
   if (provider === 'aws-s3') {
     const accessKeyId = env('S3_ACCESS_KEY_ID');
     const secretAccessKey = env('S3_SECRET_ACCESS_KEY');
     const acl = env('S3_ACL', '');
     return {
+      ...colorPicker,
       upload: {
         config: {
           provider: 'aws-s3',
@@ -51,7 +54,7 @@ const config = ({ env }: Core.Config.Shared.ConfigParams) => {
     };
   }
 
-  return { upload: { config: { sizeLimit } } };
+  return { ...colorPicker, upload: { config: { sizeLimit } } };
 };
 
 export default config;

@@ -3,75 +3,185 @@
   "info": {
     "displayName": "Palette",
     "icon": "brush",
-    "description": "Color tokens for one theme (light or dark). Any CSS color: oklch(), hex, hsl()."
+    "description": "Color tokens for one theme (light or dark). Pick each color with the color picker (hex)."
   },
   "options": {},
   "attributes": {
     "background": {
-      "type": "string"
+      "type": "customField",
+      "customField": "plugin::color-picker.color",
+      "options": {
+        "format": "hex"
+      },
+      "regex": "^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$"
     },
     "foreground": {
-      "type": "string"
+      "type": "customField",
+      "customField": "plugin::color-picker.color",
+      "options": {
+        "format": "hex"
+      },
+      "regex": "^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$"
     },
     "card": {
-      "type": "string"
+      "type": "customField",
+      "customField": "plugin::color-picker.color",
+      "options": {
+        "format": "hex"
+      },
+      "regex": "^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$"
     },
     "cardForeground": {
-      "type": "string"
+      "type": "customField",
+      "customField": "plugin::color-picker.color",
+      "options": {
+        "format": "hex"
+      },
+      "regex": "^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$"
     },
     "popover": {
-      "type": "string"
+      "type": "customField",
+      "customField": "plugin::color-picker.color",
+      "options": {
+        "format": "hex"
+      },
+      "regex": "^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$"
     },
     "popoverForeground": {
-      "type": "string"
+      "type": "customField",
+      "customField": "plugin::color-picker.color",
+      "options": {
+        "format": "hex"
+      },
+      "regex": "^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$"
     },
     "primary": {
-      "type": "string"
+      "type": "customField",
+      "customField": "plugin::color-picker.color",
+      "options": {
+        "format": "hex"
+      },
+      "regex": "^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$"
     },
     "primaryForeground": {
-      "type": "string"
+      "type": "customField",
+      "customField": "plugin::color-picker.color",
+      "options": {
+        "format": "hex"
+      },
+      "regex": "^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$"
     },
     "secondary": {
-      "type": "string"
+      "type": "customField",
+      "customField": "plugin::color-picker.color",
+      "options": {
+        "format": "hex"
+      },
+      "regex": "^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$"
     },
     "secondaryForeground": {
-      "type": "string"
+      "type": "customField",
+      "customField": "plugin::color-picker.color",
+      "options": {
+        "format": "hex"
+      },
+      "regex": "^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$"
     },
     "muted": {
-      "type": "string"
+      "type": "customField",
+      "customField": "plugin::color-picker.color",
+      "options": {
+        "format": "hex"
+      },
+      "regex": "^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$"
     },
     "mutedForeground": {
-      "type": "string"
+      "type": "customField",
+      "customField": "plugin::color-picker.color",
+      "options": {
+        "format": "hex"
+      },
+      "regex": "^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$"
     },
     "accent": {
-      "type": "string"
+      "type": "customField",
+      "customField": "plugin::color-picker.color",
+      "options": {
+        "format": "hex"
+      },
+      "regex": "^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$"
     },
     "accentForeground": {
-      "type": "string"
+      "type": "customField",
+      "customField": "plugin::color-picker.color",
+      "options": {
+        "format": "hex"
+      },
+      "regex": "^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$"
     },
     "destructive": {
-      "type": "string"
+      "type": "customField",
+      "customField": "plugin::color-picker.color",
+      "options": {
+        "format": "hex"
+      },
+      "regex": "^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$"
     },
     "border": {
-      "type": "string"
+      "type": "customField",
+      "customField": "plugin::color-picker.color",
+      "options": {
+        "format": "hex"
+      },
+      "regex": "^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$"
     },
     "input": {
-      "type": "string"
+      "type": "customField",
+      "customField": "plugin::color-picker.color",
+      "options": {
+        "format": "hex"
+      },
+      "regex": "^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$"
     },
     "ring": {
-      "type": "string"
+      "type": "customField",
+      "customField": "plugin::color-picker.color",
+      "options": {
+        "format": "hex"
+      },
+      "regex": "^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$"
     },
     "tierra": {
-      "type": "string"
+      "type": "customField",
+      "customField": "plugin::color-picker.color",
+      "options": {
+        "format": "hex"
+      },
+      "regex": "^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$"
     },
     "tierraForeground": {
-      "type": "string"
+      "type": "customField",
+      "customField": "plugin::color-picker.color",
+      "options": {
+        "format": "hex"
+      },
+      "regex": "^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$"
     },
     "arena": {
-      "type": "string"
+      "type": "customField",
+      "customField": "plugin::color-picker.color",
+      "options": {
+        "format": "hex"
+      },
+      "regex": "^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$"
     },
     "arenaForeground": {
-      "type": "string"
+      "type": "customField",
+      "customField": "plugin::color-picker.color",
+      "options": {
+        "format": "hex"
+      },
+      "regex": "^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$"
     }
   }
 }

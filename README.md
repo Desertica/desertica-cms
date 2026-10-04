@@ -65,7 +65,7 @@ Usa una base de pruebas o local: crea y borra un token de API temporal, y el log
 | `reservation` | no | no | `tourSlug`, `tourTitle`, `date`, `language`, `format`, `adults`, `children`, `payment`, `amount`, `locale`, `name`, `email`, `phone`, `status`, `notes` |
 | `contact-message` | no | no | `name`, `email`, `whatsapp`, `country`, `message`, `locale`, `handled` |
 | `site-setting` (single) | no | no | `email`, `phone`, `whatsapp`, redes (`instagram`, `facebook`, `tiktok`, `youtube`, `linkedin`, `google`, `tripadvisor`), `legalName`, `ruc`, `brandName`, `legalYear`, `shareImage`/`shareImageUrl` |
-| `theme-setting` (single) | no | no | `light`, `dark` (componente `theme.palette`, 22 colores), `radius`, `fontSans`, `fontHeading`, `headerHeightSm/Md/Lg`, `introEnabled`, `introAccent`, `introRestScale`, `introFailsafeMs` |
+| `theme-setting` (single) | no | no | `light`, `dark` (componente `theme.palette`, 22 colores en hex con selector de color, plugin oficial `@strapi/plugin-color-picker` 5.56.0, habilitado en `config/plugins.ts`), `fontSans`, `fontHeading` (selector de 9 fuentes), `radius` (none/small/medium/large/full), `headerSize` (compact/standard/tall), `introEnabled`, `introAccent`, `introRestScale`, `introFailsafeMs` |
 | `booking-setting` (single) | si | no | no localizados: `depositRate` (0..1), `adultsMin`, `adultsDefault`, `childrenMin`, `childrenDefault`, `peopleMax`, `currencyCode`; localizado: `assurances` (`shared.feature`) |
 | `form-setting` (single) | no | no | `nameMin`, `nameMax`, `emailMax`, `messageMax` |
 | `navigation` (single) | si | no | localizados: `headerLinks`, `footerBrandLinks`, `footerLegalLinks` (`shared.nav-link`: `label`, `path`, `fragment`, `kind` = `link`/`tours-menu`), `planTripLabel`, `planTripPath` |
