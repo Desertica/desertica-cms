@@ -128,26 +128,6 @@
         "images"
       ]
     },
-    "portraitUrls": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      },
-      "type": "json"
-    },
-    "portraits": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      },
-      "type": "media",
-      "multiple": true,
-      "allowedTypes": [
-        "images"
-      ]
-    },
     "destination": {
       "type": "relation",
       "relation": "manyToOne",
@@ -179,14 +159,6 @@
       },
       "type": "text"
     },
-    "lead2": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "type": "text"
-    },
     "meeting": {
       "pluginOptions": {
         "i18n": {
@@ -194,16 +166,6 @@
         }
       },
       "type": "text"
-    },
-    "highlights": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "type": "component",
-      "repeatable": true,
-      "component": "shared.feature"
     },
     "practices": {
       "pluginOptions": {
@@ -264,6 +226,67 @@
       "type": "component",
       "repeatable": true,
       "component": "shared.list-item"
+    },
+    "paragraphs": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.list-item"
+    },
+    "expandedParagraphs": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.list-item"
+    },
+    "termsSummary": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "type": "text"
+    },
+    "videos": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.video"
+    },
+    "itineraryFile": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "itineraryFileUrl": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "string"
     }
   }
 }

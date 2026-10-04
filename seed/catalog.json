@@ -71,42 +71,29 @@
         "https://images.unsplash.com/photo-1509316785289-025f5b846b35?auto=format&fit=crop&w=900&h=1200&q=80",
         "https://images.unsplash.com/photo-1473580044384-7ba9967e16a0?auto=format&fit=crop&w=900&h=1200&q=80"
       ],
-      "portraitUrls": [
-        "https://images.unsplash.com/photo-1621795307430-3ff25aa08945?auto=format&fit=crop&w=900&h=1600&q=80",
-        "https://images.unsplash.com/photo-1643856120284-f47c4e9521e0?auto=format&fit=crop&w=900&h=1600&q=80"
-      ],
+      "itineraryFileUrl": "/tours/dune-buggy-itinerary.pdf",
       "i18n": {
         "en": {
           "title": "Dune buggy",
           "description": "Ride the Huacachina sand dunes.",
           "lead": "Ride the Huacachina dunes in a tubular, with stops to board and stay for the low light.",
-          "lead2": "We meet in Ica. The pace is the group's. Confirmation before the engine starts.",
           "meeting": "Meet in Ica",
-          "highlights": [
+          "paragraphs": [
+            "We meet in Ica. The pace is the group's. Confirmation before the engine starts.",
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vitae nisl at erat tristique tincidunt, sed interdum nisl a tincidunt posuere.",
+            "Suspendisse potenti. Curabitur at lectus nec nisi tincidunt gravida. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas."
+          ],
+          "expandedParagraphs": [
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam tincidunt, sapien at fermentum pretium, lorem nisl iaculis erat, vitae vehicula nisl lorem sit amet nisl.",
+            "Praesent sagittis, lorem a tincidunt tincidunt, nisl nisl aliquam nisl, a tincidunt nisl nisl sit amet nisl. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae."
+          ],
+          "termsSummary": "Booking is confirmed on WhatsApp. Cancellations and changes follow the published terms.",
+          "videos": [
             {
-              "icon": "lucideCar",
-              "title": "Dune buggy",
-              "body": "A run across the open sand, with photo stops on the ridges."
+              "posterUrl": "https://images.unsplash.com/photo-1621795307430-3ff25aa08945?auto=format&fit=crop&w=900&h=1600&q=80"
             },
             {
-              "icon": "lucideWind",
-              "title": "Sandboard",
-              "body": "A board to ride belly-down. Beginner-friendly, not standing."
-            },
-            {
-              "icon": "lucideShield",
-              "title": "Helmet",
-              "body": "Helmets on for the buggy. Say so if you need a different size."
-            },
-            {
-              "icon": "lucideSun",
-              "title": "Low light",
-              "body": "We stay out until the light drops. Clouds happen; the hour still holds."
-            },
-            {
-              "icon": "lucideMapPin",
-              "title": "Meet in Ica",
-              "body": "The day starts in Ica, not a pickup from Lima."
+              "posterUrl": "https://images.unsplash.com/photo-1643856120284-f47c4e9521e0?auto=format&fit=crop&w=900&h=1600&q=80"
             }
           ],
           "practices": [
@@ -133,29 +120,34 @@
           ],
           "itinerary": [
             {
-              "time": "15:50",
+              "imageUrl": "https://images.unsplash.com/photo-1621795307430-3ff25aa08945?auto=format&fit=crop&w=900&h=1600&q=80",
               "title": "Meeting point",
-              "body": "Ica. Be ready ten minutes early."
+              "body": "Ica. The exact point comes with confirmation.",
+              "expandedBody": "We meet in Ica. The exact point and time come with confirmation, according to the day and the group's pace."
             },
             {
-              "time": "15:55",
+              "imageUrl": "https://images.unsplash.com/photo-1533106497176-45ae19e68ba2?auto=format&fit=crop&w=1800&h=1200&q=80",
               "title": "Dunes",
-              "body": "Buggy across the ridges, with stops for photos."
+              "body": "Buggy across the ridges, with stops for photos.",
+              "expandedBody": "The buggy runs the ridges with photo stops. The route follows the sand and the group, not a closed loop."
             },
             {
-              "time": "16:30",
+              "imageUrl": "https://images.unsplash.com/photo-1509316785289-025f5b846b35?auto=format&fit=crop&w=900&h=1200&q=80",
               "title": "Board",
-              "body": "Belly-down on an artisan board."
+              "body": "Belly-down on an artisan board.",
+              "expandedBody": "Belly-down on an artisan board. Not standing. The guide picks the dune and the pace."
             },
             {
-              "time": "17:40",
+              "imageUrl": "https://images.unsplash.com/photo-1473580044384-7ba9967e16a0?auto=format&fit=crop&w=900&h=1200&q=80",
               "title": "Low light",
-              "body": "Time on the sand as the sun drops."
+              "body": "Time on the sand as the sun drops.",
+              "expandedBody": "We stay on the sand as the sun drops. Clouds happen; the hour still holds."
             },
             {
-              "time": "18:15",
+              "imageUrl": "https://images.unsplash.com/photo-1643856120284-f47c4e9521e0?auto=format&fit=crop&w=900&h=1600&q=80",
               "title": "Close",
-              "body": "Back toward the oasis as the light goes."
+              "body": "Back toward the oasis as the light goes.",
+              "expandedBody": "Back toward the oasis as the light goes. The close follows the day, not a fixed clock."
             }
           ],
           "included": [
@@ -183,33 +175,23 @@
           "title": "Tubulares",
           "description": "Recorre las dunas de Huacachina.",
           "lead": "Recorre las dunas de Huacachina en tubular, con paradas para bajar en tabla y quedarte a la luz baja.",
-          "lead2": "El encuentro es en Ica. El ritmo, el del grupo. Confirmación antes de encender el motor.",
           "meeting": "Encuentro en Ica",
-          "highlights": [
+          "paragraphs": [
+            "El encuentro es en Ica. El ritmo, el del grupo. Confirmación antes de encender el motor.",
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vitae nisl at erat tristique tincidunt, sed interdum nisl a tincidunt posuere.",
+            "Suspendisse potenti. Curabitur at lectus nec nisi tincidunt gravida. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas."
+          ],
+          "expandedParagraphs": [
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam tincidunt, sapien at fermentum pretium, lorem nisl iaculis erat, vitae vehicula nisl lorem sit amet nisl.",
+            "Praesent sagittis, lorem a tincidunt tincidunt, nisl nisl aliquam nisl, a tincidunt nisl nisl sit amet nisl. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae."
+          ],
+          "termsSummary": "La reserva se confirma por WhatsApp. Cancelaciones y cambios siguen los términos publicados.",
+          "videos": [
             {
-              "icon": "lucideCar",
-              "title": "Tubular",
-              "body": "Un tramo por la arena abierta, con paradas de foto en las crestas."
+              "posterUrl": "https://images.unsplash.com/photo-1621795307430-3ff25aa08945?auto=format&fit=crop&w=900&h=1600&q=80"
             },
             {
-              "icon": "lucideWind",
-              "title": "Sandboard",
-              "body": "Tabla para bajar boca abajo. Para empezar, no de pie."
-            },
-            {
-              "icon": "lucideShield",
-              "title": "Casco",
-              "body": "Casco en el tubular. Di si necesitas otra talla."
-            },
-            {
-              "icon": "lucideSun",
-              "title": "Luz baja",
-              "body": "Nos quedamos hasta que baja la luz. Si hay nubes, la hora se mantiene."
-            },
-            {
-              "icon": "lucideMapPin",
-              "title": "Encuentro en Ica",
-              "body": "El día sale de Ica, no de un recojo en Lima."
+              "posterUrl": "https://images.unsplash.com/photo-1643856120284-f47c4e9521e0?auto=format&fit=crop&w=900&h=1600&q=80"
             }
           ],
           "practices": [
@@ -236,29 +218,34 @@
           ],
           "itinerary": [
             {
-              "time": "15:50",
+              "imageUrl": "https://images.unsplash.com/photo-1621795307430-3ff25aa08945?auto=format&fit=crop&w=900&h=1600&q=80",
               "title": "Encuentro",
-              "body": "Ica. Diez minutos antes."
+              "body": "Ica. El punto exacto va en la confirmación.",
+              "expandedBody": "Nos vemos en Ica. El punto y la hora exactos van en la confirmación, según el día y el ritmo del grupo."
             },
             {
-              "time": "15:55",
+              "imageUrl": "https://images.unsplash.com/photo-1533106497176-45ae19e68ba2?auto=format&fit=crop&w=1800&h=1200&q=80",
               "title": "Dunas",
-              "body": "Tubular por las crestas, con paradas de foto."
+              "body": "Tubular por las crestas, con paradas de foto.",
+              "expandedBody": "El tubular recorre las crestas con paradas para foto. El tramo se ajusta a la arena y al grupo, no a un circuito cerrado."
             },
             {
-              "time": "16:30",
+              "imageUrl": "https://images.unsplash.com/photo-1509316785289-025f5b846b35?auto=format&fit=crop&w=900&h=1200&q=80",
               "title": "Tabla",
-              "body": "Boca abajo, en tabla artesanal."
+              "body": "Boca abajo, en tabla artesanal.",
+              "expandedBody": "Bajada boca abajo en tabla artesanal. No es de pie. El guía indica la duna y el ritmo."
             },
             {
-              "time": "17:40",
+              "imageUrl": "https://images.unsplash.com/photo-1473580044384-7ba9967e16a0?auto=format&fit=crop&w=900&h=1200&q=80",
               "title": "Luz baja",
-              "body": "Tiempo en la arena cuando baja el sol."
+              "body": "Tiempo en la arena cuando baja el sol.",
+              "expandedBody": "Nos quedamos en la arena cuando baja el sol. Si hay nubes, la hora se mantiene."
             },
             {
-              "time": "18:15",
+              "imageUrl": "https://images.unsplash.com/photo-1643856120284-f47c4e9521e0?auto=format&fit=crop&w=900&h=1600&q=80",
               "title": "Cierre",
-              "body": "Vuelta hacia el oasis cuando se va la luz."
+              "body": "Vuelta hacia el oasis cuando se va la luz.",
+              "expandedBody": "Vuelta hacia el oasis cuando se va la luz. El cierre depende del día, no de un reloj fijo."
             }
           ],
           "included": [
@@ -302,14 +289,16 @@
         "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?auto=format&fit=crop&w=1200&h=1200&q=80",
         "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?auto=format&fit=crop&w=1200&h=1200&q=80"
       ],
-      "portraitUrls": [],
       "i18n": {
         "en": {
           "title": "Oasis overnight",
           "description": "Camp, sunrise walk, and breakfast.",
           "lead": "Camp, sunrise walk, and breakfast.",
           "meeting": "Meet in Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -322,7 +311,10 @@
           "description": "Campamento, caminata al amanecer y desayuno.",
           "lead": "Campamento, caminata al amanecer y desayuno.",
           "meeting": "Encuentro en Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -350,14 +342,16 @@
         "https://images.unsplash.com/photo-1473580044384-7ba9967e16a0?auto=format&fit=crop&w=1200&h=1200&q=80",
         "https://images.unsplash.com/photo-1473580044384-7ba9967e16a0?auto=format&fit=crop&w=1200&h=1200&q=80"
       ],
-      "portraitUrls": [],
       "i18n": {
         "en": {
           "title": "Huacachina weekend",
           "description": "Dunes, oasis, and a slow morning.",
           "lead": "Dunes, oasis, and a slow morning.",
           "meeting": "Meet in Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -370,7 +364,10 @@
           "description": "Dunas, oasis y una mañana lenta.",
           "lead": "Dunas, oasis y una mañana lenta.",
           "meeting": "Encuentro en Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -398,14 +395,16 @@
         "https://images.unsplash.com/photo-1474044159687-1ee9f3a62995?auto=format&fit=crop&w=1200&h=1200&q=80",
         "https://images.unsplash.com/photo-1474044159687-1ee9f3a62995?auto=format&fit=crop&w=1200&h=1200&q=80"
       ],
-      "portraitUrls": [],
       "i18n": {
         "en": {
           "title": "Sandboarding",
           "description": "Ride a board down the Huacachina dunes.",
           "lead": "Ride a board down the Huacachina dunes.",
           "meeting": "Meet in Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -418,7 +417,10 @@
           "description": "Baja las dunas de Huacachina en tabla.",
           "lead": "Baja las dunas de Huacachina en tabla.",
           "meeting": "Encuentro en Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -446,14 +448,16 @@
         "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?auto=format&fit=crop&w=1200&h=1200&q=80",
         "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?auto=format&fit=crop&w=1200&h=1200&q=80"
       ],
-      "portraitUrls": [],
       "i18n": {
         "en": {
           "title": "Ica vineyards",
           "description": "Bodegas, pisco, and a sunset in the vines.",
           "lead": "Bodegas, pisco, and a sunset in the vines.",
           "meeting": "Meet in Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -466,7 +470,10 @@
           "description": "Bodegas, pisco y atardecer entre parras.",
           "lead": "Bodegas, pisco y atardecer entre parras.",
           "meeting": "Encuentro en Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -494,14 +501,16 @@
         "https://images.unsplash.com/photo-1418065460487-3e41a6c84dc5?auto=format&fit=crop&w=1200&h=1200&q=80",
         "https://images.unsplash.com/photo-1418065460487-3e41a6c84dc5?auto=format&fit=crop&w=1200&h=1200&q=80"
       ],
-      "portraitUrls": [],
       "i18n": {
         "en": {
           "title": "Oasis walk",
           "description": "A short walk around the lagoon and town.",
           "lead": "A short walk around the lagoon and town.",
           "meeting": "Meet in Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -514,7 +523,10 @@
           "description": "Paseo corto por la laguna y el pueblo.",
           "lead": "Paseo corto por la laguna y el pueblo.",
           "meeting": "Encuentro en Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -542,14 +554,16 @@
         "https://images.unsplash.com/photo-1547234935-80c7145ec969?auto=format&fit=crop&w=1200&h=1200&q=80",
         "https://images.unsplash.com/photo-1547234935-80c7145ec969?auto=format&fit=crop&w=1200&h=1200&q=80"
       ],
-      "portraitUrls": [],
       "i18n": {
         "en": {
           "title": "Paracas dune buggy",
           "description": "Sand and cliffs of the reserve.",
           "lead": "Sand and cliffs of the reserve.",
           "meeting": "Meet in Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -562,7 +576,10 @@
           "description": "Arena y acantilados de la reserva.",
           "lead": "Arena y acantilados de la reserva.",
           "meeting": "Encuentro en Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -590,14 +607,16 @@
         "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&h=1200&q=80",
         "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&h=1200&q=80"
       ],
-      "portraitUrls": [],
       "i18n": {
         "en": {
           "title": "Ballestas Islands",
           "description": "Sea lions and birds off Paracas.",
           "lead": "Sea lions and birds off Paracas.",
           "meeting": "Meet in Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -610,7 +629,10 @@
           "description": "Lobos marinos y aves frente a Paracas.",
           "lead": "Lobos marinos y aves frente a Paracas.",
           "meeting": "Encuentro en Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -638,14 +660,16 @@
         "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&h=1200&q=80",
         "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&h=1200&q=80"
       ],
-      "portraitUrls": [],
       "i18n": {
         "en": {
           "title": "Paracas National Reserve",
           "description": "Desert, coast, and reserve lookouts.",
           "lead": "Desert, coast, and reserve lookouts.",
           "meeting": "Meet in Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -658,7 +682,10 @@
           "description": "Desierto, costa y miradores de la reserva.",
           "lead": "Desierto, costa y miradores de la reserva.",
           "meeting": "Encuentro en Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -686,14 +713,16 @@
         "https://images.unsplash.com/photo-1437719417032-859601134d76?auto=format&fit=crop&w=1200&h=1200&q=80",
         "https://images.unsplash.com/photo-1437719417032-859601134d76?auto=format&fit=crop&w=1200&h=1200&q=80"
       ],
-      "portraitUrls": [],
       "i18n": {
         "en": {
           "title": "Paracas sunset",
           "description": "Cliffs and low light over the reserve.",
           "lead": "Cliffs and low light over the reserve.",
           "meeting": "Meet in Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -706,7 +735,10 @@
           "description": "Acantilados y luz baja sobre la reserva.",
           "lead": "Acantilados y luz baja sobre la reserva.",
           "meeting": "Encuentro en Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -734,14 +766,16 @@
         "https://images.unsplash.com/photo-1509316785289-025f5b846b35?auto=format&fit=crop&w=1200&h=1200&q=80",
         "https://images.unsplash.com/photo-1509316785289-025f5b846b35?auto=format&fit=crop&w=1200&h=1200&q=80"
       ],
-      "portraitUrls": [],
       "i18n": {
         "en": {
           "title": "Nazca lines",
           "description": "The lines from the ground lookout.",
           "lead": "The lines from the ground lookout.",
           "meeting": "Meet in Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -754,7 +788,10 @@
           "description": "Las líneas desde el mirador terrestre.",
           "lead": "Las líneas desde el mirador terrestre.",
           "meeting": "Encuentro en Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -782,14 +819,16 @@
         "https://images.unsplash.com/photo-1451337516015-6b6e9a44a8a3?auto=format&fit=crop&w=1200&h=1200&q=80",
         "https://images.unsplash.com/photo-1451337516015-6b6e9a44a8a3?auto=format&fit=crop&w=1200&h=1200&q=80"
       ],
-      "portraitUrls": [],
       "i18n": {
         "en": {
           "title": "Nazca overflight",
           "description": "A short flight over the desert.",
           "lead": "A short flight over the desert.",
           "meeting": "Meet in Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -802,7 +841,10 @@
           "description": "Sobrevuelo corto sobre el desierto.",
           "lead": "Sobrevuelo corto sobre el desierto.",
           "meeting": "Encuentro en Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -830,14 +872,16 @@
         "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1200&h=1200&q=80",
         "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1200&h=1200&q=80"
       ],
-      "portraitUrls": [],
       "i18n": {
         "en": {
           "title": "Cantalloc aqueducts",
           "description": "Spiral wells beside Nazca.",
           "lead": "Spiral wells beside Nazca.",
           "meeting": "Meet in Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -850,7 +894,10 @@
           "description": "Espirales de agua junto a Nazca.",
           "lead": "Espirales de agua junto a Nazca.",
           "meeting": "Encuentro en Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -878,14 +925,16 @@
         "https://images.unsplash.com/photo-1526392060635-9d6019884377?auto=format&fit=crop&w=1200&h=1200&q=80",
         "https://images.unsplash.com/photo-1526392060635-9d6019884377?auto=format&fit=crop&w=1200&h=1200&q=80"
       ],
-      "portraitUrls": [],
       "i18n": {
         "en": {
           "title": "Cahuachi",
           "description": "Adobe pyramids in the Nazca desert.",
           "lead": "Adobe pyramids in the Nazca desert.",
           "meeting": "Meet in Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -898,7 +947,10 @@
           "description": "Pirámides de adobe en el desierto de Nazca.",
           "lead": "Pirámides de adobe en el desierto de Nazca.",
           "meeting": "Encuentro en Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -926,14 +978,16 @@
         "https://images.unsplash.com/photo-1554907984-15263bfd63bd?auto=format&fit=crop&w=1200&h=1200&q=80",
         "https://images.unsplash.com/photo-1554907984-15263bfd63bd?auto=format&fit=crop&w=1200&h=1200&q=80"
       ],
-      "portraitUrls": [],
       "i18n": {
         "en": {
           "title": "María Reiche museum",
           "description": "The lines, explained beside the desert.",
           "lead": "The lines, explained beside the desert.",
           "meeting": "Meet in Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -946,7 +1000,10 @@
           "description": "Las líneas explicadas junto al desierto.",
           "lead": "Las líneas explicadas junto al desierto.",
           "meeting": "Encuentro en Ica",
-          "highlights": [],
+          "paragraphs": [],
+          "expandedParagraphs": [],
+          "termsSummary": "",
+          "videos": [],
           "practices": [],
           "itinerary": [],
           "included": [],
@@ -1465,6 +1522,18 @@
       }
     },
     {
+      "key": "a11y.intro",
+      "group": "a11y",
+      "i18n": {
+        "en": {
+          "value": "Loading Desértica"
+        },
+        "es": {
+          "value": "Cargando Desértica"
+        }
+      }
+    },
+    {
       "key": "whatsapp.tooltip",
       "group": "whatsapp",
       "i18n": {
@@ -1597,6 +1666,18 @@
       }
     },
     {
+      "key": "pages.productsSoon",
+      "group": "pages",
+      "i18n": {
+        "en": {
+          "value": "Coming soon"
+        },
+        "es": {
+          "value": "Próximamente"
+        }
+      }
+    },
+    {
       "key": "pages.contactTitle",
       "group": "pages",
       "i18n": {
@@ -1621,14 +1702,26 @@
       }
     },
     {
+      "key": "pages.reservationsKicker",
+      "group": "pages",
+      "i18n": {
+        "en": {
+          "value": "{ The day }"
+        },
+        "es": {
+          "value": "{ El día }"
+        }
+      }
+    },
+    {
       "key": "pages.reservationsTitle",
       "group": "pages",
       "i18n": {
         "en": {
-          "value": "Reservations"
+          "value": "Build your day"
         },
         "es": {
-          "value": "Reservas"
+          "value": "Arma tu día"
         }
       }
     },
@@ -1637,10 +1730,34 @@
       "group": "pages",
       "i18n": {
         "en": {
-          "value": "Reservations (CSR). Form later."
+          "value": "Huacachina, Paracas, or Nazca. Pick the axis and the tour. One thread to book."
         },
         "es": {
-          "value": "Reservas (CSR). Formulario más adelante."
+          "value": "Huacachina, Paracas o Nazca. Elige el eje y el tour. Un hilo para reservar."
+        }
+      }
+    },
+    {
+      "key": "pages.reservationsAxis",
+      "group": "pages",
+      "i18n": {
+        "en": {
+          "value": "Axis"
+        },
+        "es": {
+          "value": "Eje"
+        }
+      }
+    },
+    {
+      "key": "pages.reservationsTour",
+      "group": "pages",
+      "i18n": {
+        "en": {
+          "value": "Tour"
+        },
+        "es": {
+          "value": "Tour"
         }
       }
     },
@@ -1665,6 +1782,30 @@
         },
         "es": {
           "value": "Historias de Ica y Huacachina."
+        }
+      }
+    },
+    {
+      "key": "pages.blogSoon",
+      "group": "pages",
+      "i18n": {
+        "en": {
+          "value": "Coming soon"
+        },
+        "es": {
+          "value": "Próximamente"
+        }
+      }
+    },
+    {
+      "key": "pages.blogHeroAlt",
+      "group": "pages",
+      "i18n": {
+        "en": {
+          "value": "Ica desert dunes at dusk."
+        },
+        "es": {
+          "value": "Dunas del desierto de Ica al atardecer."
         }
       }
     },
@@ -2597,10 +2738,10 @@
       "group": "about",
       "i18n": {
         "en": {
-          "value": "{ From Ica }"
+          "value": "{ Who we are }"
         },
         "es": {
-          "value": "{ Desde Ica }"
+          "value": "{ Quiénes somos }"
         }
       }
     },
@@ -2641,30 +2782,6 @@
       }
     },
     {
-      "key": "about.quoteA",
-      "group": "about",
-      "i18n": {
-        "en": {
-          "value": "This is the beginning."
-        },
-        "es": {
-          "value": "Somos el comienzo."
-        }
-      }
-    },
-    {
-      "key": "about.quoteB",
-      "group": "about",
-      "i18n": {
-        "en": {
-          "value": "The desert, up close, every day."
-        },
-        "es": {
-          "value": "El desierto, de cerca, todos los días."
-        }
-      }
-    },
-    {
       "key": "about.mapKicker",
       "group": "about",
       "i18n": {
@@ -2697,18 +2814,6 @@
         },
         "es": {
           "value": "El departamento es el mapa. Oasis, reserva y líneas salen de Ica, no de una escala en el sur."
-        }
-      }
-    },
-    {
-      "key": "about.ribbon",
-      "group": "about",
-      "i18n": {
-        "en": {
-          "value": "Ica · Huacachina · Paracas · Nazca"
-        },
-        "es": {
-          "value": "Ica · Huacachina · Paracas · Nazca"
         }
       }
     },
@@ -2965,18 +3070,6 @@
       }
     },
     {
-      "key": "tour.highlights",
-      "group": "tour",
-      "i18n": {
-        "en": {
-          "value": "What the day includes"
-        },
-        "es": {
-          "value": "Qué entra en el día"
-        }
-      }
-    },
-    {
       "key": "tour.practices",
       "group": "tour",
       "i18n": {
@@ -3029,10 +3122,10 @@
       "group": "tour",
       "i18n": {
         "en": {
-          "value": "Before you go"
+          "value": "Important"
         },
         "es": {
-          "value": "Antes de salir"
+          "value": "Importante"
         }
       }
     },
@@ -3045,6 +3138,66 @@
         },
         "es": {
           "value": "Términos de la reserva"
+        }
+      }
+    },
+    {
+      "key": "tour.detailsLabel",
+      "group": "tour",
+      "i18n": {
+        "en": {
+          "value": "Details"
+        },
+        "es": {
+          "value": "Detalles"
+        }
+      }
+    },
+    {
+      "key": "tour.detailsOverview",
+      "group": "tour",
+      "i18n": {
+        "en": {
+          "value": "Description and itinerary"
+        },
+        "es": {
+          "value": "Descripción e itinerario"
+        }
+      }
+    },
+    {
+      "key": "tour.videosLabel",
+      "group": "tour",
+      "i18n": {
+        "en": {
+          "value": "Tour videos"
+        },
+        "es": {
+          "value": "Videos del tour"
+        }
+      }
+    },
+    {
+      "key": "tour.videoSoon",
+      "group": "tour",
+      "i18n": {
+        "en": {
+          "value": "Video coming soon"
+        },
+        "es": {
+          "value": "Video próximamente"
+        }
+      }
+    },
+    {
+      "key": "tour.clipPlay",
+      "group": "tour",
+      "i18n": {
+        "en": {
+          "value": "Play {tour}, clip {n}"
+        },
+        "es": {
+          "value": "Reproducir {tour}, video {n}"
         }
       }
     },
@@ -3361,18 +3514,6 @@
       }
     },
     {
-      "key": "tour.portraitsLabel",
-      "group": "tour",
-      "i18n": {
-        "en": {
-          "value": "On the dunes"
-        },
-        "es": {
-          "value": "En las dunas"
-        }
-      }
-    },
-    {
       "key": "tour.photoAlt",
       "group": "tour",
       "i18n": {
@@ -3381,6 +3522,90 @@
         },
         "es": {
           "value": "{tour}, foto {n}"
+        }
+      }
+    },
+    {
+      "key": "tour.downloadItinerary",
+      "group": "tour",
+      "i18n": {
+        "en": {
+          "value": "Download itinerary"
+        },
+        "es": {
+          "value": "Descargar itinerario"
+        }
+      }
+    },
+    {
+      "key": "tour.assure.payLater",
+      "group": "tour",
+      "i18n": {
+        "en": {
+          "value": "Book now, pay later:"
+        },
+        "es": {
+          "value": "Reserva ahora, paga después:"
+        }
+      }
+    },
+    {
+      "key": "tour.assure.payLaterBody",
+      "group": "tour",
+      "i18n": {
+        "en": {
+          "value": "Secure your spot"
+        },
+        "es": {
+          "value": "Asegura tu lugar"
+        }
+      }
+    },
+    {
+      "key": "tour.assure.cancel",
+      "group": "tour",
+      "i18n": {
+        "en": {
+          "value": "Free cancellation:"
+        },
+        "es": {
+          "value": "Cancelación gratis:"
+        }
+      }
+    },
+    {
+      "key": "tour.assure.cancelBody",
+      "group": "tour",
+      "i18n": {
+        "en": {
+          "value": "Up to 24 hours before the tour"
+        },
+        "es": {
+          "value": "Hasta 24 horas antes del tour"
+        }
+      }
+    },
+    {
+      "key": "tour.assure.price",
+      "group": "tour",
+      "i18n": {
+        "en": {
+          "value": "Final prices:"
+        },
+        "es": {
+          "value": "Precio final:"
+        }
+      }
+    },
+    {
+      "key": "tour.assure.priceBody",
+      "group": "tour",
+      "i18n": {
+        "en": {
+          "value": "All taxes and booking fees included"
+        },
+        "es": {
+          "value": "Impuestos y cargos de reserva incluidos"
         }
       }
     },
@@ -3409,6 +3634,30 @@
       }
     },
     {
+      "key": "tours.duneBuggy.description.p1",
+      "group": "tours",
+      "i18n": {
+        "en": {
+          "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vitae nisl at erat tristique tincidunt, sed interdum nisl a tincidunt posuere."
+        },
+        "es": {
+          "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vitae nisl at erat tristique tincidunt, sed interdum nisl a tincidunt posuere."
+        }
+      }
+    },
+    {
+      "key": "tours.duneBuggy.description.p2",
+      "group": "tours",
+      "i18n": {
+        "en": {
+          "value": "Suspendisse potenti. Curabitur at lectus nec nisi tincidunt gravida. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas."
+        },
+        "es": {
+          "value": "Suspendisse potenti. Curabitur at lectus nec nisi tincidunt gravida. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas."
+        }
+      }
+    },
+    {
       "key": "tours.duneBuggy.meeting",
       "group": "tours",
       "i18n": {
@@ -3417,126 +3666,6 @@
         },
         "es": {
           "value": "Encuentro en Ica"
-        }
-      }
-    },
-    {
-      "key": "tours.duneBuggy.highlights.buggy.title",
-      "group": "tours",
-      "i18n": {
-        "en": {
-          "value": "Dune buggy"
-        },
-        "es": {
-          "value": "Tubular"
-        }
-      }
-    },
-    {
-      "key": "tours.duneBuggy.highlights.buggy.body",
-      "group": "tours",
-      "i18n": {
-        "en": {
-          "value": "A run across the open sand, with photo stops on the ridges."
-        },
-        "es": {
-          "value": "Un tramo por la arena abierta, con paradas de foto en las crestas."
-        }
-      }
-    },
-    {
-      "key": "tours.duneBuggy.highlights.board.title",
-      "group": "tours",
-      "i18n": {
-        "en": {
-          "value": "Sandboard"
-        },
-        "es": {
-          "value": "Sandboard"
-        }
-      }
-    },
-    {
-      "key": "tours.duneBuggy.highlights.board.body",
-      "group": "tours",
-      "i18n": {
-        "en": {
-          "value": "A board to ride belly-down. Beginner-friendly, not standing."
-        },
-        "es": {
-          "value": "Tabla para bajar boca abajo. Para empezar, no de pie."
-        }
-      }
-    },
-    {
-      "key": "tours.duneBuggy.highlights.helmet.title",
-      "group": "tours",
-      "i18n": {
-        "en": {
-          "value": "Helmet"
-        },
-        "es": {
-          "value": "Casco"
-        }
-      }
-    },
-    {
-      "key": "tours.duneBuggy.highlights.helmet.body",
-      "group": "tours",
-      "i18n": {
-        "en": {
-          "value": "Helmets on for the buggy. Say so if you need a different size."
-        },
-        "es": {
-          "value": "Casco en el tubular. Di si necesitas otra talla."
-        }
-      }
-    },
-    {
-      "key": "tours.duneBuggy.highlights.light.title",
-      "group": "tours",
-      "i18n": {
-        "en": {
-          "value": "Low light"
-        },
-        "es": {
-          "value": "Luz baja"
-        }
-      }
-    },
-    {
-      "key": "tours.duneBuggy.highlights.light.body",
-      "group": "tours",
-      "i18n": {
-        "en": {
-          "value": "We stay out until the light drops. Clouds happen; the hour still holds."
-        },
-        "es": {
-          "value": "Nos quedamos hasta que baja la luz. Si hay nubes, la hora se mantiene."
-        }
-      }
-    },
-    {
-      "key": "tours.duneBuggy.highlights.meet.title",
-      "group": "tours",
-      "i18n": {
-        "en": {
-          "value": "Meet in Ica"
-        },
-        "es": {
-          "value": "Encuentro en Ica"
-        }
-      }
-    },
-    {
-      "key": "tours.duneBuggy.highlights.meet.body",
-      "group": "tours",
-      "i18n": {
-        "en": {
-          "value": "The day starts in Ica, not a pickup from Lima."
-        },
-        "es": {
-          "value": "El día sale de Ica, no de un recojo en Lima."
         }
       }
     },
@@ -3653,10 +3782,22 @@
       "group": "tours",
       "i18n": {
         "en": {
-          "value": "Ica. Be ready ten minutes early."
+          "value": "Ica. The exact point comes with confirmation."
         },
         "es": {
-          "value": "Ica. Diez minutos antes."
+          "value": "Ica. El punto exacto va en la confirmación."
+        }
+      }
+    },
+    {
+      "key": "tours.duneBuggy.itinerary.meet.expanded",
+      "group": "tours",
+      "i18n": {
+        "en": {
+          "value": "We meet in Ica. The exact point and time come with confirmation, according to the day and the group's pace."
+        },
+        "es": {
+          "value": "Nos vemos en Ica. El punto y la hora exactos van en la confirmación, según el día y el ritmo del grupo."
         }
       }
     },
@@ -3685,6 +3826,18 @@
       }
     },
     {
+      "key": "tours.duneBuggy.itinerary.dunes.expanded",
+      "group": "tours",
+      "i18n": {
+        "en": {
+          "value": "The buggy runs the ridges with photo stops. The route follows the sand and the group, not a closed loop."
+        },
+        "es": {
+          "value": "El tubular recorre las crestas con paradas para foto. El tramo se ajusta a la arena y al grupo, no a un circuito cerrado."
+        }
+      }
+    },
+    {
       "key": "tours.duneBuggy.itinerary.board.title",
       "group": "tours",
       "i18n": {
@@ -3705,6 +3858,18 @@
         },
         "es": {
           "value": "Boca abajo, en tabla artesanal."
+        }
+      }
+    },
+    {
+      "key": "tours.duneBuggy.itinerary.board.expanded",
+      "group": "tours",
+      "i18n": {
+        "en": {
+          "value": "Belly-down on an artisan board. Not standing. The guide picks the dune and the pace."
+        },
+        "es": {
+          "value": "Bajada boca abajo en tabla artesanal. No es de pie. El guía indica la duna y el ritmo."
         }
       }
     },
@@ -3733,6 +3898,18 @@
       }
     },
     {
+      "key": "tours.duneBuggy.itinerary.light.expanded",
+      "group": "tours",
+      "i18n": {
+        "en": {
+          "value": "We stay on the sand as the sun drops. Clouds happen; the hour still holds."
+        },
+        "es": {
+          "value": "Nos quedamos en la arena cuando baja el sol. Si hay nubes, la hora se mantiene."
+        }
+      }
+    },
+    {
       "key": "tours.duneBuggy.itinerary.close.title",
       "group": "tours",
       "i18n": {
@@ -3753,6 +3930,54 @@
         },
         "es": {
           "value": "Vuelta hacia el oasis cuando se va la luz."
+        }
+      }
+    },
+    {
+      "key": "tours.duneBuggy.itinerary.close.expanded",
+      "group": "tours",
+      "i18n": {
+        "en": {
+          "value": "Back toward the oasis as the light goes. The close follows the day, not a fixed clock."
+        },
+        "es": {
+          "value": "Vuelta hacia el oasis cuando se va la luz. El cierre depende del día, no de un reloj fijo."
+        }
+      }
+    },
+    {
+      "key": "tours.duneBuggy.details.description.p1",
+      "group": "tours",
+      "i18n": {
+        "en": {
+          "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam tincidunt, sapien at fermentum pretium, lorem nisl iaculis erat, vitae vehicula nisl lorem sit amet nisl."
+        },
+        "es": {
+          "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam tincidunt, sapien at fermentum pretium, lorem nisl iaculis erat, vitae vehicula nisl lorem sit amet nisl."
+        }
+      }
+    },
+    {
+      "key": "tours.duneBuggy.details.description.p2",
+      "group": "tours",
+      "i18n": {
+        "en": {
+          "value": "Praesent sagittis, lorem a tincidunt tincidunt, nisl nisl aliquam nisl, a tincidunt nisl nisl sit amet nisl. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae."
+        },
+        "es": {
+          "value": "Praesent sagittis, lorem a tincidunt tincidunt, nisl nisl aliquam nisl, a tincidunt nisl nisl sit amet nisl. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae."
+        }
+      }
+    },
+    {
+      "key": "tours.duneBuggy.termsSummary",
+      "group": "tours",
+      "i18n": {
+        "en": {
+          "value": "Booking is confirmed on WhatsApp. Cancellations and changes follow the published terms."
+        },
+        "es": {
+          "value": "La reserva se confirma por WhatsApp. Cancelaciones y cambios siguen los términos publicados."
         }
       }
     },
@@ -4011,6 +4236,18 @@
   ],
   "mediaSlots": [
     {
+      "key": "home.hero",
+      "imageUrl": "https://images.unsplash.com/photo-1509316785289-025f5b846b35?auto=format&fit=crop&w=2400&h=1600&q=80"
+    },
+    {
+      "key": "blog.hero",
+      "imageUrl": "/about/sand-poster.jpg"
+    },
+    {
+      "key": "products.hero",
+      "imageUrl": "https://images.unsplash.com/photo-1511919471431-35002133f316?auto=format&fit=crop&w=2400&h=1200&q=80"
+    },
+    {
       "key": "tours.banner",
       "imageUrl": "https://images.unsplash.com/photo-1511919471431-35002133f316?auto=format&fit=crop&w=2400&h=1200&q=80"
     },
@@ -4049,6 +4286,30 @@
     {
       "key": "about.archive.6",
       "imageUrl": "https://images.unsplash.com/photo-1623524322001-edc2423ac854?auto=format&fit=crop&w=900&h=1450&q=80"
+    },
+    {
+      "key": "about.archive.7",
+      "imageUrl": "https://images.unsplash.com/photo-1533106497176-45ae19e68ba2?auto=format&fit=crop&w=900&h=1300&q=80"
+    },
+    {
+      "key": "about.archive.8",
+      "imageUrl": "https://images.unsplash.com/photo-1509316785289-025f5b846b35?auto=format&fit=crop&w=1000&h=1500&q=80"
+    },
+    {
+      "key": "about.archive.9",
+      "imageUrl": "https://images.unsplash.com/photo-1473580044384-7ba9967e16a0?auto=format&fit=crop&w=900&h=1400&q=80"
+    },
+    {
+      "key": "about.archive.10",
+      "imageUrl": "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?auto=format&fit=crop&w=800&h=1250&q=80"
+    },
+    {
+      "key": "about.archive.11",
+      "imageUrl": "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1000&h=1550&q=80"
+    },
+    {
+      "key": "about.archive.12",
+      "imageUrl": "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=900&h=1350&q=80"
     },
     {
       "key": "about.video",

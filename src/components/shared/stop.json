@@ -6,15 +6,24 @@
   },
   "options": {},
   "attributes": {
-    "time": {
-      "type": "string",
-      "required": true
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "imageUrl": {
+      "type": "string"
     },
     "title": {
       "type": "string",
       "required": true
     },
     "body": {
+      "type": "text"
+    },
+    "expandedBody": {
       "type": "text"
     }
   }

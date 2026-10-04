@@ -34,21 +34,21 @@ La primera vez, `/admin` pide crear el usuario administrador. Para produccion: `
 | Tipo | i18n | Draft/Publish | Campos |
 | --- | --- | --- | --- |
 | `destination` | si | si | no localizados: `slug`, `order`, `imageUrl`, `image`; localizados: `title`, `lead`, `allLabel`; relacion `tours` |
-| `tour` | si | si | no localizados: `slug`, `order`, `durationHours`, `priceFrom`, `featured`, `format`, `languages`, `imageUrl`, `image`, `galleryUrls`, `gallery`, `portraitUrls`, `portraits`, `destination`; localizados: `title`, `description`, `lead`, `lead2`, `meeting`, `highlights`, `practices` (`shared.feature`), `itinerary` (`shared.stop`), `included`, `excluded`, `pack`, `notes` (`shared.list-item`) |
+| `tour` | si | si | no localizados: `slug`, `order`, `durationHours`, `priceFrom`, `featured`, `format`, `languages`, `imageUrl`, `image`, `galleryUrls`, `gallery`, `itineraryFile`, `itineraryFileUrl`, `destination`; localizados: `title`, `description`, `lead`, `meeting`, `termsSummary`, `paragraphs`, `expandedParagraphs` (`shared.list-item`), `practices` (`shared.feature`), `itinerary` (`shared.stop`: `image`, `imageUrl`, `title`, `body`, `expandedBody`), `videos` (`shared.video`: `poster`/`posterUrl`, `webm`/`webmUrl`, `mp4`/`mp4Url`), `included`, `excluded`, `pack`, `notes` (`shared.list-item`) |
 | `reservation` | no | no | `tourSlug`, `tourTitle`, `date`, `language`, `format`, `adults`, `children`, `payment`, `amount`, `locale`, `name`, `email`, `phone`, `status`, `notes` |
 | `contact-message` | no | no | `name`, `email`, `whatsapp`, `country`, `message`, `locale`, `handled` |
 | `site-setting` (single) | no | no | `email`, `phone`, `whatsapp`, redes (`instagram`, `facebook`, `tiktok`, `youtube`, `linkedin`, `google`, `tripadvisor`), `legalName`, `ruc` |
 | `translation` | si | no | no localizados: `key`, `group`; localizado: `value` (todas las cadenas de `src/locales/{en,es}.json`) |
 | `media-slot` | si | no | no localizados: `key`, `image`/`imageUrl`, `video`/`videoUrl`/`videoWebmUrl`, `poster`/`posterUrl`; localizado: `alt` |
 | `page` | si | si | no localizados: `slug`, `heroImage`, `heroImageUrl`; localizados: `title`, `lead`, `body` (Markdown), `seoTitle`, `seoDescription` |
-| `blog-post` | si | si | no localizados: `slug`, `publishedDate`, `cover`, `coverUrl`, `featured`; localizados: `title`, `excerpt`, `content` (Markdown), `seoDescription` |
+| `blog-post` | si | si | no localizados: `slug`, `publishedDate`, `cover`, `coverUrl`, `featured`; localizados: `title`, `category`, `excerpt`, `content` (Markdown), `seoDescription` |
 | `product` | si | si | no localizados: `slug`, `order`, `price`, `featured`, `image`, `imageUrl`, `gallery`; localizados: `title`, `description`, `details` (Markdown) |
 
-Las imagenes pueden venir de `imageUrl`/`galleryUrls`/`portraitUrls` (URLs externas, p. ej. Unsplash) o de los campos media (`image`, `gallery`, `portraits`) subidos a la libreria de medios; la app debe preferir el media si existe.
+Las imagenes pueden venir de `imageUrl`/`galleryUrls`/`itineraryFileUrl` (URLs externas, p. ej. Unsplash) o de los campos media (`image`, `gallery`, `itineraryFile`, `itinerary[].image`, `videos[].poster/webm/mp4`) subidos a la libreria de medios; la app debe preferir el media si existe.
 
 ## Seed
 
-Al arrancar (idempotente) el bootstrap: crea el locale `es`, concede permisos publicos y, si no hay destinos y `SEED_ON_EMPTY` no es `false`, carga `seed/catalog.json` (3 destinos, 15 tours, 248 traducciones, 13 media-slots, 7 paginas, ambos idiomas, publicados) y los datos de `site-setting`. Un fallo del seed se registra y no impide el arranque. Los datos de contacto de `site-setting` son marcadores (`XXXX`): editarlos desde el admin.
+Al arrancar (idempotente) el bootstrap: crea el locale `es`, concede permisos publicos y, si no hay destinos y `SEED_ON_EMPTY` no es `false`, carga `seed/catalog.json` (3 destinos, 15 tours, 267 traducciones, 22 media-slots, 7 paginas, ambos idiomas, publicados) y los datos de `site-setting`. Un fallo del seed se registra y no impide el arranque. Los datos de contacto de `site-setting` son marcadores (`XXXX`): editarlos desde el admin.
 
 `seed/catalog.json` se genera desde el catalogo estatico de Angular y `src/locales/{en,es}.json`; regenerar desde la raiz del repo:
 
@@ -67,9 +67,9 @@ El rol Public solo recibe: `destination` find/findOne, `tour` find/findOne, `sit
 La app usa `STRAPI_URL` y estos endpoints:
 
 - `GET /api/destinations?locale=es`
-- `GET /api/tours?locale=es&populate[destination][fields][0]=slug&populate[image]=true&populate[gallery]=true&populate[portraits]=true&populate[highlights]=true&populate[practices]=true&populate[itinerary]=true&populate[included]=true&populate[excluded]=true&populate[pack]=true&populate[notes]=true`
+- `GET /api/tours?locale=es&populate[destination][fields][0]=slug&populate[image]=true&populate[gallery]=true&populate[itineraryFile]=true&populate[practices]=true&populate[paragraphs]=true&populate[expandedParagraphs]=true&populate[termsSummary]=true&populate[itinerary][populate]=image&populate[videos][populate]=poster,webm,mp4&populate[included]=true&populate[excluded]=true&populate[pack]=true&populate[notes]=true`
 - `GET /api/site-setting`
-- `GET /api/translations?locale=es&pagination[pageSize]=200&pagination[page]=1&fields[0]=key&fields[1]=value` (2 paginas, 248 claves)
+- `GET /api/translations?locale=es&pagination[pageSize]=200&pagination[page]=1&fields[0]=key&fields[1]=value` (2 paginas, 267 claves)
 - `GET /api/media-slots?locale=es&populate=image,video,poster`, `GET /api/pages?locale=es`, `/api/blog-posts`, `/api/products`
 - `POST /api/reservations` con `{ "data": { ... } }`
 - `POST /api/contact-messages` con `{ "data": { ... } }`
@@ -81,3 +81,5 @@ En el admin, `Content Manager` > `Destination`/`Tour`: editar, cambiar de idioma
 ## Formularios y limite de peticiones
 
 El frontend no llama a Strapi desde el navegador: `POST /api/forms/reservation` y `/api/forms/contact` (Express) validan y reenvian a `POST /api/reservations` y `/api/contact-messages`. Como todas las peticiones llegan desde el servidor Angular, el limite de `global::rate-limit` usa la IP real del visitante solo si la peticion trae `X-Forms-Secret` igual a `FORMS_PROXY_SECRET` (definir el mismo valor aqui y en el servidor Angular). Sin secreto, el limite se aplica por IP del proxy.
+
+Nota: en Strapi 5 `populate=*` solo baja un nivel (componentes si, pero NO los media anidados como `itinerary[].image` o `videos[].poster`); para esos usar `populate[itinerary][populate]=image` y `populate[videos][populate]=poster,webm,mp4`.
