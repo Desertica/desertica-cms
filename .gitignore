@@ -12,3 +12,4 @@ public/uploads/*
 *.log
 .DS_Store
 types/generated/
+.strapi-updater.json
