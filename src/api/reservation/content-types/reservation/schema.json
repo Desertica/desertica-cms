@@ -1,0 +1,92 @@
+{
+  "kind": "collectionType",
+  "collectionName": "reservations",
+  "info": {
+    "singularName": "reservation",
+    "pluralName": "reservations",
+    "displayName": "Reservation"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "tourSlug": {
+      "type": "string",
+      "required": true
+    },
+    "tourTitle": {
+      "type": "string"
+    },
+    "date": {
+      "type": "date",
+      "required": true
+    },
+    "language": {
+      "type": "enumeration",
+      "enum": [
+        "es",
+        "en"
+      ],
+      "required": true
+    },
+    "format": {
+      "type": "enumeration",
+      "enum": [
+        "shared",
+        "private"
+      ]
+    },
+    "adults": {
+      "type": "integer",
+      "required": true,
+      "min": 1,
+      "max": 50
+    },
+    "children": {
+      "type": "integer",
+      "min": 0,
+      "max": 50,
+      "default": 0
+    },
+    "payment": {
+      "type": "enumeration",
+      "enum": [
+        "full",
+        "deposit"
+      ]
+    },
+    "amount": {
+      "type": "float",
+      "min": 0
+    },
+    "locale": {
+      "type": "enumeration",
+      "enum": [
+        "es",
+        "en"
+      ]
+    },
+    "name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "email"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "pending",
+        "confirmed",
+        "cancelled"
+      ],
+      "default": "pending",
+      "private": false
+    },
+    "notes": {
+      "type": "text"
+    }
+  }
+}
