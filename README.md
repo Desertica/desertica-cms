@@ -2,6 +2,8 @@
 
 Backend de contenido para el sitio Angular de Desertica (tours en Ica, Huacachina, Paracas y Nazca). Bilingue `en` (por defecto) y `es`.
 
+> Este proyecto es independiente del frontend. El contrato con la app Angular (campos, endpoints, variables) esta en [`CONTRACT.md`](CONTRACT.md).
+
 ## Puesta en marcha
 
 Requiere Node 20 a 24 o 26 (probado con Node 22).
@@ -50,11 +52,14 @@ Las imagenes pueden venir de `imageUrl`/`galleryUrls`/`itineraryFileUrl` (URLs e
 
 Al arrancar (idempotente) el bootstrap: crea el locale `es`, concede permisos publicos y, si no hay destinos y `SEED_ON_EMPTY` no es `false`, carga `seed/catalog.json` (3 destinos, 15 tours, 267 traducciones, 22 media-slots, 7 paginas, ambos idiomas, publicados) y los datos de `site-setting`. Un fallo del seed se registra y no impide el arranque. Los datos de contacto de `site-setting` son marcadores (`XXXX`): editarlos desde el admin.
 
-`seed/catalog.json` se genera desde el catalogo estatico de Angular y `src/locales/{en,es}.json`; regenerar desde la raiz del repo:
+`seed/catalog.json` es la fuente del seed y se versiona aqui. Se genero desde el catalogo estatico de la app Angular y sus `src/locales/{en,es}.json` con `scripts/build-cms-seed.mjs`, que vive en el repo del frontend (`desertica-web`):
 
 ```bash
-node scripts/build-cms-seed.mjs
+# desde la raiz de desertica-web, con este repo clonado al lado
+node scripts/build-cms-seed.mjs --out ../desertica-cms/seed/catalog.json
 ```
+
+Una vez en produccion el seed solo se usa en bases vacias; el contenido real se edita desde el admin.
 
 Para resembrar, borrar `.tmp/data.db` (solo desarrollo) y reiniciar.
 

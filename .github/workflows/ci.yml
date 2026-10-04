@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Seed is valid JSON with the expected shape
+        run: npm run seed-check
+      - name: Build admin panel
+        run: npm run build
+        env:
+          APP_KEYS: ci1,ci2,ci3,ci4
+          API_TOKEN_SALT: ci
+          ADMIN_JWT_SECRET: ci
+          TRANSFER_TOKEN_SALT: ci
+          ENCRYPTION_KEY: ci
+          JWT_SECRET: ci
