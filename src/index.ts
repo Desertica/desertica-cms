@@ -250,8 +250,28 @@ async function seedSingles(strapi: Core.Strapi, source: string) {
   }
 }
 
+/** Legal pages created empty (as drafts) when missing, once per database; editors fill and publish them. */
+const EXTRA_PAGES = [
+  { slug: 'cancellation', title: { en: 'Cancellation and refund policy', es: 'Política de cancelación y reembolso' } },
+  { slug: 'cookies', title: { en: 'Cookie policy', es: 'Política de cookies' } },
+];
+
+async function ensureExtraPages(strapi: Core.Strapi) {
+  const store = strapi.store({ type: 'plugin', name: 'desertica', key: 'extra-pages' });
+  if (await store.get({})) return;
+  const uid = 'api::page.page' as any;
+  for (const { slug, title } of EXTRA_PAGES) {
+    const found = await strapi.documents(uid).findFirst({ locale: 'en', filters: { slug } });
+    if (found) continue;
+    const created = await strapi.documents(uid).create({ locale: 'en', data: { slug, title: title.en } as any });
+    await strapi.documents(uid).update({ documentId: created.documentId, locale: 'es', data: { slug, title: title.es } as any });
+    strapi.log.info(`[seed] empty draft page "${slug}" created`);
+  }
+  await store.set({ value: { done: true } });
+}
+
 const CM_UID = 'plugin::content-manager.content-types';
-const CM_CONFIG_VERSION = 5;
+const CM_CONFIG_VERSION = 6;
 
 type ListConfig = { fields: string[]; mainField?: string; sortBy?: string; sortOrder?: 'ASC' | 'DESC'; pageSize?: number };
 const LIST_CONFIGS: Record<string, ListConfig> = {
@@ -379,6 +399,12 @@ const FIELD_HINTS: Record<string, Record<string, string>> = {
     assurances: 'Optional. Replaces the global assurances (Site — Booking rules) for this tour.',
     seoTitle: 'Page title for search engines. Empty = tour title.',
     seoDescription: 'Meta description. Empty = tour description.',
+    meeting: 'Meeting point as text (shown to the visitor).',
+    meetingPointUrl: 'Map link to the meeting point (for example a Google Maps URL).',
+    latitude: 'Meeting point latitude in decimal degrees, from -90 to 90.',
+    longitude: 'Meeting point longitude in decimal degrees, from -180 to 180.',
+    waiverBody: 'Liability waiver text (Markdown) that each passenger signs. One per language; the API stores a snapshot when it is used.',
+    faqs: 'Questions and answers shown on the tour page and in structured data.',
   },
 };
 
@@ -476,6 +502,11 @@ export default {
       await seedCatalog(strapi);
     } catch (error) {
       strapi.log.error(`[seed] failed (boot continues): ${(error as Error).stack ?? error}`);
+    }
+    try {
+      await ensureExtraPages(strapi);
+    } catch (error) {
+      strapi.log.error(`[seed] extra pages failed (boot continues): ${(error as Error).message}`);
     }
   },
 };

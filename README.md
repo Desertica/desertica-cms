@@ -62,7 +62,7 @@ Usa una base de pruebas o local: crea y borra un token de API temporal, y el log
 | --- | --- | --- | --- |
 | `destination` | si | si | no localizados: `slug`, `order`, `footerOrder`, `showInFooter`, `imageUrl`, `image`; localizados: `title`, `lead`, `allLabel`; relacion `tours` |
 | `tour` | si | si | no localizados: `slug`, `order`, `durationHours`, `priceFrom`, `featured`, `format`, `languages`, `imageUrl`, `image`, `galleryUrls`, `gallery`, `itineraryFile`, `itineraryFileUrl`, `destination`; localizados: `title`, `description`, `lead`, `meeting`, `termsSummary`, `seoTitle`, `seoDescription`, `assurances` (`shared.feature`, opcional: sustituye las de `booking-setting`), `paragraphs`, `expandedParagraphs` (`shared.list-item`), `practices` (`shared.feature`), `itinerary` (`shared.stop`: `image`, `imageUrl`, `title`, `body`, `expandedBody`), `videos` (`shared.video`: `poster`/`posterUrl`, `webm`/`webmUrl`, `mp4`/`mp4Url`), `included`, `excluded`, `pack`, `notes` (`shared.list-item`) |
-| `reservation` | no | no | `tourSlug`, `tourTitle`, `date`, `language`, `format`, `adults`, `children`, `payment`, `amount`, `locale`, `name`, `email`, `phone`, `status`, `notes` |
+| `reservation` (legado, ver nota) | no | no | `tourSlug`, `tourTitle`, `date`, `language`, `format`, `adults`, `children`, `payment`, `amount`, `locale`, `name`, `email`, `phone`, `status`, `notes` |
 | `contact-message` | no | no | `name`, `email`, `whatsapp`, `country`, `message`, `locale`, `handled` |
 | `site-setting` (single) | no | no | `email`, `phone`, `whatsapp`, redes (`instagram`, `facebook`, `tiktok`, `youtube`, `linkedin`, `google`, `tripadvisor`), `legalName`, `ruc`, `brandName`, `legalYear`, `shareImage`/`shareImageUrl` |
 | `theme-setting` (single) | no | no | `light`, `dark` (componente `theme.palette`, 22 colores en hex con selector de color, plugin oficial `@strapi/plugin-color-picker` 5.56.0, habilitado en `config/plugins.ts`), `fontSans`, `fontHeading` (selector de 9 fuentes), `radius` (none/small/medium/large/full), `headerSize` (compact/standard/tall), `introEnabled`, `introAccent`, `introRestScale`, `introFailsafeMs` |
@@ -76,6 +76,13 @@ Usa una base de pruebas o local: crea y borra un token de API temporal, y el log
 | `product` | si | si | no localizados: `slug`, `order`, `price`, `featured`, `image`, `imageUrl`, `gallery`; localizados: `title`, `description`, `details` (Markdown) |
 
 Las imagenes pueden venir de `imageUrl`/`galleryUrls`/`itineraryFileUrl` (URLs externas, p. ej. Unsplash) o de los campos media (`image`, `gallery`, `itineraryFile`, `itinerary[].image`, `videos[].poster/webm/mp4`) subidos a la libreria de medios; la app debe preferir el media si existe.
+
+Notas del modelo:
+
+- `tour` incluye ademas `waiverBody` (descargo de responsabilidad, localizado), `latitude`, `longitude`, `meetingPointUrl` y `faqs[]` (`shared.faq`, localizado); todos opcionales. Detalle y populate en `CONTRACT.md`.
+- `reservation` es **legado**: `desertica-api` la reemplazara cuando el checkout nuevo se active. Hasta entonces se queda como esta y sus permisos publicos (`create`) no se retiran.
+- Las paginas legales `cancellation` y `cookies` se crean vacias y en borrador al arrancar (una vez); hay que redactarlas y publicarlas. Slugs por documento legal en `CONTRACT.md`.
+- Webhook de publicacion (opcional): `docs/WEBHOOKS.md`.
 
 ## Organizacion del admin
 
