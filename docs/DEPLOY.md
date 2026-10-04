@@ -76,3 +76,30 @@ En el servidor Angular (no en el navegador): `STRAPI_URL` (URL con la que el ser
 - Rotar secretos si se filtran (invalida sesiones del admin y tokens). Crear tokens de API con el minimo permiso y vencimiento; eliminar los usados para pruebas.
 - El login del admin tiene limite de intentos (429 tras varios fallos); no automatizar logins repetidos.
 - CORS: `CLIENT_URLS` solo con origenes propios. CSP: `img-src`/`media-src` incluyen `'self'`, `PUBLIC_URL`, `S3_PUBLIC_URL` y `MEDIA_HOSTS`.
+
+
+## Plataforma recomendada: Railway + Cloudflare
+
+Para pruebas en entorno real (staging) y una primera produccion pequena.
+
+**Por que Railway:** despliega cada repo privado de GitHub directamente desde su `Dockerfile` (el mismo que construye el CI, sin credenciales de registro), crea Postgres con un clic y entrega `DATABASE_URL`, tiene red privada entre servicios, volumenes, dominios con TLS y entornos separados (staging desde `develop`, produccion desde `main`) con la opcion de esperar a que pase el CI. El costo es por uso; revisa los precios vigentes antes de decidir.
+**Cloudflare delante:** DNS y CDN gratis, y R2 para los medios (compatible con S3, ver `UPLOAD_PROVIDER=aws-s3`). Si prefieres latencia desde Sao Paulo o mas control, las alternativas son Fly.io (region `gru`) o AWS (ECS + RDS + S3); el contenedor y las variables son los mismos.
+
+### Pasos
+
+1. Proyecto nuevo en Railway y servicio **PostgreSQL**.
+2. Servicio **cms** desde `Desertica/desertica-cms` (rama `main` en produccion, `develop`/la que uses en staging). Variables:
+   - `DATABASE_CLIENT=postgres`, `DATABASE_URL=${{Postgres.DATABASE_URL}}` (referencia al servicio Postgres), `DATABASE_SSL=false` (red privada).
+   - `PUBLIC_URL=https://cms.tudominio.com`, `CLIENT_URLS=https://tudominio.com,https://www.tudominio.com`, `PROXY=true`.
+   - `APP_KEYS`, `API_TOKEN_SALT`, `ADMIN_JWT_SECRET`, `TRANSFER_TOKEN_SALT`, `ENCRYPTION_KEY`, `JWT_SECRET`: valores aleatorios (`openssl rand -base64 24`; `APP_KEYS` son cuatro separados por coma).
+   - `FORMS_PROXY_SECRET`: aleatorio, el mismo valor en el sitio.
+   - Medios: un volumen montado en `/opt/app/public/uploads`, o bien R2/S3 con `UPLOAD_PROVIDER=aws-s3` y las variables `S3_*`.
+   - Ajustes del servicio: puerto 1337, healthcheck en `/_health`.
+3. Crear el administrador una sola vez desde el shell del servicio: `node_modules/.bin/strapi admin:create-user --firstname ... --lastname ... --email ... --password ...` (evita dejar `/admin` abierto a que cualquiera registre el primer usuario). Despues `SEED_ON_EMPTY=false`.
+4. Dominio `cms.tudominio.com` hacia el servicio, y en Cloudflare el registro con proxy activado.
+5. Sitio: ver `docs/DEPLOY.md` del repo `desertica-web`.
+6. Staging: duplica el entorno en Railway, apuntalo a la rama de pruebas con su propia base de datos y sus propios secretos.
+
+### Que esta verificado
+
+El `Dockerfile`, Postgres (incluido `DATABASE_URL`, con la semilla), las subidas de medios y los workflows de CI e imagen estan probados. La configuracion concreta de Railway (referencias entre servicios, healthcheck, volumenes, dominios) esta escrita a partir de su documentacion y **no se ha probado en una cuenta real**.
