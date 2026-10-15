@@ -250,8 +250,28 @@ async function seedSingles(strapi: Core.Strapi, source: string) {
   }
 }
 
+/** Legal pages created empty (as drafts) when missing, once per database; editors fill and publish them. */
+const EXTRA_PAGES = [
+  { slug: 'cancellation', title: { en: 'Cancellation and refund policy', es: 'Política de cancelación y reembolso' } },
+  { slug: 'cookies', title: { en: 'Cookie policy', es: 'Política de cookies' } },
+];
+
+async function ensureExtraPages(strapi: Core.Strapi) {
+  const store = strapi.store({ type: 'plugin', name: 'desertica', key: 'extra-pages' });
+  if (await store.get({})) return;
+  const uid = 'api::page.page' as any;
+  for (const { slug, title } of EXTRA_PAGES) {
+    const found = await strapi.documents(uid).findFirst({ locale: 'en', filters: { slug } });
+    if (found) continue;
+    const created = await strapi.documents(uid).create({ locale: 'en', data: { slug, title: title.en } as any });
+    await strapi.documents(uid).update({ documentId: created.documentId, locale: 'es', data: { slug, title: title.es } as any });
+    strapi.log.info(`[seed] empty draft page "${slug}" created`);
+  }
+  await store.set({ value: { done: true } });
+}
+
 const CM_UID = 'plugin::content-manager.content-types';
-const CM_CONFIG_VERSION = 5;
+const CM_CONFIG_VERSION = 7;
 
 type ListConfig = { fields: string[]; mainField?: string; sortBy?: string; sortOrder?: 'ASC' | 'DESC'; pageSize?: number };
 const LIST_CONFIGS: Record<string, ListConfig> = {
@@ -259,6 +279,8 @@ const LIST_CONFIGS: Record<string, ListConfig> = {
   'api::media-slot.media-slot': { fields: ['page', 'section', 'key'], mainField: 'key', sortBy: 'page', sortOrder: 'ASC', pageSize: 50 },
   'api::tour.tour': { fields: ['title', 'destination', 'featured', 'order', 'priceFrom'], mainField: 'title', sortBy: 'order', sortOrder: 'ASC' },
   'api::destination.destination': { fields: ['title', 'order', 'footerOrder'], mainField: 'title', sortBy: 'order', sortOrder: 'ASC' },
+  // Legal texts and hub pages share this list: sorted by slug so cancellation, complaints, conduct, cookies, legal-mincetur, privacy and terms sit together.
+  'api::page.page': { fields: ['title', 'slug', 'updatedAt'], mainField: 'title', sortBy: 'slug', sortOrder: 'ASC', pageSize: 25 },
   'api::reservation.reservation': { fields: ['tourTitle', 'date', 'adults', 'children', 'status'], mainField: 'tourTitle', sortBy: 'createdAt', sortOrder: 'DESC' },
   'api::contact-message.contact-message': { fields: ['name', 'email', 'handled', 'createdAt'], mainField: 'name', sortBy: 'createdAt', sortOrder: 'DESC' },
 };
@@ -361,7 +383,8 @@ const FIELD_HINTS: Record<string, Record<string, string>> = {
     introFailsafeMs: 'Milliseconds after which the intro is dismissed no matter what.',
   },
   'api::booking-setting.booking-setting': {
-    depositRate: 'Fraction charged as deposit, from 0 to 1 (0.2 = 20%).',
+    depositRate: 'OBSOLETE. The deposit is now decided by the booking API (Setting.depositPercent) and this value is ignored by the new booking engine. It stays only until the website stops reading it; do not rely on it.',
+    availabilityMonths: 'How many calendar months the booking calendar shows, from 1 to 12 (default 3). The same for every language.',
     peopleMax: 'Maximum adults + children per booking.',
     currencyCode: 'ISO currency code, for example USD.',
     assurances: 'Reassurance bullets next to the booking form. A tour can override them.',
@@ -369,6 +392,10 @@ const FIELD_HINTS: Record<string, Record<string, string>> = {
   'api::form-setting.form-setting': { messageMax: 'Maximum characters in the contact message.' },
   'api::navigation.navigation': {
     headerLinks: 'Kind "tours-menu" marks the item whose dropdown is built from destinations and tours.',
+  },
+  'api::page.page': {
+    slug: 'Legal texts use fixed slugs: terms, privacy, cancellation, cookies, conduct, complaints, legal-mincetur. Hub pages: blog, products. Do not change a slug; the website and the booking API look pages up by it.',
+    body: 'Page text in Markdown, one per language. For legal texts, each published change becomes a new version stored by the booking API.',
   },
   'api::destination.destination': {
     order: 'Order in menus and the tours page.',
@@ -379,6 +406,12 @@ const FIELD_HINTS: Record<string, Record<string, string>> = {
     assurances: 'Optional. Replaces the global assurances (Site — Booking rules) for this tour.',
     seoTitle: 'Page title for search engines. Empty = tour title.',
     seoDescription: 'Meta description. Empty = tour description.',
+    meeting: 'Meeting point as text (shown to the visitor).',
+    meetingPointUrl: 'Map link to the meeting point (for example a Google Maps URL).',
+    latitude: 'Meeting point latitude in decimal degrees, from -90 to 90.',
+    longitude: 'Meeting point longitude in decimal degrees, from -180 to 180.',
+    waiverBody: 'Liability waiver text (Markdown) that each passenger signs, one per language. Every published change creates a new version in the booking API, and passengers sign the text in force when they book. Review it before pressing Publish; saving a draft changes nothing for passengers.',
+    faqs: 'Questions and answers shown on the tour page and in structured data.',
   },
 };
 
@@ -476,6 +509,11 @@ export default {
       await seedCatalog(strapi);
     } catch (error) {
       strapi.log.error(`[seed] failed (boot continues): ${(error as Error).stack ?? error}`);
+    }
+    try {
+      await ensureExtraPages(strapi);
+    } catch (error) {
+      strapi.log.error(`[seed] extra pages failed (boot continues): ${(error as Error).message}`);
     }
   },
 };

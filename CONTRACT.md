@@ -23,7 +23,7 @@ Todos publicos (rol Public), lectura con `?locale=en|es` y paginacion `paginatio
   &populate[image]=true&populate[gallery]=true&populate[itineraryFile]=true
   &populate[practices]=true&populate[paragraphs]=true&populate[expandedParagraphs]=true
   &populate[included]=true&populate[excluded]=true&populate[pack]=true&populate[notes]=true
-  &populate[assurances]=true
+  &populate[assurances]=true&populate[faqs]=true
   &populate[itinerary][populate][0]=image
   &populate[videos][populate][0]=poster&populate[videos][populate][1]=webm&populate[videos][populate][2]=mp4
 ```
@@ -47,7 +47,7 @@ Localizados = un valor por idioma (`en` por defecto, `es`). El resto se sincroni
 | Tipo | Campos no localizados | Campos localizados |
 | --- | --- | --- |
 | `destination` | `slug`, `order`, `footerOrder`, `showInFooter`, `image`, `imageUrl` | `title`, `lead`, `allLabel` |
-| `tour` | `slug`, `order`, `destination`, `durationHours`, `priceFrom`, `featured`, `format` (`shared`/`private`/`both`), `languages` (json), `image`, `imageUrl`, `gallery`, `galleryUrls`, `itineraryFile`, `itineraryFileUrl` | `title`, `seoTitle`, `seoDescription`, `assurances[]` (opcional, sustituye las globales), `description`, `lead`, `meeting`, `termsSummary`, `paragraphs[]`, `expandedParagraphs[]`, `practices[]`, `itinerary[]`, `videos[]`, `included[]`, `excluded[]`, `pack[]`, `notes[]` |
+| `tour` | `slug`, `order`, `destination`, `durationHours`, `priceFrom`, `featured`, `format` (`shared`/`private`/`both`), `languages` (json), `image`, `imageUrl`, `gallery`, `galleryUrls`, `itineraryFile`, `itineraryFileUrl`, `latitude`, `longitude`, `meetingPointUrl` | `title`, `seoTitle`, `seoDescription`, `assurances[]` (opcional, sustituye las globales), `description`, `lead`, `meeting`, `termsSummary`, `paragraphs[]`, `expandedParagraphs[]`, `practices[]`, `itinerary[]`, `videos[]`, `included[]`, `excluded[]`, `pack[]`, `notes[]`, `waiverBody` (Markdown), `faqs[]` (`shared.faq`) |
 | `translation` | `key`, `group`, `page`, `section`, `label`, `note`, `kind` (`short`/`long`) | `value` |
 | `media-slot` | `key`, `page`, `section`, `description`, `image`, `imageUrl`, `video`, `videoUrl`, `videoWebmUrl`, `poster`, `posterUrl` | `alt` |
 | `page` | `slug`, `heroImage`, `heroImageUrl` | `title`, `lead`, `body` (Markdown), `seoTitle`, `seoDescription` |
@@ -55,13 +55,13 @@ Localizados = un valor por idioma (`en` por defecto, `es`). El resto se sincroni
 | `product` | `slug`, `order`, `price`, `featured`, `image`, `imageUrl`, `gallery` | `title`, `description`, `details` (Markdown) |
 | `site-setting` (single) | `email`, `phone`, `whatsapp` (solo digitos), `instagram`, `facebook`, `tiktok`, `youtube`, `linkedin`, `google`, `tripadvisor`, `legalName`, `ruc`, `brandName`, `legalYear`, `shareImage`, `shareImageUrl` | - |
 | `theme-setting` (single) | `light`, `dark` (`theme.palette`), `fontSans`, `fontHeading` (enum: `radio-canada`, `inter`, `poppins`, `montserrat`, `dm-sans`, `playfair-display`, `lora`, `merriweather`, `system`), `radius` (enum: `none`, `small`, `medium`, `large`, `full`), `headerSize` (enum: `compact`, `standard`, `tall`), `introEnabled`, `introAccent` (hex), `introRestScale`, `introFailsafeMs` | - |
-| `booking-setting` (single) | `depositRate` (0..1), `adultsMin`, `adultsDefault`, `childrenMin`, `childrenDefault`, `peopleMax`, `currencyCode` | `assurances[]` (`shared.feature`) |
+| `booking-setting` (single) | `depositRate` (0..1, **obsoleto**, ver abajo), `availabilityMonths` (1..12, 3 por defecto), `adultsMin`, `adultsDefault`, `childrenMin`, `childrenDefault`, `peopleMax`, `currencyCode` | `assurances[]` (`shared.feature`) |
 | `form-setting` (single) | `nameMin`, `nameMax`, `emailMax`, `messageMax` | - |
 | `navigation` (single) | - | `headerLinks[]`, `footerBrandLinks[]`, `footerLegalLinks[]` (`shared.nav-link`), `planTripLabel`, `planTripPath` |
-| `reservation` (solo `create`) | `tourSlug`, `tourTitle`, `date`, `language`, `format`, `adults`, `children`, `payment`, `amount`, `locale`, `name`, `email`, `phone`, `notes`, `status` | - |
+| `reservation` (solo `create`, **legado**, ver abajo) | `tourSlug`, `tourTitle`, `date`, `language`, `format`, `adults`, `children`, `payment`, `amount`, `locale`, `name`, `email`, `phone`, `notes`, `status` | - |
 | `contact-message` (solo `create`) | `name`, `email`, `whatsapp`, `country`, `message`, `locale`, `handled` | - |
 
-Componentes: `theme.palette` {background, foreground, card, cardForeground, popover, popoverForeground, primary, primaryForeground, secondary, secondaryForeground, muted, mutedForeground, accent, accentForeground, destructive, border, input, ring, tierra, tierraForeground, arena, arenaForeground} (cada uno un hex `#rrggbb` o `#rrggbbaa`, validado por regex, elegido con el selector de color `plugin::color-picker.color`; `light` se aplica en `:root`, `dark` bajo la clase `.dark`). Equivalencias: `radius` none=0, small=0.25rem, medium=0.625rem, large=1rem, full=pill; `headerSize` compact=3rem/3.5rem/4rem, standard=3.5rem/4rem/5rem, tall=4rem/5rem/6rem (movil/640px/1024px) — la tabla exacta la define el frontend. `shared.nav-link` {label, path, fragment, kind: `link`|`tours-menu`}: `tours-menu` marca el item del header cuyo desplegable el frontend construye con destinos y tours. `shared.*`: `feature` {icon, title, body}, `stop` {image, imageUrl, title, body, expandedBody}, `video` {poster, posterUrl, webm, webmUrl, mp4, mp4Url}, `list-item` {text}.
+Componentes: `theme.palette` {background, foreground, card, cardForeground, popover, popoverForeground, primary, primaryForeground, secondary, secondaryForeground, muted, mutedForeground, accent, accentForeground, destructive, border, input, ring, tierra, tierraForeground, arena, arenaForeground} (cada uno un hex `#rrggbb` o `#rrggbbaa`, validado por regex, elegido con el selector de color `plugin::color-picker.color`; `light` se aplica en `:root`, `dark` bajo la clase `.dark`). Equivalencias: `radius` none=0, small=0.25rem, medium=0.625rem, large=1rem, full=pill; `headerSize` compact=3rem/3.5rem/4rem, standard=3.5rem/4rem/5rem, tall=4rem/5rem/6rem (movil/640px/1024px) — la tabla exacta la define el frontend. `shared.nav-link` {label, path, fragment, kind: `link`|`tours-menu`}: `tours-menu` marca el item del header cuyo desplegable el frontend construye con destinos y tours. `shared.*`: `feature` {icon, title, body}, `stop` {image, imageUrl, title, body, expandedBody}, `video` {poster, posterUrl, webm, webmUrl, mp4, mp4Url}, `list-item` {text}, `faq` {question, answer}.
 
 Un medio subido (`image`, `poster`, ...) tiene prioridad sobre su campo `*Url`; las rutas relativas (`/uploads/...`) se resuelven con `STRAPI_PUBLIC_URL` en el frontend.
 
@@ -87,3 +87,65 @@ En el CMS: `CLIENT_URLS` (CORS) debe incluir el origen del frontend, y `PUBLIC_U
 ## Publicacion de cambios
 
 El frontend renderiza todas sus rutas por peticion y lee el CMS con una cache de servidor corta (`STRAPI_CACHE_TTL_MS`, 30 s por defecto): lo publicado se ve en menos de ese tiempo, sin webhook ni reconstruccion. Si el CMS no responde, el frontend sirve la ultima respuesta buena y, si no hay, sus valores por defecto.
+
+## Cambios que requiere el mapper de `desertica-web`
+
+Para esta ola: leer `availabilityMonths` (ya lo hace) y dejar de leer `depositRate` cuando el flujo legado desaparezca; el deposito sale del API. Todo lo siguiente es nuevo, aditivo y vacio por defecto (`null` / `[]`); el frontend actual no se rompe si lo ignora. El mapper (`src/app/core/cms/`) lo incorporara en otra sesion.
+
+Campos nuevos de `tour`:
+
+| Campo | Tipo | Localizado | Populate | Notas |
+| --- | --- | --- | --- | --- |
+| `waiverBody` | richtext (Markdown) | si | ninguno (campo plano) | texto del descargo de responsabilidad que firma cada pasajero; `null` = el tour no define uno |
+| `latitude` | decimal (-90..90) | no | ninguno | latitud del punto de encuentro; `null` si no esta |
+| `longitude` | decimal (-180..180) | no | ninguno | longitud del punto de encuentro; `null` si no esta |
+| `meetingPointUrl` | string | no | ninguno | enlace de mapa del punto de encuentro |
+| `faqs[]` | componente repetible `shared.faq` {`question`, `answer`} | si | `populate[faqs]=true` | para la ficha y para datos estructurados (`FAQPage`) |
+
+`meeting` sigue siendo el texto del punto de encuentro. Los campos planos nuevos se devuelven sin populate (con `fields[]` explicito hay que listarlos); solo `faqs` necesita `populate[faqs]=true` (el componente no contiene medios).
+
+Campo nuevo de `booking-setting` (single type, no localizado, sin populate; aparece en `/api/booking-setting?locale=`):
+
+| Campo | Tipo | Notas |
+| --- | --- | --- |
+| `availabilityMonths` | entero 1..12, por defecto 3 | cuantos meses de calendario muestra la web. Las bases nuevas lo traen en 3; en una base existente puede venir `null` hasta que alguien guarde `Booking rules`, y la web usa 3. El mapper actual ya lo lee (`booking-defaults.ts` lo limita a 1..12) |
+
+`booking-setting.depositRate` esta **obsoleto**: ignorado por el motor de reservas nuevo; se retira cuando la web deje de leerlo. El deposito lo decide el API (`Setting.depositPercent`). No se borra ni se renombra. Hoy lo leen en `desertica-web`: `src/app/core/cms/cms-mapper.ts` (`mapBooking`), `booking-defaults.ts` (`withBookingDefaults`/`DEFAULT_BOOKING`) y `src/app/features/tours/detail/tour-book.ts` (`TOUR_DEPOSIT_RATE`, `tourDuePrice`, formulario de reserva legado). El flujo nuevo (`booking-panel`, `checkout*`) usa `depositCents` del API y no lo lee.
+
+Paginas nuevas (colección `pages`, mismo populate `heroImage`): `cancellation` y `cookies` (ver abajo). No hay cambios en el resto de endpoints.
+
+## Documentos legales y su slug
+
+El API (`desertica-api`) guarda un snapshot del texto de cada version al publicarla. El slug de `page` que se debe leer por tipo de documento:
+
+| Tipo de documento | Slug de `page` | Origen |
+| --- | --- | --- |
+| `TERMS` | `terms` | seed |
+| `PRIVACY` | `privacy` | seed |
+| `CANCELLATION` | `cancellation` | borrador vacio creado al arrancar |
+| `COOKIES` | `cookies` | borrador vacio creado al arrancar |
+| `CONDUCT` | `conduct` | seed |
+
+Otras paginas existentes: `complaints`, `legal-mincetur` (el slug real es con guion, no `legal/mincetur`), `products`, `blog`. El texto va en `body` (Markdown) y es localizado (`en`, `es`); el snapshot debe leerse con `?locale=` y `status=published`.
+
+`cancellation` y `cookies` no estan en `seed/catalog.json` (generado, no se edita a mano). Al arrancar, `ensureExtraPages` en `src/index.ts` crea ambas, solo una vez por base de datos (marca en el store `plugin_desertica_extra-pages`), con titulo en `en`/`es`, cuerpo vacio y **en borrador**: no aparecen en la API publica hasta que alguien escriba el texto y pulse `Publish` en cada idioma. Si se borran a proposito no se recrean. Para crearlas a mano: `Pages — Page` > `Create new entry`, slug `cancellation` o `cookies`, titulo y cuerpo en `en` y `es`, `Publish`. Si el slug no esta publicado el API debe tratarlo como "documento sin texto" y no publicar una version vacia.
+
+## Descargo de los tours (`waiverBody`)
+
+Cada cambio **publicado** del `waiverBody` genera una version nueva en el API (que guarda el snapshot) y los pasajeros firman el texto vigente al reservar. El CMS no versiona: guardar un borrador no cambia nada para los pasajeros. La ayuda del campo en el admin lo explica.
+
+## Paginas legales en el admin
+
+Las siete paginas legales (`terms`, `privacy`, `cancellation`, `cookies`, `conduct`, `complaints`, `legal-mincetur`) son del mismo tipo `page` y comparten campos (`title`, `lead`, `body`, SEO). En `Pages — Page` la lista va ordenada por `slug` (columnas `title`, `slug`, `updatedAt`, mas el estado de Strapi); comparte lista con las paginas hub `blog` y `products`. No hay cambios de contrato.
+
+Textos de ejemplo NO LEGALES para desarrollo: `docs/DEV-LEGAL-SAMPLES.md`.
+
+## `reservation` es legado
+
+La coleccion `reservation` (y `POST /api/reservations`) sera reemplazada por `desertica-api` (dinero, cupos y reservas) cuando se active el checkout nuevo. Hasta entonces se mantiene tal cual y **sus permisos publicos (`create`) no se retiran**: el frontend actual la sigue usando. Al activar el checkout nuevo se retirara el permiso y la coleccion pasara a solo lectura/archivo en un cambio aparte, coordinado con `desertica-web`. `contact-message` no cambia.
+
+## Inconsistencia `translation.page` vs `media-slot.page`
+
+`media-slot.page` tenia el valor `brand` y `translation.page` no. Se anadio `brand` al enum de `translation.page` (cambio aditivo: no altera filas existentes ni el contrato: `translation.page` solo organiza el admin). Ambos enums quedan iguales.
+
+Webhook opcional de publicacion para invalidar caches: ver `docs/WEBHOOKS.md`.
