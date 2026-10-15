@@ -1,0 +1,93 @@
+name: Image and deploy
+
+# develop  -> image :develop  -> deploys to staging automatically
+# v* tag   -> image :vX.Y.Z   -> deploys to production after environment approval
+on:
+  push:
+    branches: [develop]
+    tags: ['v*']
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: image-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  IMAGE: ghcr.io/desertica/desertica-cms
+
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
+      security-events: write
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Log in to GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=raw,value=develop,enable=${{ github.ref == 'refs/heads/develop' }}
+            type=sha,prefix=sha-,format=short
+            type=semver,pattern=v{{version}}
+            type=semver,pattern=v{{major}}.{{minor}}
+      - id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          load: ${{ github.event_name == 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          sbom: true
+          provenance: mode=max
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Scan image (fails on fixable HIGH/CRITICAL)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ env.IMAGE }}:${{ steps.meta.outputs.version }}
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'
+      - name: Sign image (keyless)
+        if: github.event_name != 'pull_request'
+        uses: sigstore/cosign-installer@v3
+      - if: github.event_name != 'pull_request'
+        run: cosign sign --yes "${{ env.IMAGE }}@${{ steps.build.outputs.digest }}"
+
+  deploy-staging:
+    if: github.ref == 'refs/heads/develop'
+    needs: image
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Trigger Coolify
+        run: curl -fsS --retry 3 -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" "${{ secrets.COOLIFY_STAGING_WEBHOOK }}"
+
+  deploy-production:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: image
+    runs-on: ubuntu-latest
+    environment: production   # configure required reviewers on this environment
+    steps:
+      - name: Trigger Coolify
+        run: curl -fsS --retry 3 -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" "${{ secrets.COOLIFY_PRODUCTION_WEBHOOK }}"
