@@ -12,7 +12,21 @@ Hoy no hace falta: el frontend lee el CMS con una cache de servidor corta (`STRA
 
 ## Que recibe el receptor
 
-`POST` con JSON, p. ej. `{ "event": "entry.publish", "createdAt": "...", "model": "tour", "uid": "api::tour.tour", "entry": { "documentId": "...", "slug": "...", "locale": "es", ... } }`. Con i18n llega un evento por idioma publicado. El receptor puede invalidar por `model` (y `entry.slug`/`entry.locale` si quiere ser fino) o vaciar todo. Responder 2xx rapido. La forma exacta del cuerpo y las opciones de la pantalla dependen de la version de Strapi (5.56.0 aqui): comprobar con `Trigger` antes de escribir el receptor.
+`POST` con JSON y cabeceras `Content-Type: application/json` y `X-Strapi-Event: <evento>` (mas las que se hayan configurado, p. ej. el secreto). Cuerpo:
+
+```json
+{ "event": "entry.publish", "createdAt": "2026-10-04T22:00:00.000Z", "model": "tour", "uid": "api::tour.tour",
+  "entry": { "id": 4, "documentId": "...", "slug": "...", "locale": "es", "publishedAt": "...", "...": "..." } }
+```
+
+- `model` es el `singularName` (`tour`, `page`, `booking-setting`...); `uid` es el uid completo.
+- `entry` es la fila completa y sanitizada (relaciones y componentes poblados, sin campos privados). En `entry.unpublish` y `entry.delete` no se puebla: llegan solo los campos propios.
+- Con i18n llega un evento por idioma publicado/despublicado (`entry.locale`).
+- `entry.update` se emite tambien al guardar un **borrador**; para saber que es publico usar `entry.publish`.
+- No hay firma HMAC: la autenticacion es la cabecera secreta propia. El receptor tiene 10 s para responder, **no hay reintentos** (por eso la cache debe expirar por TTL) y Strapi procesa 5 envios a la vez.
+- Solo `Publish` y `Unpublish` aparecen para tipos con borrador; los demas eventos (`Create`, `Update`, `Delete`, `Media`) son opcionales.
+
+Verificado contra el codigo de Strapi 5.56.0 instalado (`@strapi/core` `webhook-runner` y `document-service/events`), no contra docs.strapi.io (sin acceso desde esta sesion: el proxy lo bloquea). Antes de escribir el receptor, pulsar `Trigger` en el admin: su cuerpo es solo `{ "event": "trigger-test", "createdAt": "..." }` (sin `model` ni `entry`), asi que sirve para probar conectividad y secreto, no el formato de los eventos reales.
 
 ## Notas
 

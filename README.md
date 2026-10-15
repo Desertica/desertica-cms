@@ -66,7 +66,7 @@ Usa una base de pruebas o local: crea y borra un token de API temporal, y el log
 | `contact-message` | no | no | `name`, `email`, `whatsapp`, `country`, `message`, `locale`, `handled` |
 | `site-setting` (single) | no | no | `email`, `phone`, `whatsapp`, redes (`instagram`, `facebook`, `tiktok`, `youtube`, `linkedin`, `google`, `tripadvisor`), `legalName`, `ruc`, `brandName`, `legalYear`, `shareImage`/`shareImageUrl` |
 | `theme-setting` (single) | no | no | `light`, `dark` (componente `theme.palette`, 22 colores en hex con selector de color, plugin oficial `@strapi/plugin-color-picker` 5.56.0, habilitado en `config/plugins.ts`), `fontSans`, `fontHeading` (selector de 9 fuentes), `radius` (none/small/medium/large/full), `headerSize` (compact/standard/tall), `introEnabled`, `introAccent`, `introRestScale`, `introFailsafeMs` |
-| `booking-setting` (single) | si | no | no localizados: `depositRate` (0..1), `adultsMin`, `adultsDefault`, `childrenMin`, `childrenDefault`, `peopleMax`, `currencyCode`; localizado: `assurances` (`shared.feature`) |
+| `booking-setting` (single) | si | no | no localizados: `depositRate` (0..1, obsoleto: el deposito lo decide el API), `availabilityMonths` (1..12, por defecto 3), `adultsMin`, `adultsDefault`, `childrenMin`, `childrenDefault`, `peopleMax`, `currencyCode`; localizado: `assurances` (`shared.feature`) |
 | `form-setting` (single) | no | no | `nameMin`, `nameMax`, `emailMax`, `messageMax` |
 | `navigation` (single) | si | no | localizados: `headerLinks`, `footerBrandLinks`, `footerLegalLinks` (`shared.nav-link`: `label`, `path`, `fragment`, `kind` = `link`/`tours-menu`), `planTripLabel`, `planTripPath` |
 | `translation` | si | no | no localizados: `key`, `group`, `page`, `section`, `label`, `note`, `kind` (`short`/`long`); localizado: `value` (cadenas de interfaz de `src/locales/{en,es}.json`, sin las claves de tours y destinos) |
@@ -81,6 +81,7 @@ Notas del modelo:
 
 - `tour` incluye ademas `waiverBody` (descargo de responsabilidad, localizado), `latitude`, `longitude`, `meetingPointUrl` y `faqs[]` (`shared.faq`, localizado); todos opcionales. Detalle y populate en `CONTRACT.md`.
 - `reservation` es **legado**: `desertica-api` la reemplazara cuando el checkout nuevo se active. Hasta entonces se queda como esta y sus permisos publicos (`create`) no se retiran.
+- Para probar con textos de ejemplo NO LEGALES (descargo, cancelacion, cookies) en un CMS de desarrollo: `docs/DEV-LEGAL-SAMPLES.md`.
 - Las paginas legales `cancellation` y `cookies` se crean vacias y en borrador al arrancar (una vez); hay que redactarlas y publicarlas. Slugs por documento legal en `CONTRACT.md`.
 - Webhook de publicacion (opcional): `docs/WEBHOOKS.md`.
 
