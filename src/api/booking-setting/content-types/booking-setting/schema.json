@@ -4,7 +4,7 @@
   "info": {
     "singularName": "booking-setting",
     "pluralName": "booking-settings",
-    "displayName": "Site — Booking rules",
+    "displayName": "Sitio — Reglas de reserva",
     "description": "Calendar months shown, party size limits, currency and the assurances shown next to the booking form. The deposit is decided by the booking API."
   },
   "options": {

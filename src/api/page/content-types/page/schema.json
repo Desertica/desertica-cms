@@ -4,7 +4,7 @@
   "info": {
     "singularName": "page",
     "pluralName": "pages",
-    "displayName": "Pages — Page",
+    "displayName": "Páginas — Página",
     "description": "Legal pages and hub pages with Markdown body and SEO fields."
   },
   "options": {

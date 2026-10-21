@@ -4,7 +4,7 @@
   "info": {
     "singularName": "form-setting",
     "pluralName": "form-settings",
-    "displayName": "Site — Forms",
+    "displayName": "Sitio — Formularios",
     "description": "Validation limits of the contact form."
   },
   "options": {

@@ -4,7 +4,7 @@
   "info": {
     "singularName": "destination",
     "pluralName": "destinations",
-    "displayName": "Catalog — Destination",
+    "displayName": "Catálogo — Destino",
     "description": "Destination hubs (Nazca, Huacachina, Paracas) with their title, lead and footer placement."
   },
   "options": {

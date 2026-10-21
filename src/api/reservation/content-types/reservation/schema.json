@@ -4,7 +4,7 @@
   "info": {
     "singularName": "reservation",
     "pluralName": "reservations",
-    "displayName": "Inbox — Reservation",
+    "displayName": "Bandeja — Solicitud de reserva",
     "description": "Reservation requests sent from the tour page. Update the status after replying."
   },
   "options": {
