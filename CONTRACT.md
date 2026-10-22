@@ -86,7 +86,7 @@ En el CMS: `CLIENT_URLS` (CORS) debe incluir el origen del frontend, y `PUBLIC_U
 
 ## Publicacion de cambios
 
-El frontend renderiza todas sus rutas por peticion y lee el CMS con una cache de servidor corta (`STRAPI_CACHE_TTL_MS`, 30 s por defecto): lo publicado se ve en menos de ese tiempo, sin webhook ni reconstruccion. Si el CMS no responde, el frontend sirve la ultima respuesta buena y, si no hay, sus valores por defecto.
+El frontend renderiza todas sus rutas por peticion y lee el CMS con una cache de servidor corta (`STRAPI_CACHE_TTL_MS`, 30 s por defecto): lo publicado se ve en menos de ese tiempo mas los 10 s que la web guarda cada pagina publica en memoria (`PAGE_CACHE_TTL_MS`), unos 40 s en total, sin webhook ni reconstruccion. Si el CMS no responde, el frontend sirve la ultima respuesta buena y, si no hay, sus valores por defecto.
 
 ## Cambios que requiere el mapper de `desertica-web`
 
