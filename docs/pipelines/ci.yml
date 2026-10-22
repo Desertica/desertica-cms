@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, develop, staging]
+    branches: ['**']
   pull_request:
 
 permissions:
@@ -34,6 +34,18 @@ jobs:
           case "${{ github.head_ref }}" in
             claude/*) echo "::error::Branch names must not start with claude/"; exit 1;;
           esac
+
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
 
   build:
     runs-on: ubuntu-latest

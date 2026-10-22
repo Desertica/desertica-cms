@@ -25,6 +25,7 @@ Abre una PR cualquiera hacia `develop` para que los checks aparezcan: GitHub sol
 | Check | Que hace |
 |---|---|
 | `commit-policy` | sin Co-Authored-By ni ramas `claude/*` |
+| `lint` | ESLint sobre `src/` y `config/` (errores bloquean; `any` y variables sin usar solo avisan) |
 | `build` | typecheck, tests, seed-check, build del admin |
 | `smoke` | arranca Strapi con SQLite y exige `/_health` = 204 |
 | `secrets` | gitleaks sobre todo el historial |
@@ -34,6 +35,8 @@ Abre una PR cualquiera hacia `develop` para que los checks aparezcan: GitHub sol
 5. **Create** / **Save changes**.
 
 Si un check no aparece en el buscador, aun no ha corrido: abre una PR y vuelve.
+
+Los workflows corren en toda PR (cualquier rama base) y en todo push a cualquier rama. `docker.yml` solo publica/despliega desde `develop` y tags `v*`.
 
 ## 2. Alertas (Settings -> Code security)
 Activa **Dependabot alerts**, **Dependabot security updates**, **Secret scanning** y **Push protection**. Dependabot ya esta configurado en `.github/dependabot.yml`.
