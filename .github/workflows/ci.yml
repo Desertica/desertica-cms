@@ -30,6 +30,7 @@ jobs:
       ENCRYPTION_KEY: ci
       JWT_SECRET: ci
       FORMS_PROXY_SECRET: ci
+      CLIENT_URLS: http://localhost:4200
       SEED_ON_EMPTY: 'true'
     steps:
       - uses: actions/checkout@v4

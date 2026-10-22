@@ -4,6 +4,7 @@ import type { Core } from '@strapi/strapi';
 import { ensureSampleTour } from './sample-tour';
 import { registerTranslateRoute } from './translate';
 import { catalogNeedsSeed, clean, markCatalogSeeded, seedLocalized, syncNewTranslations } from './seed-sync';
+import { assertProductionEnv } from './production-env';
 import { registerBookingGuard } from './booking-guard';
 import { registerPlaceholderGuard } from './placeholders';
 import { LOCALE_NAMES, configureContentManager } from './content-manager';
@@ -307,18 +308,7 @@ export default {
     registerTranslateRoute(strapi);
     registerPlaceholderGuard(strapi);
     registerBookingGuard(strapi);
-    // The example secrets are public in the repo: signing admin tokens with them would open the panel.
-    const placeholders = ['APP_KEYS', 'API_TOKEN_SALT', 'ADMIN_JWT_SECRET', 'TRANSFER_TOKEN_SALT', 'ENCRYPTION_KEY', 'JWT_SECRET'].filter((key) =>
-      /changeMe/i.test(process.env[key] ?? ''),
-    );
-    if (process.env.NODE_ENV === 'production' && placeholders.length) {
-      throw new Error(`Placeholder secrets in production: ${placeholders.join(', ')}. Generate real values.`);
-    }
-
-    // Without it every visitor shares the proxy's IP: ten form submissions in ten minutes for the whole website.
-    if (process.env.NODE_ENV === 'production' && !process.env.FORMS_PROXY_SECRET) {
-      throw new Error('FORMS_PROXY_SECRET is required in production (the same value as the website).');
-    }
+    assertProductionEnv(process.env);
   },
 
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
