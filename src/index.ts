@@ -137,6 +137,24 @@ async function syncNewTranslations(strapi: Core.Strapi) {
   if (missing.length) strapi.log.info(`[seed] ${missing.length} new translation(s) added`);
 }
 
+/**
+ * The built-in Editor role is what partners get: tours, destinations, texts, media and pages. Strapi gives it
+ * the inbox too, which holds customers' names, e-mails and WhatsApp numbers, so those two types are taken away
+ * once; an admin can grant them back from Settings > Roles and the change is kept.
+ */
+async function restrictEditorRole(strapi: Core.Strapi) {
+  const store = strapi.store({ type: 'plugin', name: 'desertica', key: 'editor-role' });
+  if (await store.get({})) return;
+
+  const role = await strapi.db.query('admin::role').findOne({ where: { code: 'strapi-editor' } });
+  if (!role) return;
+
+  const subjects = ['api::reservation.reservation', 'api::contact-message.contact-message'];
+  const { count } = (await strapi.db.query('admin::permission').deleteMany({ where: { role: role.id, subject: { $in: subjects } } })) as { count: number };
+  await store.set({ value: { done: true } });
+  strapi.log.info(`[bootstrap] Editor role: ${count} inbox permission(s) removed`);
+}
+
 async function seedCatalog(strapi: Core.Strapi) {
   if (process.env.SEED_ON_EMPTY === 'false') return;
 
@@ -566,6 +584,11 @@ export default {
       await grantPublicPermissions(strapi);
     } catch (error) {
       strapi.log.error(`[bootstrap] permissions failed: ${(error as Error).message}`);
+    }
+    try {
+      await restrictEditorRole(strapi);
+    } catch (error) {
+      strapi.log.error(`[bootstrap] editor role failed: ${(error as Error).message}`);
     }
     try {
       await configureContentManager(strapi);
