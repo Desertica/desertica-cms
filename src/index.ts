@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import type { Core } from '@strapi/strapi';
+import { ensureSampleTour } from './sample-tour';
 import { COMPONENT_FIELDS, CONTENT_TYPE_FIELDS, type FieldMeta } from './admin-es';
 
 const PUBLIC_ACTIONS = [
@@ -105,6 +106,36 @@ async function seedExtras(strapi: Core.Strapi, source: string) {
   }
 }
 
+function seedSource(): string | null {
+  const file = path.join(__dirname, '..', '..', 'seed', 'catalog.json');
+  const altFile = path.join(process.cwd(), 'seed', 'catalog.json');
+  const source = fs.existsSync(file) ? file : altFile;
+  return fs.existsSync(source) ? source : null;
+}
+
+/**
+ * Texts the website gains after the first seed (a new button, the cookie banner) appear as rows in
+ * "Textos" without reseeding. Each key is offered once: a row an editor deletes does not come back,
+ * and existing rows are never touched. Runs whatever SEED_ON_EMPTY says.
+ */
+async function syncNewTranslations(strapi: Core.Strapi) {
+  const source = seedSource();
+  if (!source) return;
+
+  const uid = 'api::translation.translation';
+  const store = strapi.store({ type: 'plugin', name: 'desertica', key: 'translations-offered' });
+  const offered = new Set<string>(((await store.get({})) as { keys?: string[] } | null)?.keys ?? []);
+  const existing = new Set((await strapi.documents(uid as any).findMany({ locale: 'en', fields: ['key'], limit: 5000 })).map((row: any) => row.key));
+  const rows = (JSON.parse(fs.readFileSync(source, 'utf8')).translations ?? []).filter((row: any) => !offered.has(row.key));
+  const missing = rows.filter((row: any) => !existing.has(row.key));
+  await seedLocalized(strapi, uid, missing.map(({ i18n, ...base }: any) => ({ base: clean(base), i18n, publish: false })));
+  if (rows.length) {
+    await store.set({ value: { keys: [...offered, ...rows.map((row: any) => row.key)] } });
+  }
+
+  if (missing.length) strapi.log.info(`[seed] ${missing.length} new translation(s) added`);
+}
+
 async function seedCatalog(strapi: Core.Strapi) {
   if (process.env.SEED_ON_EMPTY === 'false') return;
 
@@ -112,10 +143,8 @@ async function seedCatalog(strapi: Core.Strapi) {
   const tourUid = 'api::tour.tour';
   const settingUid = 'api::site-setting.site-setting';
 
-  const file = path.join(__dirname, '..', '..', 'seed', 'catalog.json');
-  const altFile = path.join(process.cwd(), 'seed', 'catalog.json');
-  const source = fs.existsSync(file) ? file : altFile;
-  if (!fs.existsSync(source)) {
+  const source = seedSource();
+  if (!source) {
     strapi.log.warn('[seed] seed/catalog.json not found; skipping');
     return;
   }
@@ -545,6 +574,18 @@ export default {
       await seedCatalog(strapi);
     } catch (error) {
       strapi.log.error(`[seed] failed (boot continues): ${(error as Error).stack ?? error}`);
+    }
+    if (process.env.SEED_SAMPLE_TOUR === 'true') {
+      try {
+        await ensureSampleTour(strapi);
+      } catch (error) {
+        strapi.log.error(`[seed] sample tour failed (boot continues): ${(error as Error).stack ?? error}`);
+      }
+    }
+    try {
+      await syncNewTranslations(strapi);
+    } catch (error) {
+      strapi.log.error(`[seed] translation sync failed (boot continues): ${(error as Error).stack ?? error}`);
     }
     try {
       await ensureExtraPages(strapi);

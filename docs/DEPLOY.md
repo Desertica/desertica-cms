@@ -110,3 +110,8 @@ El `Dockerfile`, Postgres (incluido `DATABASE_URL`, con la semilla), las subidas
 - `global::public-guard` rechaza (415) cuerpos multipart anonimos fuera de `/api/upload` y fuerza `status=published` en peticiones sin `Authorization`, para que el rol Public no lea borradores.
 - Al arrancar, el rol Public queda exactamente con `PUBLIC_ACTIONS` (se borra el registro de usuarios y demas rutas de users-permissions).
 - En produccion, Strapi no arranca si algun secreto conserva el valor `changeMe` de `.env.example`.
+
+## Contenido de ejemplo y textos nuevos
+
+- `SEED_SAMPLE_TOUR=true` (solo staging) crea una vez el tour `[EJEMPLO] Tour completo` con todos los campos en lorem ipsum, en ingles y espanol, y un PDF de muestra. Es un tour normal: los socios lo duplican para empezar uno nuevo y lo borran cuando no lo necesiten.
+- Al arrancar, los textos que la web gana despues del primer seed (por ejemplo el boton de WhatsApp o el banner de cookies) se agregan solos como filas de *Textos — Texto de la web*. Cada clave se ofrece una sola vez: una fila que un editor borra no vuelve y las existentes no se tocan. Las claves de pago, reservas, reclamaciones y descargo viven solo en el codigo de la web a proposito.
