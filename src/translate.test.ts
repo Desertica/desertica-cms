@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { deepl, plan, protect, restore } from './translate.ts';
+import { deepl, missingPlaceholders, plan, protect, restore } from './translate.ts';
 
 const strapi = {
   components: {
@@ -90,4 +90,10 @@ test('placeholders are shielded from DeepL and restored, and plain texts go thro
     async () => void (await deepl(['Plain'], 'en', 'es')),
   );
   assert.equal(sent.tag_handling, undefined);
+});
+
+test('missingPlaceholders reports dropped markers and ignores new or repeated ones', () => {
+  assert.deepEqual(missingPlaceholders('Hi, I want {tour} on {date}', 'Quiero {date}'), ['{tour}']);
+  assert.deepEqual(missingPlaceholders('{a} {a}', 'x {a}'), []);
+  assert.deepEqual(missingPlaceholders('Hola', 'Hola {extra}'), []);
 });

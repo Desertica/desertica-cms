@@ -10,7 +10,10 @@ const TEXT_TYPES = new Set(['string', 'text', 'richtext']);
 const DEEPL_LANG: Record<Locale, string> = { en: 'EN-US', es: 'ES' };
 
 /** `{tour}`-style placeholders must reach the website untouched, so DeepL is told to leave them out of the translation. */
-const PLACEHOLDER = /\{[A-Za-z0-9_.]+\}/g;
+export const PLACEHOLDER = /\{[A-Za-z0-9_.]+\}/g;
+/** Markers like `{tour}` that the original text has and the edited one lost. */
+export const missingPlaceholders = (original: string, edited: string): string[] =>
+  [...new Set(original.match(PLACEHOLDER) ?? [])].filter((p) => !edited.includes(p));
 const escapeXml = (text: string) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 export const protect = (text: string) => escapeXml(text).replace(PLACEHOLDER, (match) => `<keep>${match}</keep>`);
 export const restore = (text: string) => text.replace(/<\/?keep>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');

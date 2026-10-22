@@ -4587,6 +4587,294 @@
       }
     },
     {
+      "key": "booking.title",
+      "group": "booking",
+      "page": "booking",
+      "section": "flow",
+      "label": "Booking — Flow · title",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Book online"
+        },
+        "es": {
+          "value": "Reserva en línea"
+        }
+      }
+    },
+    {
+      "key": "booking.lead",
+      "group": "booking",
+      "page": "booking",
+      "section": "flow",
+      "label": "Booking — Flow · lead",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Pick a currency, a date and your group. We hold your seats while you check out."
+        },
+        "es": {
+          "value": "Elige moneda, fecha y tu grupo. Guardamos tus cupos mientras completas la reserva."
+        }
+      }
+    },
+    {
+      "key": "booking.noAvailability",
+      "group": "booking",
+      "page": "booking",
+      "section": "flow",
+      "label": "Booking — Flow · no availability",
+      "kind": "long",
+      "i18n": {
+        "en": {
+          "value": "No departures in the coming months for these options. Try another currency, format or language."
+        },
+        "es": {
+          "value": "No hay salidas en los próximos meses con estas opciones. Prueba otra moneda, formato o idioma."
+        }
+      }
+    },
+    {
+      "key": "booking.taxIncluded",
+      "group": "booking",
+      "page": "booking",
+      "section": "flow",
+      "label": "Booking — Flow · tax included",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Prices include taxes."
+        },
+        "es": {
+          "value": "Los precios incluyen impuestos."
+        }
+      }
+    },
+    {
+      "key": "booking.holdNote",
+      "group": "booking",
+      "page": "booking",
+      "section": "flow",
+      "label": "Booking — Flow · hold note",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "We hold your seats for a few minutes while you enter your details."
+        },
+        "es": {
+          "value": "Guardamos tus cupos unos minutos mientras ingresas tus datos."
+        }
+      }
+    },
+    {
+      "key": "checkout.title",
+      "group": "checkout",
+      "page": "booking",
+      "section": "checkout",
+      "label": "Booking — Checkout · title",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Checkout"
+        },
+        "es": {
+          "value": "Reserva"
+        }
+      }
+    },
+    {
+      "key": "checkout.empty",
+      "group": "checkout",
+      "page": "booking",
+      "section": "checkout",
+      "label": "Booking — Checkout · empty",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "You have no booking in progress. Pick a tour and a date to start."
+        },
+        "es": {
+          "value": "No tienes una reserva en curso. Elige un tour y una fecha para empezar."
+        }
+      }
+    },
+    {
+      "key": "checkout.passengersLead",
+      "group": "checkout",
+      "page": "booking",
+      "section": "checkout",
+      "label": "Booking — Checkout · passengers lead",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "One entry per traveller, as it appears on their ID."
+        },
+        "es": {
+          "value": "Un registro por viajero, tal como figura en su documento."
+        }
+      }
+    },
+    {
+      "key": "checkout.billingLead",
+      "group": "checkout",
+      "page": "booking",
+      "section": "checkout",
+      "label": "Booking — Checkout · billing lead",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Choose a boleta (receipt) or a factura (invoice, needs a RUC)."
+        },
+        "es": {
+          "value": "Elige boleta o factura (la factura requiere RUC)."
+        }
+      }
+    },
+    {
+      "key": "payment.successTitle",
+      "group": "payment",
+      "page": "booking",
+      "section": "payment",
+      "label": "Booking — Payment · success title",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Payment received"
+        },
+        "es": {
+          "value": "Pago recibido"
+        }
+      }
+    },
+    {
+      "key": "payment.successBody",
+      "group": "payment",
+      "page": "booking",
+      "section": "payment",
+      "label": "Booking — Payment · success body",
+      "kind": "long",
+      "i18n": {
+        "en": {
+          "value": "Thank you. Your payment is confirmed and your booking is updated. We also sent the details to your email."
+        },
+        "es": {
+          "value": "Gracias. Tu pago está confirmado y tu reserva se actualizó. También te enviamos el detalle por correo."
+        }
+      }
+    },
+    {
+      "key": "payment.pendingTitle",
+      "group": "payment",
+      "page": "booking",
+      "section": "payment",
+      "label": "Booking — Payment · pending title",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "We are confirming your payment"
+        },
+        "es": {
+          "value": "Estamos confirmando tu pago"
+        }
+      }
+    },
+    {
+      "key": "payment.pendingBody",
+      "group": "payment",
+      "page": "booking",
+      "section": "payment",
+      "label": "Booking — Payment · pending body",
+      "kind": "long",
+      "i18n": {
+        "en": {
+          "value": "The payment went through on the card side, but our system has not confirmed it yet. Do not pay again: you will get an email as soon as it is confirmed, and you can check \"My booking\" in a few minutes."
+        },
+        "es": {
+          "value": "El pago se procesó en tu tarjeta, pero nuestro sistema aún no lo confirma. No pagues de nuevo: recibirás un correo apenas se confirme, y puedes revisar \"Mi reserva\" en unos minutos."
+        }
+      }
+    },
+    {
+      "key": "myBooking.lead",
+      "group": "myBooking",
+      "page": "booking",
+      "section": "my-booking",
+      "label": "Booking — My booking · lead",
+      "kind": "long",
+      "i18n": {
+        "en": {
+          "value": "Enter your booking reference and email. We will send you a link to open your booking."
+        },
+        "es": {
+          "value": "Ingresa tu referencia y tu correo. Te enviaremos un enlace para abrir tu reserva."
+        }
+      }
+    },
+    {
+      "key": "complaints.lead",
+      "group": "complaints",
+      "page": "legal",
+      "section": "complaints",
+      "label": "Legal — Complaints · lead",
+      "kind": "long",
+      "i18n": {
+        "en": {
+          "value": "Use this book to file a complaint (reclamo) or a grievance (queja) about our services. You will receive a copy by email."
+        },
+        "es": {
+          "value": "Usa este libro para registrar un reclamo o una queja sobre nuestros servicios. Recibirás una copia por correo."
+        }
+      }
+    },
+    {
+      "key": "complaints.legalNote",
+      "group": "complaints",
+      "page": "legal",
+      "section": "complaints",
+      "label": "Legal — Complaints · legal note",
+      "kind": "long",
+      "i18n": {
+        "en": {
+          "value": "Filing a complaint does not prevent you from using other dispute-resolution routes, and it is not a requirement to file a complaint with INDECOPI. We will answer within the legal deadline, which you will see after sending this form."
+        },
+        "es": {
+          "value": "La formulación del reclamo no impide acudir a otras vías de solución de controversias ni es requisito previo para interponer una denuncia ante el INDECOPI. Responderemos dentro del plazo legal, que verás al enviar este formulario."
+        }
+      }
+    },
+    {
+      "key": "complaints.doneTitle",
+      "group": "complaints",
+      "page": "legal",
+      "section": "complaints",
+      "label": "Legal — Complaints · done title",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "We received your complaint"
+        },
+        "es": {
+          "value": "Recibimos tu reclamación"
+        }
+      }
+    },
+    {
+      "key": "waiver.thanks",
+      "group": "waiver",
+      "page": "legal",
+      "section": "waiver",
+      "label": "Legal — Waiver · thanks",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Thank you. Your waiver is signed and saved."
+        },
+        "es": {
+          "value": "Gracias. Tu descargo quedó firmado y guardado."
+        }
+      }
+    },
+    {
       "key": "notFound.title",
       "group": "notFound",
       "page": "global",
