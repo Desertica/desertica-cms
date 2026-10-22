@@ -1,13 +1,36 @@
 name: CI
 
 on:
-  push:
-    branches: [main, develop]
   pull_request:
+    branches: [develop, staging, prod]
+  push:
+    branches: [develop, staging, prod]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build:
+  test-build:
+    name: test-build
     runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      HOST: 127.0.0.1
+      PORT: 1337
+      DATABASE_CLIENT: sqlite
+      DATABASE_FILENAME: .tmp/smoke.db
+      APP_KEYS: ci1,ci2,ci3,ci4
+      API_TOKEN_SALT: ci
+      ADMIN_JWT_SECRET: ci
+      TRANSFER_TOKEN_SALT: ci
+      ENCRYPTION_KEY: ci
+      JWT_SECRET: ci
+      FORMS_PROXY_SECRET: ci
+      SEED_ON_EMPTY: 'true'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -15,16 +38,36 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - name: Typecheck
-        run: npm run typecheck
-      - name: Seed is valid JSON with the expected shape
-        run: npm run seed-check
-      - name: Build admin panel
-        run: npm run build
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run seed-check
+      - run: npm run build
+      - name: Start Strapi on an empty database and wait for /_health
         env:
-          APP_KEYS: ci1,ci2,ci3,ci4
-          API_TOKEN_SALT: ci
-          ADMIN_JWT_SECRET: ci
-          TRANSFER_TOKEN_SALT: ci
-          ENCRYPTION_KEY: ci
-          JWT_SECRET: ci
+          NODE_ENV: production
+        run: |
+          npm start > smoke.log 2>&1 &
+          pid=$!
+          for i in $(seq 1 60); do
+            [ "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:1337/_health)" = 204 ] && exit 0
+            kill -0 $pid 2>/dev/null || break
+            sleep 2
+          done
+          cat smoke.log; exit 1
+
+  docker:
+    name: docker
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: The image builds
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+

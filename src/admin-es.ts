@@ -105,7 +105,7 @@ export const CONTENT_TYPE_FIELDS: Record<string, Fields> = {
     section: f('Sección', 'Bloque de la página (cabecera, formulario, errores...).'),
     label: f('Qué es este texto', 'Dónde y para qué se usa.'),
     note: f('Nota para el equipo', 'Es visible por la API pública aunque la web no la muestre: no escribas datos internos ni pendientes legales.'),
-    value: f('Texto que se muestra en la web', 'Un valor por idioma.'),
+    value: f('Texto que se muestra en la web', 'Un valor por idioma. No borres ni cambies los marcadores entre llaves ({tour}, {price}, {date}...): la web los reemplaza con el dato real y el CMS no deja guardar si falta alguno.'),
     kind: f('Tipo', 'short = texto corto, long = texto largo.'),
   },
   'api::media-slot.media-slot': {
