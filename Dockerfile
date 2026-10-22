@@ -4,6 +4,7 @@ ARG NODE_VERSION=22
 
 FROM node:${NODE_VERSION}-bookworm-slim AS base
 WORKDIR /opt/app
+ENV STRAPI_TELEMETRY_DISABLED=true
 
 # Toolchain for native modules (better-sqlite3 falls back to compiling when no prebuilt binary matches).
 FROM base AS toolchain

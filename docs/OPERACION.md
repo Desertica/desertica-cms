@@ -97,7 +97,7 @@ Según recuerdo, el plan gratuito cubre hasta 50 usuarios; compruébalo en Cloud
 
 - **Turnstile:** Cloudflare > Turnstile > *Add widget* para `stg.desertica.pe`. La *site key* va en `TURNSTILE_SITE_KEY` y la *secret key* en `TURNSTILE_SECRET_KEY` de la web.
 - **DeepL:** cuenta en deepl.com/pro-api (el plan gratuito sirve para empezar); la clave va en `DEEPL_API_KEY` del CMS.
-- **Socios:** *Settings > Administration panel > Users > Invite new user* con el rol **Editor**. El rol ya viene sin acceso a *Bandeja* (mensajes de clientes). Si no hay correo configurado, Strapi muestra el enlace de registro para que se lo envíes. Cada persona elige *Español* en su perfil.
+- **Socios:** *Settings > Administration panel > Users > Invite new user* con el rol **Editor**. El Editor edita y publica tours, destinos, páginas, blog, tienda, textos y medios, en `en` y `es`; no borra tours, destinos ni páginas (solo el Super Admin), ni entra a *Bandeja* (mensajes de clientes) ni a *Sitio* (datos de la empresa, colores, reglas de reserva, formularios, menús). Los permisos se fijan una sola vez al arrancar; si los cambias en *Settings > Roles* se conservan. Si no hay correo configurado, Strapi muestra el enlace de registro para que se lo envíes. Cada persona elige *Español* en su perfil.
 
 ## 7. De staging a producción (al lanzar)
 
@@ -105,6 +105,12 @@ Los socios cargan el contenido en staging. Al lanzar, hay dos caminos; ensáyalo
 
 - `npx strapi export --no-encrypt -f staging` en staging y `npx strapi import -f staging.tar.gz` en producción (contenido y archivos). No lo he probado en este proyecto.
 - O restaurar una copia de Postgres y apuntar producción al mismo bucket de imágenes.
+
+**Checklist de lanzamiento: páginas legales.** En una base nueva las siete (`terms`, `privacy`, `cancellation`, `cookies`, `conduct`, `complaints`, `legal-mincetur`) están en **borrador** y la web no las muestra hasta publicarlas. Antes de lanzar, en *Páginas — Página*:
+
+1. Redacta el texto definitivo (revisado por el abogado) de las siete, en **inglés y español**.
+2. Pulsa `Publish` en cada una, en cada idioma (14 publicaciones). Solo `blog` y `products` salen publicadas del seed.
+3. Comprueba sin credenciales: `curl -s "https://<cms>/api/pages?locale=es&filters[slug][$eq]=terms"` devuelve la página con `body`, y lo mismo para las otras seis y para `en`.
 
 Los secretos de producción son **distintos** de los de staging (`ENCRYPTION_KEY`, `JWT_SECRET`...): al copiar datos entre entornos, revisa que los tokens de API y de transferencia se vuelvan a crear en producción.
 

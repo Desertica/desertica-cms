@@ -1,5 +1,6 @@
 #!/bin/bash
-# Prepares cloud sessions: installs dependencies and creates .env with throwaway secrets.
+# Prepares cloud sessions: installs dependencies (npm ci, from the lockfile) and creates .env with throwaway secrets.
+# FORMS_PROXY_SECRET is random too, so it will not match the website's: forms sent from a real frontend get 403 in production mode.
 # Does nothing on a local machine. Idempotent.
 set -euo pipefail
 
@@ -14,7 +15,7 @@ if [ "$node_major" -gt 24 ]; then
   echo "warning: Node $node_major detected; Strapi is verified on Node 22." >&2
 fi
 
-npm install --no-audit --no-fund --prefer-offline
+npm ci --no-audit --no-fund --prefer-offline
 
 if [ ! -f .env ] && [ -f .env.example ]; then
   secret() { openssl rand -base64 24 | tr -d '\n/+=' ; }

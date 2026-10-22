@@ -4,7 +4,9 @@ const LOCALES = ['en', 'es'] as const;
 type Locale = (typeof LOCALES)[number];
 
 /** Text that is a value, not copy: icons, routes, kinds and media addresses stay as they are. */
-const KEEP = new Set(['slug', 'key', 'icon', 'path', 'fragment', 'kind', 'imageUrl', 'posterUrl', 'webmUrl', 'mp4Url', 'planTripPath']);
+const KEEP = new Set(['waiverBody', 'slug', 'key', 'icon', 'path', 'fragment', 'kind', 'imageUrl', 'posterUrl', 'webmUrl', 'mp4Url', 'planTripPath']);
+/** Legal texts are written and reviewed by a person: pages (terms, privacy...) and, through KEEP, the tours' waiverBody never go to DeepL. */
+const NOT_TRANSLATED = new Set(['api::page.page']);
 const TEXT_TYPES = new Set(['string', 'text', 'richtext']);
 
 const DEEPL_LANG: Record<Locale, string> = { en: 'EN-US', es: 'ES' };
@@ -94,6 +96,7 @@ export function plan(strapi: Core.Strapi, attrs: Record<string, Attr>, value: Re
 }
 
 export async function translateDocument(strapi: Core.Strapi, uid: string, documentId: string, from: Locale, to: Locale, userAbility?: unknown) {
+  if (NOT_TRANSLATED.has(uid)) throw Object.assign(new Error('Legal texts are not machine translated'), { status: 422 });
   const model = strapi.contentType(uid as any) as any;
   const populate = Object.fromEntries(
     Object.entries(model.attributes as Record<string, Attr>)
