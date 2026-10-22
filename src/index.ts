@@ -45,6 +45,11 @@ async function grantPublicPermissions(strapi: Core.Strapi) {
       strapi.log.info(`[bootstrap] public permission granted: ${action}`);
     }
   }
+
+  // users-permissions ships the Public role with register, login and password-reset routes; anyone could
+  // create an account. The Public role is exactly PUBLIC_ACTIONS.
+  const { count } = (await permQuery.deleteMany({ where: { role: role.id, action: { $notIn: PUBLIC_ACTIONS } } })) as { count: number };
+  if (count) strapi.log.info(`[bootstrap] ${count} extra public permission(s) removed`);
 }
 
 const clean = <T extends Record<string, any>>(obj: T): T =>
@@ -115,6 +120,7 @@ async function seedCatalog(strapi: Core.Strapi) {
     return;
   }
 
+  // shortcut: tours are seeded inside the destinations branch, so a crash between them leaves a catalog without tours; upgrade by seeding tours on their own count.
   const existingDestinations = await strapi.documents(destUid).count({ locale: 'en' });
   if (existingDestinations === 0) {
     const catalog = JSON.parse(fs.readFileSync(source, 'utf8'));
@@ -272,7 +278,7 @@ async function ensureExtraPages(strapi: Core.Strapi) {
 }
 
 const CM_UID = 'plugin::content-manager.content-types';
-const CM_CONFIG_VERSION = 8;
+const CM_CONFIG_VERSION = 9;
 
 type ListConfig = { fields: string[]; mainField?: string; sortBy?: string; sortOrder?: 'ASC' | 'DESC'; pageSize?: number };
 const LIST_CONFIGS: Record<string, ListConfig> = {
@@ -387,7 +393,11 @@ const EDIT_LAYOUTS: Record<string, Array<Array<{ name: string; size: number }>>>
   ],
 };
 
-const SINGLE_TYPE_TITLES: Record<string, string> = { 'api::theme-setting.theme-setting': 'fontSans' };
+const SINGLE_TYPE_TITLES: Record<string, string> = {
+  'api::theme-setting.theme-setting': 'fontSans',
+  'api::booking-setting.booking-setting': 'currencyCode',
+  'api::site-setting.site-setting': 'brandName',
+};
 
 /** Component layouts: uid -> rows. Grouped as surfaces, brand, text, states, accents. */
 const COMPONENT_LAYOUTS: Record<string, Array<Array<{ name: string; size: number }>>> = {
@@ -505,7 +515,15 @@ async function configureContentManager(strapi: Core.Strapi) {
 }
 
 export default {
-  register() {},
+  register() {
+    // The example secrets are public in the repo: signing admin tokens with them would open the panel.
+    const placeholders = ['APP_KEYS', 'API_TOKEN_SALT', 'ADMIN_JWT_SECRET', 'TRANSFER_TOKEN_SALT', 'ENCRYPTION_KEY', 'JWT_SECRET'].filter((key) =>
+      /changeMe/i.test(process.env[key] ?? ''),
+    );
+    if (process.env.NODE_ENV === 'production' && placeholders.length) {
+      throw new Error(`Placeholder secrets in production: ${placeholders.join(', ')}. Generate real values.`);
+    }
+  },
 
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
     try {

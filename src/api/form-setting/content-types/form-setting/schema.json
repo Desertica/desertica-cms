@@ -19,17 +19,20 @@
     "nameMax": {
       "type": "integer",
       "min": 1,
-      "default": 80
+      "default": 80,
+      "max": 80
     },
     "emailMax": {
       "type": "integer",
       "min": 1,
-      "default": 254
+      "default": 254,
+      "max": 254
     },
     "messageMax": {
       "type": "integer",
       "min": 1,
-      "default": 500
+      "default": 500,
+      "max": 500
     }
   }
 }

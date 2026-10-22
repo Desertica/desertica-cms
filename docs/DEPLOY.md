@@ -42,12 +42,12 @@ Sin Docker: `npm ci && npm run build && NODE_ENV=production npm run start` con l
 ## Lista de primera puesta en marcha
 
 1. Crear el administrador (comando de arriba o `/admin` si no hay ninguno).
-2. Editar **Site - Settings**: email, telefono, WhatsApp (solo digitos), redes y datos legales (el seed trae marcadores `XXXX`). Revisar Theme, Booking rules, Forms y Navigation.
+2. Editar **Sitio — Datos de la empresa**: email, telefono, WhatsApp (solo digitos), redes y datos legales (el seed trae marcadores `XXXX`). Revisar Colores y estilo, Reglas de reserva, Formularios y Menús.
 3. Subir los medios en **Media Library** y asignarlos (tours: `image`, `gallery`, `itineraryFile`, `itinerary[].image`, `videos`; destinos, `media-slot`, paginas, blog, productos, `shareImage`). Publicar cada idioma (`en` y `es`). Un medio subido tiene prioridad sobre su campo `*Url`.
 4. Poner `SEED_ON_EMPTY=false` y reiniciar (evita resembrar si algun dia la base queda vacia).
 5. No hace falta webhook ni reconstruir el frontend: todas sus rutas se renderizan por peticion y leen el CMS con una cache corta (30 s por defecto, `STRAPI_CACHE_TTL_MS` en el frontend).
 6. Verificar: `GET https://cms.ejemplo.com/_health` (204) y `GET /api/tours?locale=es` sin credenciales.
-7. Opcional: `CMS_URL=https://cms.ejemplo.com CMS_ADMIN_EMAIL=... CMS_ADMIN_PASSWORD=... node scripts/verify-uploads.mjs` comprueba subidas, populate del frontend, URLs y Range de video (limpia lo que crea; no usar con credenciales compartidas).
+7. Opcional: `CMS_URL=https://cms.ejemplo.com CMS_ADMIN_EMAIL=... CMS_ADMIN_PASSWORD=... node scripts/verify-uploads.mjs` comprueba subidas, populate del frontend, URLs y Range de video (limpia lo que crea; **solo en staging**: crea un token de 7 días y publica medios de prueba en el tour `dune-buggy`, el destino `huacachina`, la página `terms` y `site-setting`, y si se interrumpe quedan; no usar con credenciales compartidas).
 
 ## Frontend
 
@@ -103,3 +103,10 @@ Para pruebas en entorno real (staging) y una primera produccion pequena.
 ### Que esta verificado
 
 El `Dockerfile`, Postgres (incluido `DATABASE_URL`, con la semilla), las subidas de medios y los workflows de CI e imagen estan probados. La configuracion concreta de Railway (referencias entre servicios, healthcheck, volumenes, dominios) esta escrita a partir de su documentacion y **no se ha probado en una cuenta real**.
+
+## Seguridad de la API publica
+
+- Con `FORMS_PROXY_SECRET` definido, `POST /api/reservations` y `POST /api/contact-messages` exigen la cabecera `X-Forms-Secret` con ese valor (403 sin ella): solo la web puede enviar formularios, y el limite de peticiones usa la IP real que ella reenvia. Para probar a mano con curl hay que enviar la cabecera.
+- `global::public-guard` rechaza (415) cuerpos multipart anonimos fuera de `/api/upload` y fuerza `status=published` en peticiones sin `Authorization`, para que el rol Public no lea borradores.
+- Al arrancar, el rol Public queda exactamente con `PUBLIC_ACTIONS` (se borra el registro de usuarios y demas rutas de users-permissions).
+- En produccion, Strapi no arranca si algun secreto conserva el valor `changeMe` de `.env.example`.

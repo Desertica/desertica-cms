@@ -108,7 +108,7 @@ Campo nuevo de `booking-setting` (single type, no localizado, sin populate; apar
 
 | Campo | Tipo | Notas |
 | --- | --- | --- |
-| `availabilityMonths` | entero 1..12, por defecto 3 | cuantos meses de calendario muestra la web. Las bases nuevas lo traen en 3; en una base existente puede venir `null` hasta que alguien guarde `Booking rules`, y la web usa 3. El mapper actual ya lo lee (`booking-defaults.ts` lo limita a 1..12) |
+| `availabilityMonths` | entero 1..12, por defecto 3 | cuantos meses de calendario muestra la web. Las bases nuevas lo traen en 3; en una base existente puede venir `null` hasta que alguien guarde `Sitio — Reglas de reserva`, y la web usa 3. El mapper actual ya lo lee (`booking-defaults.ts` lo limita a 1..12) |
 
 `booking-setting.depositRate` esta **obsoleto**: ignorado por el motor de reservas nuevo; se retira cuando la web deje de leerlo. El deposito lo decide el API (`Setting.depositPercent`). No se borra ni se renombra. Hoy lo leen en `desertica-web`: `src/app/core/cms/cms-mapper.ts` (`mapBooking`), `booking-defaults.ts` (`withBookingDefaults`/`DEFAULT_BOOKING`) y `src/app/features/tours/detail/tour-book.ts` (`TOUR_DEPOSIT_RATE`, `tourDuePrice`, formulario de reserva legado). El flujo nuevo (`booking-panel`, `checkout*`) usa `depositCents` del API y no lo lee.
 

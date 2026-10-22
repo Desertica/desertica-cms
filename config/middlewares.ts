@@ -47,12 +47,14 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Middlewar
     },
     'strapi::poweredBy',
     'strapi::query',
+    'global::public-guard',
     {
       name: 'strapi::body',
       config: {
-        formLimit: '256mb',
-        jsonLimit: '10mb',
-        textLimit: '10mb',
+        // Forms and JSON are small; files travel as multipart, which has its own limit below.
+        formLimit: '1mb',
+        jsonLimit: '2mb',
+        textLimit: '1mb',
         formidable: { maxFileSize },
       },
     },

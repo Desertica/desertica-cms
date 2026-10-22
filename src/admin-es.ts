@@ -103,7 +103,7 @@ export const CONTENT_TYPE_FIELDS: Record<string, Fields> = {
     page: f('Página', 'Página donde aparece este texto.'),
     section: f('Sección', 'Bloque de la página (cabecera, formulario, errores...).'),
     label: f('Qué es este texto', 'Dónde y para qué se usa.'),
-    note: f('Nota interna', 'Ayuda para quien edita. No se muestra en la web.'),
+    note: f('Nota para el equipo', 'Es visible por la API pública aunque la web no la muestre: no escribas datos internos ni pendientes legales.'),
     value: f('Texto que se muestra en la web', 'Un valor por idioma.'),
     kind: f('Tipo', 'short = texto corto, long = texto largo.'),
   },
@@ -125,7 +125,7 @@ export const CONTENT_TYPE_FIELDS: Record<string, Fields> = {
     brandName: f('Nombre de la marca'),
     legalName: f('Razón social'),
     ruc: f('RUC'),
-    legalYear: f('Año de constitución'),
+    legalYear: f('Año del copyright', 'Se muestra en el pie de página como "© año nombre". Pon el año actual o el de lanzamiento de la web, no el de fundación.'),
     email: f('Correo de contacto'),
     phone: f('Teléfono'),
     whatsapp: f('WhatsApp', 'Solo dígitos, con el código de país. Ejemplo: 51999999999.'),
@@ -164,9 +164,9 @@ export const CONTENT_TYPE_FIELDS: Record<string, Fields> = {
   },
   'api::form-setting.form-setting': {
     nameMin: f('Nombre: mínimo de caracteres'),
-    nameMax: f('Nombre: máximo de caracteres'),
-    emailMax: f('Correo: máximo de caracteres'),
-    messageMax: f('Mensaje: máximo de caracteres', 'Límite del mensaje del formulario de contacto.'),
+    nameMax: f('Nombre: máximo de caracteres', 'No puede superar 80, el límite fijo del sistema.'),
+    emailMax: f('Correo: máximo de caracteres', 'No puede superar 254, el límite fijo del sistema.'),
+    messageMax: f('Mensaje: máximo de caracteres', 'Límite del mensaje del formulario de contacto. No puede superar 500, el límite fijo del sistema.'),
   },
   'api::navigation.navigation': {
     headerLinks: f('Enlaces de la barra superior', 'El enlace de tipo "tours-menu" es el que despliega los destinos y tours.'),
@@ -207,7 +207,7 @@ export const CONTENT_TYPE_FIELDS: Record<string, Fields> = {
 export const COMPONENT_FIELDS: Record<string, Fields> = {
   'shared.faq': { question: f('Pregunta'), answer: f('Respuesta') },
   'shared.feature': {
-    icon: f('Icono', 'Nombre del icono.'),
+    icon: f('Icono', 'Nombre exacto. Garantías: lucideCalendar, lucideCar, lucideCircleDollarSign, lucideClock, lucideLanguages, lucideMapPin, lucideShield, lucideSun, lucideUsers. Actividades: lucideCar, lucideLanguages, lucideUsers, lucideWind. Con otro nombre no se muestra icono.'),
     title: f('Título'),
     body: f('Texto'),
   },
