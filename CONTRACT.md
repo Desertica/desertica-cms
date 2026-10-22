@@ -12,7 +12,7 @@ Todos publicos (rol Public), lectura con `?locale=en|es` y paginacion `paginatio
 | GET | `/api/translations` | textos de interfaz, orden `key:asc` |
 | GET | `/api/media-slots`, `/api/pages`, `/api/blog-posts`, `/api/products` | imagenes, paginas legales/hubs, blog, productos |
 | GET | `/api/site-setting` | contacto, redes, razon social, marca, imagen para compartir |
-| GET | `/api/theme-setting`, `/api/booking-setting`, `/api/form-setting`, `/api/navigation` | tema, reglas de reserva, limites de formularios, menus (los dos ultimos con `?locale=`; `booking-setting` y `navigation` son localizados) |
+| GET | `/api/theme-setting`, `/api/booking-setting`, `/api/form-setting`, `/api/navigation` | tema, reglas de reserva, limites de formularios, menus (`booking-setting` y `navigation` son localizados: se leen con `?locale=`; `site-setting`, `theme-setting` y `form-setting` no) |
 | POST | `/api/reservations`, `/api/contact-messages` | formularios (cuerpo `{ "data": { ... } }`) |
 
 `populate=*` solo llega al primer nivel: los medios dentro de componentes necesitan rutas explicitas. Consulta de tours que usa el frontend (corchetes sin codificar por legibilidad):
@@ -69,7 +69,7 @@ Un medio subido (`image`, `poster`, ...) tiene prioridad sobre su campo `*Url`; 
 
 ## Claves de texto
 
-`translation.key` es la misma clave i18n que usa el frontend (`nav.blog`, `footer.terms`, ...) y sobrescribe los JSON del frontend. `translation.page`/`section`/`label`/`note`/`kind` solo organizan el admin. Los textos de reserva, pago, Mi reserva, reclamos y renuncia solo son `translation` para las claves que decide `docs/TEXTOS-EDITABLES.md` de la web (18 de 178); el resto sigue en el código. Un texto sin los `{marcadores}` de su original se rechaza al guardar. Los textos de tours y destinos viajan en sus propios campos (no hay `translation` para `nav.<tour>`, `nav.<tour>Desc`, `footer.<destino>*`, `pages.<destino>Lead`, `tour.meetingIca`, `tours.*`); el frontend los registra como `cms.tours.<slug>.<campo>` y `cms.destinations.<slug>.<campo>`. Los `media-slot` usados: `home.hero`, `blog.hero`, `products.hero`, `tours.banner`, `tours.closer`, `contact.band`, `about.trio`, `about.archive.1..12`, `about.video`, `footer.stamp.mincetur`, `footer.stamp.complaints`.
+`translation.key` es la misma clave i18n que usa el frontend (`nav.blog`, `footer.terms`, ...) y sobrescribe los JSON del frontend. `translation.page`/`section`/`label`/`note`/`kind` solo organizan el admin. Los textos de reserva, pago, Mi reserva, reclamos y renuncia solo son `translation` para las claves que decide `docs/TEXTOS-EDITABLES.md` de la web (18 de 178); el resto sigue en el código. El seed trae 229 textos y `syncNewTranslations` añade al arrancar los que falten. Un texto sin los `{marcadores}` de su original se rechaza al guardar. Los textos de tours y destinos viajan en sus propios campos (no hay `translation` para `nav.<tour>`, `nav.<tour>Desc`, `footer.<destino>*`, `pages.<destino>Lead`, `tour.meetingIca`, `tours.*`); el frontend los registra como `cms.tours.<slug>.<campo>` y `cms.destinations.<slug>.<campo>`. Los `media-slot` usados: `home.hero`, `blog.hero`, `products.hero`, `tours.banner`, `tours.closer`, `contact.band`, `about.trio`, `about.archive.1..12`, `about.video`, `footer.stamp.mincetur`, `footer.stamp.complaints`.
 
 ## Variables que el frontend necesita
 

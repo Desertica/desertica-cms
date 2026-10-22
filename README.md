@@ -6,12 +6,11 @@ Backend de contenido para el sitio Angular de Desertica (tours en Ica, Huacachin
 
 ## Puesta en marcha
 
-Requiere Node 20 a 24 o 26 (probado con Node 22).
+Requiere Node 22 (`.nvmrc`).
 
 ```bash
-cd cms
 cp .env.example .env      # reemplazar los secretos (openssl rand -base64 16; APP_KEYS = 4 valores)
-npm install
+npm ci
 npm run develop           # http://localhost:1337/admin
 ```
 
@@ -33,12 +32,12 @@ docker compose up -d --build   # cms + postgres 16, volumenes pgdata y uploads
 | `PUBLIC_URL` | URL publica del CMS |
 | `APP_KEYS`, `API_TOKEN_SALT`, `ADMIN_JWT_SECRET`, `TRANSFER_TOKEN_SALT`, `ENCRYPTION_KEY`, `JWT_SECRET` | Secretos |
 | `DATABASE_CLIENT` (`sqlite`/`postgres`), `DATABASE_FILENAME`, `DATABASE_HOST/PORT/NAME/USERNAME/PASSWORD/SSL` | Base de datos |
-| `CLIENT_URLS` | Origenes CORS (lista con comas) |
+| `CLIENT_URLS` | Origenes CORS (lista con comas); obligatoria en produccion |
 | `SEED_ON_EMPTY` | `false` desactiva el seed inicial |
 | `STRAPI_PLUGIN_I18N_INIT_LOCALE_CODE` | Locale por defecto (`en`) |
 | `PROXY` | `true` detras de un proxy inverso con TLS |
 | `UPLOAD_PROVIDER` (`local`/`aws-s3`), `UPLOAD_MAX_FILE_SIZE_MB` (200), `S3_*`, `MEDIA_HOSTS` | Medios: proveedor, limite por archivo, bucket/credenciales/endpoint/URL publica, hosts extra de la CSP |
-| `FORMS_PROXY_SECRET` | Secreto compartido con el servidor Angular (limite de peticiones por IP real) |
+| `FORMS_PROXY_SECRET` | Secreto compartido con el servidor Angular. **Obligatorio en produccion** (el CMS no arranca sin el): los formularios solo se aceptan con la cabecera `X-Forms-Secret`, y el limite de peticiones (10 por IP cada 10 minutos en cada formulario) usa la IP real que reenvia la web |
 | `CMS_HOST_PORT` | Solo Docker Compose: puerto publicado |
 
 ## Medios y verificacion de subidas
@@ -65,7 +64,7 @@ Usa una base de pruebas o local: crea y borra un token de API temporal, y el log
 | `reservation` (legado, ver nota) | no | no | `tourSlug`, `tourTitle`, `date`, `language`, `format`, `adults`, `children`, `payment`, `amount`, `locale`, `name`, `email`, `phone`, `status`, `notes` |
 | `contact-message` | no | no | `name`, `email`, `whatsapp`, `country`, `message`, `locale`, `handled` |
 | `site-setting` (single) | no | no | `email`, `phone`, `whatsapp`, redes (`instagram`, `facebook`, `tiktok`, `youtube`, `linkedin`, `google`, `tripadvisor`), `legalName`, `ruc`, `brandName`, `legalYear`, `shareImage`/`shareImageUrl` |
-| `theme-setting` (single) | no | no | `light`, `dark` (componente `theme.palette`, 22 colores en hex con selector de color, plugin oficial `@strapi/plugin-color-picker` 5.56.0, habilitado en `config/plugins.ts`), `fontSans`, `fontHeading` (selector de 9 fuentes), `radius` (none/small/medium/large/full), `headerSize` (compact/standard/tall), `introEnabled`, `introAccent`, `introRestScale`, `introFailsafeMs` |
+| `theme-setting` (single) | no | no | `light`, `dark` (componente `theme.palette`, 22 colores en hex con selector de color, plugin oficial `@strapi/plugin-color-picker` 5.59.0, habilitado en `config/plugins.ts`), `fontSans`, `fontHeading` (selector de 9 fuentes), `radius` (none/small/medium/large/full), `headerSize` (compact/standard/tall), `introEnabled`, `introAccent`, `introRestScale`, `introFailsafeMs` |
 | `booking-setting` (single) | si | no | no localizados: `depositRate` (0..1, obsoleto: el deposito lo decide el API), `availabilityMonths` (1..12, por defecto 3), `adultsMin`, `adultsDefault`, `childrenMin`, `childrenDefault`, `peopleMax`, `currencyCode`; localizado: `assurances` (`shared.feature`) |
 | `form-setting` (single) | no | no | `nameMin`, `nameMax`, `emailMax`, `messageMax` |
 | `navigation` (single) | si | no | localizados: `headerLinks`, `footerBrandLinks`, `footerLegalLinks` (`shared.nav-link`: `label`, `path`, `fragment`, `kind` = `link`/`tours-menu`), `planTripLabel`, `planTripPath` |
@@ -91,7 +90,7 @@ El Content Manager agrupa por area gracias al `displayName` (orden alfabetico): 
 
 ## Seed
 
-Al arrancar (idempotente) el bootstrap: crea el locale `es`, concede permisos publicos y, si no hay destinos y `SEED_ON_EMPTY` no es `false`, carga `seed/catalog.json` (3 destinos, 15 tours, 184 traducciones, 22 media-slots, 7 paginas, ambos idiomas, publicados) y los single types (`site-setting`, `theme-setting`, `form-setting`, `booking-setting`, `navigation`; cada uno una sola vez). Las 83 claves de `src/locales` que son contenido de tours y destinos (`nav.<tour>`, `nav.<tour>Desc`, `footer.<destino>*`, `pages.<destino>Lead`, `tour.meetingIca`, `tours.*`) no se siembran como traducciones: viven en `tour`/`destination`. Un fallo del seed se registra y no impide el arranque. Los datos de contacto de `site-setting` son marcadores (`XXXX`): editarlos desde el admin.
+Al arrancar (idempotente) el bootstrap: crea el locale `es`, concede permisos publicos y, si no hay destinos y `SEED_ON_EMPTY` no es `false`, carga `seed/catalog.json` (3 destinos, 15 tours, 229 traducciones, 22 media-slots, 7 paginas, ambos idiomas, publicados) y los single types (`site-setting`, `theme-setting`, `form-setting`, `booking-setting`, `navigation`; cada uno una sola vez). Las 83 claves de `src/locales` que son contenido de tours y destinos (`nav.<tour>`, `nav.<tour>Desc`, `footer.<destino>*`, `pages.<destino>Lead`, `tour.meetingIca`, `tours.*`) no se siembran como traducciones: viven en `tour`/`destination`. Un fallo del seed se registra y no impide el arranque. Los datos de contacto de `site-setting` son marcadores (`XXXX`): editarlos desde el admin.
 
 `seed/catalog.json` es la fuente del seed y se versiona aqui. Se genero desde el catalogo estatico de la app Angular y sus `src/locales/{en,es}.json` con `scripts/build-cms-seed.mjs`, que vive en el repo del frontend (`desertica-web`):
 
@@ -119,7 +118,7 @@ La app usa `STRAPI_URL` y estos endpoints:
 - `GET /api/booking-setting?locale=es&populate[assurances]=true`
 - `GET /api/form-setting`
 - `GET /api/navigation?locale=es&populate[headerLinks]=true&populate[footerBrandLinks]=true&populate[footerLegalLinks]=true`
-- `GET /api/translations?locale=es&pagination[pageSize]=200&pagination[page]=1&fields[0]=key&fields[1]=value` (184 claves)
+- `GET /api/translations?locale=es&pagination[pageSize]=200&pagination[page]=1&fields[0]=key&fields[1]=value` (229 claves)
 - `GET /api/media-slots?locale=es&populate=image,video,poster`, `GET /api/pages?locale=es`, `/api/blog-posts`, `/api/products`
 - `POST /api/reservations` con `{ "data": { ... } }`
 - `POST /api/contact-messages` con `{ "data": { ... } }`
