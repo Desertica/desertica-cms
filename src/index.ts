@@ -278,7 +278,7 @@ async function ensureExtraPages(strapi: Core.Strapi) {
 }
 
 const CM_UID = 'plugin::content-manager.content-types';
-const CM_CONFIG_VERSION = 9;
+const CM_CONFIG_VERSION = 10;
 
 type ListConfig = { fields: string[]; mainField?: string; sortBy?: string; sortOrder?: 'ASC' | 'DESC'; pageSize?: number };
 const LIST_CONFIGS: Record<string, ListConfig> = {
@@ -309,7 +309,7 @@ const EDIT_LAYOUTS: Record<string, Array<Array<{ name: string; size: number }>>>
     row(['languages', 12]),
     row(['lead', 12]),
     row(['description', 12]),
-    row(['image', 12]),
+    row(['image', 8], ['imageFocus', 4]),
     row(['gallery', 12]),
     row(['meeting', 12]),
     row(['meetingPointUrl', 12]),

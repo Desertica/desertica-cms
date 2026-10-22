@@ -109,6 +109,22 @@
         "images"
       ]
     },
+    "imageFocus": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "enumeration",
+      "enum": [
+        "center",
+        "top",
+        "bottom",
+        "left",
+        "right"
+      ],
+      "default": "center"
+    },
     "galleryUrls": {
       "pluginOptions": {
         "i18n": {

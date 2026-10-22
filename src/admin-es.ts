@@ -30,6 +30,7 @@ export const CONTENT_TYPE_FIELDS: Record<string, Fields> = {
     latitude: f('Latitud', 'Del punto de encuentro, en grados decimales de -90 a 90.'),
     longitude: f('Longitud', 'Del punto de encuentro, en grados decimales de -180 a 180.'),
     image: f('Imagen principal', 'Foto de la tarjeta y de la cabecera. Si subes una, tiene prioridad sobre la dirección de imagen externa.'),
+    imageFocus: f('Enfoque de la imagen', 'Qué parte de la foto se ve cuando la tarjeta la recorta: center = centro, top = arriba, bottom = abajo, left = izquierda, right = derecha. No cambia el archivo.'),
     imageUrl: f('Imagen principal (dirección externa)', 'Opcional. Solo se usa si no hay imagen subida.'),
     gallery: f('Galería de fotos', 'Fotos de la ficha del tour. Arrastra para cambiar el orden.'),
     galleryUrls: f('Galería (direcciones externas)', 'Opcional. Solo se usa si no hay fotos subidas.'),
