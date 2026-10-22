@@ -79,7 +79,8 @@ async function seedExtras(strapi: Core.Strapi, source: string) {
   }
 
   if ((await strapi.documents('api::page.page' as any).count({ locale: 'en' })) === 0) {
-    const rows = (catalog.pages ?? []).map((p: any) => ({ base: { slug: p.slug }, i18n: p.i18n, publish: true }));
+    // Hub pages go live; the legal texts are seeded empty and stay drafts until someone writes and publishes them.
+    const rows = (catalog.pages ?? []).map((p: any) => ({ base: { slug: p.slug }, i18n: p.i18n, publish: ['blog', 'products'].includes(p.slug) }));
     await seedLocalized(strapi, 'api::page.page', rows);
     strapi.log.info(`[seed] ${rows.length} pages created`);
   }

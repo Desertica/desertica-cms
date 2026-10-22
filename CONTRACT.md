@@ -120,13 +120,13 @@ El API (`desertica-api`) guarda un snapshot del texto de cada version al publica
 
 | Tipo de documento | Slug de `page` | Origen |
 | --- | --- | --- |
-| `TERMS` | `terms` | seed |
-| `PRIVACY` | `privacy` | seed |
+| `TERMS` | `terms` | seed, en borrador |
+| `PRIVACY` | `privacy` | seed, en borrador |
 | `CANCELLATION` | `cancellation` | borrador vacio creado al arrancar |
 | `COOKIES` | `cookies` | borrador vacio creado al arrancar |
-| `CONDUCT` | `conduct` | seed |
+| `CONDUCT` | `conduct` | seed, en borrador |
 
-Otras paginas existentes: `complaints`, `legal-mincetur` (el slug real es con guion, no `legal/mincetur`), `products`, `blog`. El texto va en `body` (Markdown) y es localizado (`en`, `es`); el snapshot debe leerse con `?locale=` y `status=published`.
+Otras paginas existentes: `complaints` y `legal-mincetur` (tambien sembradas en borrador), `blog` y `products` (hubs, sembradas publicadas) (el slug real es con guion, no `legal/mincetur`). El texto va en `body` (Markdown) y es localizado (`en`, `es`); el snapshot debe leerse con `?locale=` y `status=published`.
 
 `cancellation` y `cookies` no estan en `seed/catalog.json` (generado, no se edita a mano). Al arrancar, `ensureExtraPages` en `src/index.ts` crea ambas, solo una vez por base de datos (marca en el store `plugin_desertica_extra-pages`), con titulo en `en`/`es`, cuerpo vacio y **en borrador**: no aparecen en la API publica hasta que alguien escriba el texto y pulse `Publish` en cada idioma. Si se borran a proposito no se recrean. Para crearlas a mano: `Páginas — Página` > `Create new entry`, slug `cancellation` o `cookies`, titulo y cuerpo en `en` y `es`, `Publish`. Si el slug no esta publicado el API debe tratarlo como "documento sin texto" y no publicar una version vacia.
 
@@ -137,6 +137,8 @@ Cada cambio **publicado** del `waiverBody` genera una version nueva en el API (q
 ## Paginas legales en el admin
 
 Las siete paginas legales (`terms`, `privacy`, `cancellation`, `cookies`, `conduct`, `complaints`, `legal-mincetur`) son del mismo tipo `page` y comparten campos (`title`, `lead`, `body`, SEO). En `Páginas — Página` la lista va ordenada por `slug` (columnas `title`, `slug`, `updatedAt`, mas el estado de Strapi); comparte lista con las paginas hub `blog` y `products`. No hay cambios de contrato.
+
+Las siete se siembran **en borrador y con el texto del seed sin revisar**: en una base nueva no aparecen en la API publica (ni en la web) hasta que alguien las redacte y pulse `Publish` en `en` y en `es`. Checklist de lanzamiento en `docs/OPERACION.md` (seccion 7). Una base que ya existia conserva lo que tenia publicado.
 
 Textos de ejemplo NO LEGALES para desarrollo: `docs/DEV-LEGAL-SAMPLES.md`.
 
