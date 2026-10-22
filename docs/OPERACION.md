@@ -108,6 +108,17 @@ Los socios cargan el contenido en staging. Al lanzar, hay dos caminos; ensáyalo
 
 Los secretos de producción son **distintos** de los de staging (`ENCRYPTION_KEY`, `JWT_SECRET`...): al copiar datos entre entornos, revisa que los tokens de API y de transferencia se vuelvan a crear en producción.
 
+## 8. Textos nuevos en una base que ya existe
+
+El seed solo corre con la base vacía. Cuando la web gana textos editables (por ejemplo los del flujo de reserva, pago, Libro de Reclamaciones y renuncia, ver `docs/TEXTOS-EDITABLES.md` en la web), no hay que reseedear:
+
+1. Despliega el CMS con el `seed/catalog.json` nuevo (regenerado con `npm run cms:seed` en la web).
+2. Al arrancar, `syncNewTranslations` crea como filas nuevas en *Textos* solo las claves que la base aún no tiene. No toca filas existentes (las ediciones de los socios se conservan) y cada clave se ofrece una sola vez: si un socio borra una, no vuelve.
+3. Comprueba en los logs `[seed] N new translation(s) added` y que `GET /api/translations?filters[key][$eq]=booking.lead` devuelve la fila.
+4. Hasta que alguien las edite, la web muestra el mismo texto que el código: añadirlas no cambia nada visible.
+
+Si cambias el texto original en el código de una clave que ya existe en la base, la fila del CMS sigue mandando: edítala desde *Textos*. El CMS no deja guardar un texto al que le falte un marcador entre llaves (`{tour}`, `{date}`...) que tenía el texto original del seed; límite: compara con el seed, así que un marcador añadido después en el código no se protege hasta regenerarlo.
+
 ## Cosas que conviene saber
 
 - Al arrancar, el rol Public queda **exactamente** con los permisos que declara el código: un permiso que alguien añada a Public desde el panel se revierte en el siguiente arranque. Es a propósito (ver CLAUDE.md).

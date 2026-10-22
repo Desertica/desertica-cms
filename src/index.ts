@@ -3,6 +3,8 @@ import path from 'path';
 import type { Core } from '@strapi/strapi';
 import { ensureSampleTour } from './sample-tour';
 import { registerTranslateRoute } from './translate';
+import { clean, seedLocalized, syncNewTranslations } from './seed-sync';
+import { registerPlaceholderGuard } from './placeholders';
 import { COMPONENT_FIELDS, CONTENT_TYPE_FIELDS, type FieldMeta } from './admin-es';
 
 const PUBLIC_ACTIONS = [
@@ -54,32 +56,8 @@ async function grantPublicPermissions(strapi: Core.Strapi) {
   if (count) strapi.log.info(`[bootstrap] ${count} extra public permission(s) removed`);
 }
 
-const clean = <T extends Record<string, any>>(obj: T): T =>
-  Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined && v !== null && v !== '')) as T;
-
 const items = (list: string[] = []) => list.filter(Boolean).map((text) => ({ text }));
 const features = (list: any[] = []) => list.map((f) => clean({ icon: f.icon, title: f.title, body: f.body }));
-
-async function seedLocalized(
-  strapi: Core.Strapi,
-  uid: string,
-  rows: Array<{ base: Record<string, any>; i18n: Record<string, Record<string, any>>; publish: boolean }>,
-) {
-  for (const row of rows) {
-    const status = row.publish ? 'published' : undefined;
-    const created = await strapi.documents(uid as any).create({
-      locale: 'en',
-      ...(status ? { status } : {}),
-      data: { ...row.base, ...clean(row.i18n.en) } as any,
-    });
-    await strapi.documents(uid as any).update({
-      documentId: created.documentId,
-      locale: 'es',
-      ...(status ? { status } : {}),
-      data: { ...row.base, ...clean(row.i18n.es) } as any,
-    });
-  }
-}
 
 async function seedExtras(strapi: Core.Strapi, source: string) {
   const catalog = JSON.parse(fs.readFileSync(source, 'utf8'));
@@ -112,29 +90,6 @@ function seedSource(): string | null {
   const altFile = path.join(process.cwd(), 'seed', 'catalog.json');
   const source = fs.existsSync(file) ? file : altFile;
   return fs.existsSync(source) ? source : null;
-}
-
-/**
- * Texts the website gains after the first seed (a new button, the cookie banner) appear as rows in
- * "Textos" without reseeding. Each key is offered once: a row an editor deletes does not come back,
- * and existing rows are never touched. Runs whatever SEED_ON_EMPTY says.
- */
-async function syncNewTranslations(strapi: Core.Strapi) {
-  const source = seedSource();
-  if (!source) return;
-
-  const uid = 'api::translation.translation';
-  const store = strapi.store({ type: 'plugin', name: 'desertica', key: 'translations-offered' });
-  const offered = new Set<string>(((await store.get({})) as { keys?: string[] } | null)?.keys ?? []);
-  const existing = new Set((await strapi.documents(uid as any).findMany({ locale: 'en', fields: ['key'], limit: 5000 })).map((row: any) => row.key));
-  const rows = (JSON.parse(fs.readFileSync(source, 'utf8')).translations ?? []).filter((row: any) => !offered.has(row.key));
-  const missing = rows.filter((row: any) => !existing.has(row.key));
-  await seedLocalized(strapi, uid, missing.map(({ i18n, ...base }: any) => ({ base: clean(base), i18n, publish: false })));
-  if (rows.length) {
-    await store.set({ value: { keys: [...offered, ...rows.map((row: any) => row.key)] } });
-  }
-
-  if (missing.length) strapi.log.info(`[seed] ${missing.length} new translation(s) added`);
 }
 
 /**
@@ -326,7 +281,7 @@ async function ensureExtraPages(strapi: Core.Strapi) {
 }
 
 const CM_UID = 'plugin::content-manager.content-types';
-const CM_CONFIG_VERSION = 10;
+const CM_CONFIG_VERSION = 11;
 
 type ListConfig = { fields: string[]; mainField?: string; sortBy?: string; sortOrder?: 'ASC' | 'DESC'; pageSize?: number };
 const LIST_CONFIGS: Record<string, ListConfig> = {
@@ -565,6 +520,7 @@ async function configureContentManager(strapi: Core.Strapi) {
 export default {
   register({ strapi }: { strapi: Core.Strapi }) {
     registerTranslateRoute(strapi);
+    registerPlaceholderGuard(strapi);
     // The example secrets are public in the repo: signing admin tokens with them would open the panel.
     const placeholders = ['APP_KEYS', 'API_TOKEN_SALT', 'ADMIN_JWT_SECRET', 'TRANSFER_TOKEN_SALT', 'ENCRYPTION_KEY', 'JWT_SECRET'].filter((key) =>
       /changeMe/i.test(process.env[key] ?? ''),
@@ -613,7 +569,7 @@ export default {
       }
     }
     try {
-      await syncNewTranslations(strapi);
+      await syncNewTranslations(strapi, seedSource());
     } catch (error) {
       strapi.log.error(`[seed] translation sync failed (boot continues): ${(error as Error).stack ?? error}`);
     }
