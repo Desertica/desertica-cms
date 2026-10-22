@@ -3,7 +3,7 @@ import path from 'path';
 import type { Core } from '@strapi/strapi';
 import { ensureSampleTour } from './sample-tour';
 import { registerTranslateRoute } from './translate';
-import { clean, seedLocalized, syncNewTranslations } from './seed-sync';
+import { catalogNeedsSeed, clean, markCatalogSeeded, seedLocalized, syncNewTranslations } from './seed-sync';
 import { registerPlaceholderGuard } from './placeholders';
 import { LOCALE_NAMES, configureContentManager } from './content-manager';
 
@@ -144,8 +144,7 @@ async function seedCatalog(strapi: Core.Strapi) {
   }
 
   // shortcut: tours are seeded inside the destinations branch, so a crash between them leaves a catalog without tours; upgrade by seeding tours on their own count.
-  const existingDestinations = await strapi.documents(destUid).count({ locale: 'en' });
-  if (existingDestinations === 0) {
+  if (await catalogNeedsSeed(strapi, destUid)) {
     const catalog = JSON.parse(fs.readFileSync(source, 'utf8'));
     strapi.log.info('[seed] seeding catalog...');
 
@@ -221,6 +220,8 @@ async function seedCatalog(strapi: Core.Strapi) {
     }
     strapi.log.info(`[seed] created ${catalog.destinations.length} destinations and ${catalog.tours.length} tours`);
   }
+  // Also marks databases that already had a catalog before the mark existed.
+  await markCatalogSeeded(strapi);
 
   await seedExtras(strapi, source);
 
