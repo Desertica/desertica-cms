@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, develop]
+    branches: ['**']
   pull_request:
 
 permissions:
@@ -35,6 +35,18 @@ jobs:
             claude/*) echo "::error::Branch names must not start with claude/"; exit 1;;
           esac
 
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -60,3 +72,39 @@ jobs:
           TRANSFER_TOKEN_SALT: ci
           ENCRYPTION_KEY: ci
           JWT_SECRET: ci
+
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NODE_ENV: production
+      HOST: 127.0.0.1
+      PORT: 1337
+      DATABASE_CLIENT: sqlite
+      DATABASE_FILENAME: .tmp/smoke.db
+      APP_KEYS: ci1,ci2,ci3,ci4
+      API_TOKEN_SALT: ci
+      ADMIN_JWT_SECRET: ci
+      TRANSFER_TOKEN_SALT: ci
+      ENCRYPTION_KEY: ci
+      JWT_SECRET: ci
+      FORMS_PROXY_SECRET: ci
+      SEED_ON_EMPTY: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Start Strapi and wait for /_health
+        run: |
+          npm start > smoke.log 2>&1 &
+          pid=$!
+          for i in $(seq 1 60); do
+            [ "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:1337/_health)" = 204 ] && { echo "health OK"; exit 0; }
+            kill -0 $pid 2>/dev/null || break
+            sleep 2
+          done
+          cat smoke.log; exit 1
