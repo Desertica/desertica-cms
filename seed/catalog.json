@@ -1451,6 +1451,22 @@
       }
     },
     {
+      "key": "nav.home",
+      "group": "nav",
+      "page": "navigation",
+      "section": "header",
+      "label": "Navigation — Header · home",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Home"
+        },
+        "es": {
+          "value": "Inicio"
+        }
+      }
+    },
+    {
       "key": "a11y.toggleTheme",
       "group": "a11y",
       "page": "accessibility",
@@ -1479,6 +1495,22 @@
         },
         "es": {
           "value": "Abrir menú"
+        }
+      }
+    },
+    {
+      "key": "a11y.closeMenu",
+      "group": "a11y",
+      "page": "accessibility",
+      "section": "labels",
+      "label": "Accessibility — Labels · close menu",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Close menu"
+        },
+        "es": {
+          "value": "Cerrar menú"
         }
       }
     },
@@ -1527,6 +1559,22 @@
         },
         "es": {
           "value": "Cargando Desértica"
+        }
+      }
+    },
+    {
+      "key": "a11y.newTab",
+      "group": "a11y",
+      "page": "accessibility",
+      "section": "labels",
+      "label": "Accessibility — Labels · new tab",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "(opens in a new tab)"
+        },
+        "es": {
+          "value": "(se abre en una pestaña nueva)"
         }
       }
     },
@@ -1835,22 +1883,6 @@
       }
     },
     {
-      "key": "pages.experienceLead",
-      "group": "pages",
-      "page": "global",
-      "section": "placeholders",
-      "label": "Global — Placeholders · experience lead",
-      "kind": "short",
-      "i18n": {
-        "en": {
-          "value": "SSR placeholder. Catalog later."
-        },
-        "es": {
-          "value": "Placeholder SSR. Catálogo más adelante."
-        }
-      }
-    },
-    {
       "key": "pages.blogLead",
       "group": "pages",
       "page": "blog",
@@ -1959,6 +1991,38 @@
         },
         "es": {
           "value": "Código de conducta contra la explotación sexual de niñas, niños y adolescentes en el turismo."
+        }
+      }
+    },
+    {
+      "key": "pages.cancellationLead",
+      "group": "pages",
+      "page": "legal",
+      "section": "lead",
+      "label": "Legal — Lead · cancellation lead",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Cancellation and refund policy."
+        },
+        "es": {
+          "value": "Política de cancelación y reembolso."
+        }
+      }
+    },
+    {
+      "key": "pages.cookiesLead",
+      "group": "pages",
+      "page": "legal",
+      "section": "lead",
+      "label": "Legal — Lead · cookies lead",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Which cookies we use and why."
+        },
+        "es": {
+          "value": "Qué cookies usamos y para qué."
         }
       }
     },
@@ -2183,38 +2247,6 @@
         },
         "es": {
           "value": "Mensaje enviado. Te escribimos pronto."
-        }
-      }
-    },
-    {
-      "key": "contact.notRobot",
-      "group": "contact",
-      "page": "contact",
-      "section": "form",
-      "label": "Contact — Form · not robot",
-      "kind": "short",
-      "i18n": {
-        "en": {
-          "value": "I'm not a robot"
-        },
-        "es": {
-          "value": "No soy un robot"
-        }
-      }
-    },
-    {
-      "key": "contact.captchaBrand",
-      "group": "contact",
-      "page": "contact",
-      "section": "form",
-      "label": "Contact — Form · captcha brand",
-      "kind": "short",
-      "i18n": {
-        "en": {
-          "value": "Turnstile"
-        },
-        "es": {
-          "value": "Turnstile"
         }
       }
     },
@@ -2503,6 +2535,38 @@
         },
         "es": {
           "value": "Código de conducta ESNNA"
+        }
+      }
+    },
+    {
+      "key": "footer.cancellation",
+      "group": "footer",
+      "page": "footer",
+      "section": "columns",
+      "label": "Footer — Columns · cancellation",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Cancellation policy"
+        },
+        "es": {
+          "value": "Política de cancelación"
+        }
+      }
+    },
+    {
+      "key": "footer.cookies",
+      "group": "footer",
+      "page": "footer",
+      "section": "columns",
+      "label": "Footer — Columns · cookies",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Cookies policy"
+        },
+        "es": {
+          "value": "Política de cookies"
         }
       }
     },
@@ -4075,6 +4139,86 @@
       }
     },
     {
+      "key": "tour.meeting",
+      "group": "tour",
+      "page": "tour-detail",
+      "section": "booking-form",
+      "label": "Tour detail — Booking form · meeting",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Meeting point"
+        },
+        "es": {
+          "value": "Punto de encuentro"
+        }
+      }
+    },
+    {
+      "key": "tour.viewMap",
+      "group": "tour",
+      "page": "tour-detail",
+      "section": "booking-form",
+      "label": "Tour detail — Booking form · view map",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "View on map"
+        },
+        "es": {
+          "value": "Ver en el mapa"
+        }
+      }
+    },
+    {
+      "key": "tour.faqs",
+      "group": "tour",
+      "page": "tour-detail",
+      "section": "booking-form",
+      "label": "Tour detail — Booking form · faqs",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Frequently asked questions"
+        },
+        "es": {
+          "value": "Preguntas frecuentes"
+        }
+      }
+    },
+    {
+      "key": "tour.askWhatsapp",
+      "group": "tour",
+      "page": "tour-detail",
+      "section": "booking-form",
+      "label": "Tour detail — Booking form · ask whatsapp",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Ask on WhatsApp"
+        },
+        "es": {
+          "value": "Consultar por WhatsApp"
+        }
+      }
+    },
+    {
+      "key": "tour.askWhatsappMessage",
+      "group": "tour",
+      "page": "tour-detail",
+      "section": "booking-form",
+      "label": "Tour detail — Booking form · ask whatsapp message",
+      "kind": "long",
+      "i18n": {
+        "en": {
+          "value": "Hi, I would like more information about \"{tour}\" ({hours} h, from USD {price}): {url}"
+        },
+        "es": {
+          "value": "Hola, quisiera más información sobre \"{tour}\" ({hours} h, desde USD {price}): {url}"
+        }
+      }
+    },
+    {
       "key": "gallery.from",
       "group": "gallery",
       "page": "tours",
@@ -4215,6 +4359,294 @@
         },
         "es": {
           "value": "Volver a productos"
+        }
+      }
+    },
+    {
+      "key": "cookies.title",
+      "group": "cookies",
+      "page": "legal",
+      "section": "cookies",
+      "label": "Legal — Cookies · title",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Your cookie choices"
+        },
+        "es": {
+          "value": "Tus opciones de cookies"
+        }
+      }
+    },
+    {
+      "key": "cookies.text",
+      "group": "cookies",
+      "page": "legal",
+      "section": "cookies",
+      "label": "Legal — Cookies · text",
+      "kind": "long",
+      "i18n": {
+        "en": {
+          "value": "We use necessary cookies to run the site. With your permission we also measure visits (analytics) and the ads that brought you here (marketing). Nothing optional runs until you choose."
+        },
+        "es": {
+          "value": "Usamos cookies necesarias para que el sitio funcione. Con tu permiso también medimos las visitas (analítica) y los anuncios que te trajeron aquí (marketing). Nada opcional se activa hasta que elijas."
+        }
+      }
+    },
+    {
+      "key": "cookies.policy",
+      "group": "cookies",
+      "page": "legal",
+      "section": "cookies",
+      "label": "Legal — Cookies · policy",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Privacy policy"
+        },
+        "es": {
+          "value": "Política de privacidad"
+        }
+      }
+    },
+    {
+      "key": "cookies.necessary",
+      "group": "cookies",
+      "page": "legal",
+      "section": "cookies",
+      "label": "Legal — Cookies · necessary",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Necessary"
+        },
+        "es": {
+          "value": "Necesarias"
+        }
+      }
+    },
+    {
+      "key": "cookies.necessaryText",
+      "group": "cookies",
+      "page": "legal",
+      "section": "cookies",
+      "label": "Legal — Cookies · necessary text",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Language, theme and your booking. Always on."
+        },
+        "es": {
+          "value": "Idioma, tema y tu reserva. Siempre activas."
+        }
+      }
+    },
+    {
+      "key": "cookies.analytics",
+      "group": "cookies",
+      "page": "legal",
+      "section": "cookies",
+      "label": "Legal — Cookies · analytics",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Analytics"
+        },
+        "es": {
+          "value": "Analítica"
+        }
+      }
+    },
+    {
+      "key": "cookies.analyticsText",
+      "group": "cookies",
+      "page": "legal",
+      "section": "cookies",
+      "label": "Legal — Cookies · analytics text",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Anonymous statistics on how the site is used."
+        },
+        "es": {
+          "value": "Estadísticas anónimas sobre el uso del sitio."
+        }
+      }
+    },
+    {
+      "key": "cookies.marketing",
+      "group": "cookies",
+      "page": "legal",
+      "section": "cookies",
+      "label": "Legal — Cookies · marketing",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Marketing"
+        },
+        "es": {
+          "value": "Marketing"
+        }
+      }
+    },
+    {
+      "key": "cookies.marketingText",
+      "group": "cookies",
+      "page": "legal",
+      "section": "cookies",
+      "label": "Legal — Cookies · marketing text",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Measures which ads and campaigns led to a booking."
+        },
+        "es": {
+          "value": "Mide qué anuncios y campañas llevaron a una reserva."
+        }
+      }
+    },
+    {
+      "key": "cookies.acceptAll",
+      "group": "cookies",
+      "page": "legal",
+      "section": "cookies",
+      "label": "Legal — Cookies · accept all",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Accept all"
+        },
+        "es": {
+          "value": "Aceptar todo"
+        }
+      }
+    },
+    {
+      "key": "cookies.rejectAll",
+      "group": "cookies",
+      "page": "legal",
+      "section": "cookies",
+      "label": "Legal — Cookies · reject all",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Reject all"
+        },
+        "es": {
+          "value": "Rechazar todo"
+        }
+      }
+    },
+    {
+      "key": "cookies.customize",
+      "group": "cookies",
+      "page": "legal",
+      "section": "cookies",
+      "label": "Legal — Cookies · customize",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Customize"
+        },
+        "es": {
+          "value": "Personalizar"
+        }
+      }
+    },
+    {
+      "key": "cookies.save",
+      "group": "cookies",
+      "page": "legal",
+      "section": "cookies",
+      "label": "Legal — Cookies · save",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Save preferences"
+        },
+        "es": {
+          "value": "Guardar preferencias"
+        }
+      }
+    },
+    {
+      "key": "cookies.preferences",
+      "group": "cookies",
+      "page": "legal",
+      "section": "cookies",
+      "label": "Legal — Cookies · preferences",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Cookie preferences"
+        },
+        "es": {
+          "value": "Preferencias de cookies"
+        }
+      }
+    },
+    {
+      "key": "notFound.title",
+      "group": "notFound",
+      "page": "global",
+      "section": "not-found",
+      "label": "Global — Not found · title",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Page not found"
+        },
+        "es": {
+          "value": "Página no encontrada"
+        }
+      }
+    },
+    {
+      "key": "notFound.body",
+      "group": "notFound",
+      "page": "global",
+      "section": "not-found",
+      "label": "Global — Not found · body",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "The page you are looking for does not exist or has moved."
+        },
+        "es": {
+          "value": "La página que buscas no existe o cambió de dirección."
+        }
+      }
+    },
+    {
+      "key": "notFound.home",
+      "group": "notFound",
+      "page": "global",
+      "section": "not-found",
+      "label": "Global — Not found · home",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Go to the home page"
+        },
+        "es": {
+          "value": "Ir al inicio"
+        }
+      }
+    },
+    {
+      "key": "notFound.tours",
+      "group": "notFound",
+      "page": "global",
+      "section": "not-found",
+      "label": "Global — Not found · tours",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "See our tours"
+        },
+        "es": {
+          "value": "Ver nuestros tours"
         }
       }
     }

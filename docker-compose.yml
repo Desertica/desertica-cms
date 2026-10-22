@@ -24,7 +24,7 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD:?set DATABASE_PASSWORD in .env}
       DATABASE_SSL: "false"
     ports:
-      - "${CMS_HOST_PORT:-1337}:1337"
+      - "127.0.0.1:${CMS_HOST_PORT:-1337}:1337"
     volumes:
       - uploads:/opt/app/public/uploads
     depends_on:

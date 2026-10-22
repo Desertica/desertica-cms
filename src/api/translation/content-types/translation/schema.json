@@ -4,7 +4,7 @@
   "info": {
     "singularName": "translation",
     "pluralName": "translations",
-    "displayName": "Copy — Translation",
+    "displayName": "Textos — Texto de la web",
     "description": "Interface texts (buttons, labels, headlines, errors) per page and section. Tour and destination copy lives in Tour/Destination."
   },
   "options": {

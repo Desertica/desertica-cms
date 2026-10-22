@@ -4,7 +4,7 @@
   "info": {
     "singularName": "theme-setting",
     "pluralName": "theme-settings",
-    "displayName": "Site \u2014 Theme",
+    "displayName": "Sitio — Colores y estilo",
     "description": "Colors (light and dark), fonts, corner radius, header size and intro animation."
   },
   "options": {

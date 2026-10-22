@@ -7,7 +7,7 @@ Strapi 5 (TypeScript) backend for the Desertica website and its internal content
 ```bash
 npm install && cp .env.example .env   # fill the secrets (cloud sessions do this in a SessionStart hook)
 npm run develop                        # http://localhost:1337/admin, first run seeds an empty database
-npm run typecheck && npm run build     # what CI runs
+npm run typecheck && npm test && npm run build   # what CI runs
 npm run seed-check
 ```
 
@@ -15,7 +15,7 @@ Use **Node 22**. Create the first admin with `npx strapi admin:create-user ...` 
 
 ## Model
 
-Admin sidebar groups: `Site` (settings, theme, booking rules, forms, navigation), `Catalog` (destination, tour), `Copy` (translation), `Media` (slot), `Pages`, `Blog`, `Shop`, `Inbox` (reservation, contact message). Locales: `en` (default) and `es`. `translation` and `media-slot` rows are segmented by `page` and `section`.
+The admin is for Spanish-speaking editors: sidebar names (`displayName` in each `schema.json`), field labels, hints and form layouts are in Spanish. Sidebar groups: `Sitio` (datos de la empresa, colores y estilo, reglas de reserva, formularios, menús), `Catálogo` (destino, tour), `Textos` (texto de la web), `Medios` (imagen o video de la web), `Páginas`, `Blog`, `Tienda`, `Bandeja` (solicitud de reserva, mensaje de contacto). Labels and hints live in `src/admin-es.ts` and layouts in `EDIT_LAYOUTS` in `src/index.ts`; they change only what the editor sees, never an API id or field name. Locales: `en` (default) and `es`. `translation` and `media-slot` rows are segmented by `page` and `section`.
 
 ## Rules
 
@@ -28,6 +28,8 @@ Admin sidebar groups: `Site` (settings, theme, booking rules, forms, navigation)
 
 ## Pitfalls
 
+- Long texts (`page.body`, `blog-post.content`, `product.details`, `tour.waiverBody`) use the CKEditor 5 custom field with the Markdown preset: the stored value is still Markdown. The edit-view panel "Traducción automática" (`src/admin/translate-panel.tsx`, `src/translate.ts`) needs `DEEPL_API_KEY` and only ever saves drafts.
+- `.github/workflows/ci.yml` cannot be edited from cloud sessions (no `workflow` scope); the template in `docs/pipelines/ci.yml` also runs `npm test`.
 - The rate limiter keys on IP; behind the frontend's forms proxy it needs the same `FORMS_PROXY_SECRET` on both sides.
-- Content Manager list layouts are applied once at bootstrap (`CM_CONFIG_VERSION` in `src/index.ts`); bump it to reapply.
-- Theme colors are hex strings from the official color picker custom field (`plugin::color-picker.color`, regex `^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$`); fonts, radius and header size are enumerations. Edit-view layouts and hints for `theme-setting` and `theme.palette` live in `EDIT_LAYOUTS`/`COMPONENT_CONFIGS` in `src/index.ts`. The seed converts the frontend's oklch values to hex in `build-cms-seed.mjs`.
+- Content Manager list layouts, labels and hints are applied once at bootstrap (`CM_CONFIG_VERSION` in `src/index.ts`); bump it to reapply. A field missing from an `EDIT_LAYOUTS` entry disappears from the form, so list every field of the type. The panel look (Spanish locale, olive theme, logos) is `src/admin/app.tsx`.
+- Theme colors are hex strings from the official color picker custom field (`plugin::color-picker.color`, regex `^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$`); fonts, radius and header size are enumerations. Edit-view layouts and hints for `theme-setting` and `theme.palette` live in `EDIT_LAYOUTS`/`COMPONENT_LAYOUTS` in `src/index.ts` and `src/admin-es.ts`. The seed converts the frontend's oklch values to hex in `build-cms-seed.mjs`.
