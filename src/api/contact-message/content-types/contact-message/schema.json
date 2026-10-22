@@ -4,7 +4,7 @@
   "info": {
     "singularName": "contact-message",
     "pluralName": "contact-messages",
-    "displayName": "Inbox — Contact message",
+    "displayName": "Bandeja — Mensaje de contacto",
     "description": "Messages sent from the contact form. Tick handled when answered."
   },
   "options": {

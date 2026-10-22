@@ -4,7 +4,7 @@
   "info": {
     "singularName": "navigation",
     "pluralName": "navigations",
-    "displayName": "Site — Navigation",
+    "displayName": "Sitio — Menús",
     "description": "Header and footer links per language."
   },
   "options": {

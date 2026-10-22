@@ -4,7 +4,7 @@
   "info": {
     "singularName": "reservation",
     "pluralName": "reservations",
-    "displayName": "Inbox — Reservation",
+    "displayName": "Bandeja — Solicitud de reserva",
     "description": "Reservation requests sent from the tour page. Update the status after replying."
   },
   "options": {
@@ -16,7 +16,8 @@
       "required": true
     },
     "tourTitle": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 200
     },
     "date": {
       "type": "date",
@@ -68,13 +69,15 @@
       ]
     },
     "name": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 80
     },
     "email": {
       "type": "email"
     },
     "phone": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 32
     },
     "status": {
       "type": "enumeration",
@@ -87,7 +90,8 @@
       "private": false
     },
     "notes": {
-      "type": "text"
+      "type": "text",
+      "maxLength": 500
     }
   }
 }

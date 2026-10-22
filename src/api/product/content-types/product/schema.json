@@ -4,7 +4,7 @@
   "info": {
     "singularName": "product",
     "pluralName": "products",
-    "displayName": "Shop — Product",
+    "displayName": "Tienda — Producto",
     "description": "Products (pisco, tejas, ceramics) with price, gallery and details."
   },
   "options": {
@@ -106,7 +106,11 @@
           "localized": true
         }
       },
-      "type": "richtext"
+      "type": "customField",
+      "customField": "plugin::ckeditor5.CKEditor",
+      "options": {
+        "preset": "defaultMarkdown"
+      }
     }
   }
 }

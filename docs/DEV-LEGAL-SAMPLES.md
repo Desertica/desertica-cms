@@ -20,4 +20,4 @@ El script es idempotente (vuelve a escribir el mismo borrador). Si una pagina o 
 
 ## A mano
 
-`Pages — Page` > `cancellation` / `cookies` > pegar un texto con el aviso NO LEGAL en `body` por idioma. Para el descargo: `Catalog — Tour` > un tour > `waiverBody`. Cada **publicacion** del descargo crea una version nueva en el API; los pasajeros firman el texto vigente. En desarrollo conviene publicarlo una vez y no tocarlo mientras se prueba la firma.
+`Páginas — Página` > `cancellation` / `cookies` > pegar un texto con el aviso NO LEGAL en `body` por idioma. Para el descargo: `Catálogo — Tour` > un tour > `waiverBody`. Cada **publicacion** del descargo crea una version nueva en el API; los pasajeros firman el texto vigente. En desarrollo conviene publicarlo una vez y no tocarlo mientras se prueba la firma.

@@ -1,6 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import type { Core } from '@strapi/strapi';
+import { ensureSampleTour } from './sample-tour';
+import { registerTranslateRoute } from './translate';
+import { COMPONENT_FIELDS, CONTENT_TYPE_FIELDS, type FieldMeta } from './admin-es';
 
 const PUBLIC_ACTIONS = [
   'api::destination.destination.find',
@@ -17,7 +20,7 @@ const PUBLIC_ACTIONS = [
 ];
 
 const LOCALES = ['en', 'es'] as const;
-const LOCALE_NAMES: Record<string, string> = { en: 'English (en)', es: 'Spanish (es)' };
+const LOCALE_NAMES: Record<string, string> = { en: 'Inglés (en)', es: 'Español (es)' };
 
 async function ensureLocales(strapi: Core.Strapi) {
   const service = strapi.plugin('i18n').service('locales');
@@ -44,6 +47,11 @@ async function grantPublicPermissions(strapi: Core.Strapi) {
       strapi.log.info(`[bootstrap] public permission granted: ${action}`);
     }
   }
+
+  // users-permissions ships the Public role with register, login and password-reset routes; anyone could
+  // create an account. The Public role is exactly PUBLIC_ACTIONS.
+  const { count } = (await permQuery.deleteMany({ where: { role: role.id, action: { $notIn: PUBLIC_ACTIONS } } })) as { count: number };
+  if (count) strapi.log.info(`[bootstrap] ${count} extra public permission(s) removed`);
 }
 
 const clean = <T extends Record<string, any>>(obj: T): T =>
@@ -99,6 +107,54 @@ async function seedExtras(strapi: Core.Strapi, source: string) {
   }
 }
 
+function seedSource(): string | null {
+  const file = path.join(__dirname, '..', '..', 'seed', 'catalog.json');
+  const altFile = path.join(process.cwd(), 'seed', 'catalog.json');
+  const source = fs.existsSync(file) ? file : altFile;
+  return fs.existsSync(source) ? source : null;
+}
+
+/**
+ * Texts the website gains after the first seed (a new button, the cookie banner) appear as rows in
+ * "Textos" without reseeding. Each key is offered once: a row an editor deletes does not come back,
+ * and existing rows are never touched. Runs whatever SEED_ON_EMPTY says.
+ */
+async function syncNewTranslations(strapi: Core.Strapi) {
+  const source = seedSource();
+  if (!source) return;
+
+  const uid = 'api::translation.translation';
+  const store = strapi.store({ type: 'plugin', name: 'desertica', key: 'translations-offered' });
+  const offered = new Set<string>(((await store.get({})) as { keys?: string[] } | null)?.keys ?? []);
+  const existing = new Set((await strapi.documents(uid as any).findMany({ locale: 'en', fields: ['key'], limit: 5000 })).map((row: any) => row.key));
+  const rows = (JSON.parse(fs.readFileSync(source, 'utf8')).translations ?? []).filter((row: any) => !offered.has(row.key));
+  const missing = rows.filter((row: any) => !existing.has(row.key));
+  await seedLocalized(strapi, uid, missing.map(({ i18n, ...base }: any) => ({ base: clean(base), i18n, publish: false })));
+  if (rows.length) {
+    await store.set({ value: { keys: [...offered, ...rows.map((row: any) => row.key)] } });
+  }
+
+  if (missing.length) strapi.log.info(`[seed] ${missing.length} new translation(s) added`);
+}
+
+/**
+ * The built-in Editor role is what partners get: tours, destinations, texts, media and pages. Strapi gives it
+ * the inbox too, which holds customers' names, e-mails and WhatsApp numbers, so those two types are taken away
+ * once; an admin can grant them back from Settings > Roles and the change is kept.
+ */
+async function restrictEditorRole(strapi: Core.Strapi) {
+  const store = strapi.store({ type: 'plugin', name: 'desertica', key: 'editor-role' });
+  if (await store.get({})) return;
+
+  const role = await strapi.db.query('admin::role').findOne({ where: { code: 'strapi-editor' } });
+  if (!role) return;
+
+  const subjects = ['api::reservation.reservation', 'api::contact-message.contact-message'];
+  const { count } = (await strapi.db.query('admin::permission').deleteMany({ where: { role: role.id, subject: { $in: subjects } } })) as { count: number };
+  await store.set({ value: { done: true } });
+  strapi.log.info(`[bootstrap] Editor role: ${count} inbox permission(s) removed`);
+}
+
 async function seedCatalog(strapi: Core.Strapi) {
   if (process.env.SEED_ON_EMPTY === 'false') return;
 
@@ -106,14 +162,13 @@ async function seedCatalog(strapi: Core.Strapi) {
   const tourUid = 'api::tour.tour';
   const settingUid = 'api::site-setting.site-setting';
 
-  const file = path.join(__dirname, '..', '..', 'seed', 'catalog.json');
-  const altFile = path.join(process.cwd(), 'seed', 'catalog.json');
-  const source = fs.existsSync(file) ? file : altFile;
-  if (!fs.existsSync(source)) {
+  const source = seedSource();
+  if (!source) {
     strapi.log.warn('[seed] seed/catalog.json not found; skipping');
     return;
   }
 
+  // shortcut: tours are seeded inside the destinations branch, so a crash between them leaves a catalog without tours; upgrade by seeding tours on their own count.
   const existingDestinations = await strapi.documents(destUid).count({ locale: 'en' });
   if (existingDestinations === 0) {
     const catalog = JSON.parse(fs.readFileSync(source, 'utf8'));
@@ -271,7 +326,7 @@ async function ensureExtraPages(strapi: Core.Strapi) {
 }
 
 const CM_UID = 'plugin::content-manager.content-types';
-const CM_CONFIG_VERSION = 7;
+const CM_CONFIG_VERSION = 10;
 
 type ListConfig = { fields: string[]; mainField?: string; sortBy?: string; sortOrder?: 'ASC' | 'DESC'; pageSize?: number };
 const LIST_CONFIGS: Record<string, ListConfig> = {
@@ -285,7 +340,6 @@ const LIST_CONFIGS: Record<string, ListConfig> = {
   'api::contact-message.contact-message': { fields: ['name', 'email', 'handled', 'createdAt'], mainField: 'name', sortBy: 'createdAt', sortOrder: 'DESC' },
 };
 
-/** Editor-facing hints shown under fields in the edit view: uid -> field -> description. */
 /** Which field of the related entry relations display (otherwise Strapi picks the first string). */
 const RELATION_MAIN_FIELDS: Record<string, Record<string, string>> = {
   'api::tour.tour': { destination: 'title' },
@@ -294,8 +348,89 @@ const RELATION_MAIN_FIELDS: Record<string, Record<string, string>> = {
 
 const row = (...fields: Array<[string, number]>) => fields.map(([name, size]) => ({ name, size }));
 
-/** Edit-view layouts (rows of fields, 12 columns wide). Content types: uid -> rows. */
+/** Edit-view layouts (rows of fields, 12 columns wide). Content types: uid -> rows. A field left out of a layout disappears from the form. */
 const EDIT_LAYOUTS: Record<string, Array<Array<{ name: string; size: number }>>> = {
+  'api::tour.tour': [
+    row(['title', 8], ['slug', 4]),
+    row(['destination', 6], ['order', 3], ['featured', 3]),
+    row(['priceFrom', 4], ['durationHours', 4], ['format', 4]),
+    row(['languages', 12]),
+    row(['lead', 12]),
+    row(['description', 12]),
+    row(['image', 8], ['imageFocus', 4]),
+    row(['gallery', 12]),
+    row(['meeting', 12]),
+    row(['meetingPointUrl', 12]),
+    row(['latitude', 6], ['longitude', 6]),
+    row(['itinerary', 12]),
+    row(['practices', 12]),
+    row(['included', 12]),
+    row(['excluded', 12]),
+    row(['pack', 12]),
+    row(['notes', 12]),
+    row(['paragraphs', 12]),
+    row(['expandedParagraphs', 12]),
+    row(['termsSummary', 12]),
+    row(['videos', 12]),
+    row(['itineraryFile', 12]),
+    row(['assurances', 12]),
+    row(['faqs', 12]),
+    row(['waiverBody', 12]),
+    row(['seoTitle', 12]),
+    row(['seoDescription', 12]),
+    // Fallbacks for external images; rarely needed once photos are uploaded.
+    row(['imageUrl', 12]),
+    row(['galleryUrls', 12]),
+    row(['itineraryFileUrl', 12]),
+  ],
+  'api::destination.destination': [
+    row(['title', 8], ['slug', 4]),
+    row(['lead', 12]),
+    row(['allLabel', 12]),
+    row(['image', 12]),
+    row(['order', 4], ['footerOrder', 4], ['showInFooter', 4]),
+    row(['tours', 12]),
+    row(['imageUrl', 12]),
+  ],
+  'api::page.page': [
+    row(['title', 8], ['slug', 4]),
+    row(['lead', 12]),
+    row(['body', 12]),
+    row(['heroImage', 12]),
+    row(['seoTitle', 12]),
+    row(['seoDescription', 12]),
+    row(['heroImageUrl', 12]),
+  ],
+  'api::media-slot.media-slot': [
+    row(['key', 6], ['page', 3], ['section', 3]),
+    row(['description', 12]),
+    row(['image', 12]),
+    row(['alt', 12]),
+    row(['video', 6], ['poster', 6]),
+    row(['imageUrl', 12]),
+    row(['videoUrl', 6], ['videoWebmUrl', 6]),
+    row(['posterUrl', 12]),
+  ],
+  'api::site-setting.site-setting': [
+    row(['brandName', 6], ['legalName', 6]),
+    row(['ruc', 6], ['legalYear', 6]),
+    row(['email', 6], ['phone', 6]),
+    row(['whatsapp', 12]),
+    row(['instagram', 6], ['facebook', 6]),
+    row(['tiktok', 6], ['youtube', 6]),
+    row(['linkedin', 6], ['google', 6]),
+    row(['tripadvisor', 12]),
+    row(['shareImage', 12]),
+    row(['shareImageUrl', 12]),
+  ],
+  'api::booking-setting.booking-setting': [
+    row(['availabilityMonths', 6], ['currencyCode', 6]),
+    row(['adultsMin', 6], ['adultsDefault', 6]),
+    row(['childrenMin', 6], ['childrenDefault', 6]),
+    row(['peopleMax', 12]),
+    row(['assurances', 12]),
+    row(['depositRate', 12]),
+  ],
   'api::theme-setting.theme-setting': [
     row(['fontSans', 6], ['fontHeading', 6]),
     row(['radius', 6], ['headerSize', 6]),
@@ -306,114 +441,51 @@ const EDIT_LAYOUTS: Record<string, Array<Array<{ name: string; size: number }>>>
   ],
 };
 
-const SINGLE_TYPE_TITLES: Record<string, string> = { 'api::theme-setting.theme-setting': 'fontSans' };
-
-/** Component layouts: uid -> rows, and per-field hints. Grouped as surfaces, brand, text, states, accents. */
-const COMPONENT_CONFIGS: Record<string, { layout: Array<Array<{ name: string; size: number }>>; hints: Record<string, string> }> = {
-  'theme.palette': {
-    layout: [
-      // Surfaces
-      row(['background', 6], ['foreground', 6]),
-      row(['card', 6], ['cardForeground', 6]),
-      row(['popover', 6], ['popoverForeground', 6]),
-      // Brand
-      row(['primary', 6], ['primaryForeground', 6]),
-      row(['secondary', 6], ['secondaryForeground', 6]),
-      row(['accent', 6], ['accentForeground', 6]),
-      // Text
-      row(['muted', 6], ['mutedForeground', 6]),
-      // States
-      row(['destructive', 6], ['border', 6]),
-      row(['input', 6], ['ring', 6]),
-      // Accents
-      row(['tierra', 6], ['tierraForeground', 6]),
-      row(['arena', 6], ['arenaForeground', 6]),
-    ],
-    hints: {
-      background: 'Surfaces: page background.',
-      foreground: 'Surfaces: main text color on the page.',
-      card: 'Surfaces: background of cards and panels.',
-      cardForeground: 'Surfaces: text on cards.',
-      popover: 'Surfaces: background of menus and popups.',
-      popoverForeground: 'Surfaces: text in menus and popups.',
-      primary: 'Brand: main color (buttons, links, highlights).',
-      primaryForeground: 'Brand: text and icons on primary buttons.',
-      secondary: 'Brand: secondary buttons and soft blocks.',
-      secondaryForeground: 'Brand: text on secondary blocks.',
-      accent: 'Brand: hover and selected states.',
-      accentForeground: 'Brand: text on accent areas.',
-      muted: 'Text: subtle background (tags, disabled, skeletons).',
-      mutedForeground: 'Text: secondary text (captions, hints).',
-      destructive: 'States: errors and dangerous actions.',
-      border: 'States: lines and dividers.',
-      input: 'States: outline of form fields.',
-      ring: 'States: focus outline.',
-      tierra: 'Accents: terracotta tone used in highlights.',
-      tierraForeground: 'Accents: text on the terracotta tone.',
-      arena: 'Accents: sand tone used in soft sections.',
-      arenaForeground: 'Accents: text on the sand tone.',
-    },
-  },
+const SINGLE_TYPE_TITLES: Record<string, string> = {
+  'api::theme-setting.theme-setting': 'fontSans',
+  'api::booking-setting.booking-setting': 'currencyCode',
+  'api::site-setting.site-setting': 'brandName',
 };
 
-const FIELD_HINTS: Record<string, Record<string, string>> = {
-  'api::translation.translation': {
-    key: 'Technical key used by the website. Do not change it.',
-    page: 'Page where this text appears.',
-    section: 'Block of the page (hero, form, errors...).',
-    label: 'Where and what this text is.',
-    note: 'Internal hint for editors (not public).',
-    value: 'The text shown on the site, one per language.',
-  },
-  'api::media-slot.media-slot': {
-    key: 'Technical key used by the website. Do not change it.',
-    image: 'Uploaded image; takes priority over Image URL.',
-    imageUrl: 'External image URL, used when no image is uploaded.',
-  },
-  'api::theme-setting.theme-setting': {
-    light: 'Colors of the light theme. Click a swatch to open the color picker.',
-    dark: 'Colors of the dark theme (applied when the visitor uses dark mode).',
-    fontSans: 'Body text font. Radio Canada = current look; Inter/Poppins/Montserrat/DM Sans = clean sans-serif; Playfair Display/Lora/Merriweather = serif; System = the visitor device font.',
-    fontHeading: 'Headings font. Same options as body text; a serif here with a sans body gives an editorial look.',
-    radius: 'Corner roundness of cards, inputs and buttons. None = square corners, Small = slightly softened, Medium = default, Large = very round, Full = pill-shaped buttons.',
-    headerSize: 'Height of the top bar. Compact = 3rem to 4rem, Standard = 3.5rem to 5rem, Tall = 4rem to 6rem (phone to desktop).',
-    introEnabled: 'Show the animated logo intro on the first visit.',
-    introAccent: 'Color of the intro animation.',
-    introRestScale: 'Final scale of the logo in the intro (0.85 = 85%).',
-    introFailsafeMs: 'Milliseconds after which the intro is dismissed no matter what.',
-  },
-  'api::booking-setting.booking-setting': {
-    depositRate: 'OBSOLETE. The deposit is now decided by the booking API (Setting.depositPercent) and this value is ignored by the new booking engine. It stays only until the website stops reading it; do not rely on it.',
-    availabilityMonths: 'How many calendar months the booking calendar shows, from 1 to 12 (default 3). The same for every language.',
-    peopleMax: 'Maximum adults + children per booking.',
-    currencyCode: 'ISO currency code, for example USD.',
-    assurances: 'Reassurance bullets next to the booking form. A tour can override them.',
-  },
-  'api::form-setting.form-setting': { messageMax: 'Maximum characters in the contact message.' },
-  'api::navigation.navigation': {
-    headerLinks: 'Kind "tours-menu" marks the item whose dropdown is built from destinations and tours.',
-  },
-  'api::page.page': {
-    slug: 'Legal texts use fixed slugs: terms, privacy, cancellation, cookies, conduct, complaints, legal-mincetur. Hub pages: blog, products. Do not change a slug; the website and the booking API look pages up by it.',
-    body: 'Page text in Markdown, one per language. For legal texts, each published change becomes a new version stored by the booking API.',
-  },
-  'api::destination.destination': {
-    order: 'Order in menus and the tours page.',
-    footerOrder: 'Order of the destination column in the footer.',
-    showInFooter: 'Show this destination in the footer.',
-  },
-  'api::tour.tour': {
-    assurances: 'Optional. Replaces the global assurances (Site — Booking rules) for this tour.',
-    seoTitle: 'Page title for search engines. Empty = tour title.',
-    seoDescription: 'Meta description. Empty = tour description.',
-    meeting: 'Meeting point as text (shown to the visitor).',
-    meetingPointUrl: 'Map link to the meeting point (for example a Google Maps URL).',
-    latitude: 'Meeting point latitude in decimal degrees, from -90 to 90.',
-    longitude: 'Meeting point longitude in decimal degrees, from -180 to 180.',
-    waiverBody: 'Liability waiver text (Markdown) that each passenger signs, one per language. Every published change creates a new version in the booking API, and passengers sign the text in force when they book. Review it before pressing Publish; saving a draft changes nothing for passengers.',
-    faqs: 'Questions and answers shown on the tour page and in structured data.',
-  },
+/** Component layouts: uid -> rows. Grouped as surfaces, brand, text, states, accents. */
+const COMPONENT_LAYOUTS: Record<string, Array<Array<{ name: string; size: number }>>> = {
+  'theme.palette': [
+    // Surfaces
+    row(['background', 6], ['foreground', 6]),
+    row(['card', 6], ['cardForeground', 6]),
+    row(['popover', 6], ['popoverForeground', 6]),
+    // Brand
+    row(['primary', 6], ['primaryForeground', 6]),
+    row(['secondary', 6], ['secondaryForeground', 6]),
+    row(['accent', 6], ['accentForeground', 6]),
+    // Text
+    row(['muted', 6], ['mutedForeground', 6]),
+    // States
+    row(['destructive', 6], ['border', 6]),
+    row(['input', 6], ['ring', 6]),
+    // Accents
+    row(['tierra', 6], ['tierraForeground', 6]),
+    row(['arena', 6], ['arenaForeground', 6]),
+  ],
 };
+
+/** Spanish label, hint and placeholder for each field (see src/admin-es.ts); list columns get the same label. */
+function applyFieldMeta(metadatas: Record<string, any>, fields: Record<string, FieldMeta> = {}) {
+  for (const [field, meta] of Object.entries(fields)) {
+    const current = metadatas[field];
+    if (!current) continue;
+    metadatas[field] = {
+      ...current,
+      edit: {
+        ...current.edit,
+        label: meta.label,
+        ...(meta.description !== undefined ? { description: meta.description } : {}),
+        ...(meta.placeholder !== undefined ? { placeholder: meta.placeholder } : {}),
+      },
+      list: { ...current.list, label: meta.label },
+    };
+  }
+}
 
 async function configureContentManager(strapi: Core.Strapi) {
   const store = strapi.store({ type: 'plugin', name: 'desertica', key: 'content-manager-config' });
@@ -423,7 +495,7 @@ async function configureContentManager(strapi: Core.Strapi) {
   const service = strapi.service(CM_UID as any) as any;
   const uids = new Set([
     ...Object.keys(LIST_CONFIGS),
-    ...Object.keys(FIELD_HINTS),
+    ...Object.keys(CONTENT_TYPE_FIELDS),
     ...Object.keys(RELATION_MAIN_FIELDS),
     ...Object.keys(EDIT_LAYOUTS),
   ]);
@@ -456,30 +528,34 @@ async function configureContentManager(strapi: Core.Strapi) {
           };
         }
       }
-      for (const [field, description] of Object.entries(FIELD_HINTS[uid] ?? {})) {
-        if (metadatas[field]) metadatas[field] = { ...metadatas[field], edit: { ...metadatas[field].edit, description } };
-      }
+      applyFieldMeta(metadatas, CONTENT_TYPE_FIELDS[uid]);
       await service.updateConfiguration(contentType, { settings, layouts, metadatas });
     } catch (error) {
       strapi.log.error(`[bootstrap] content-manager config failed for ${uid}: ${(error as Error).message}`);
     }
   }
   const components = strapi.service('plugin::content-manager.components') as any;
-  for (const [uid, config] of Object.entries(COMPONENT_CONFIGS)) {
+  for (const uid of new Set([...Object.keys(COMPONENT_LAYOUTS), ...Object.keys(COMPONENT_FIELDS)])) {
     try {
       const component = strapi.components[uid as keyof typeof strapi.components] as any;
       const current = await components.findConfiguration(component);
       const metadatas = { ...current.metadatas };
-      for (const [field, description] of Object.entries(config.hints)) {
-        if (metadatas[field]) metadatas[field] = { ...metadatas[field], edit: { ...metadatas[field].edit, description } };
-      }
+      applyFieldMeta(metadatas, COMPONENT_FIELDS[uid]);
       await components.updateConfiguration(component, {
         settings: current.settings,
-        layouts: { ...current.layouts, edit: config.layout },
+        layouts: { ...current.layouts, ...(COMPONENT_LAYOUTS[uid] ? { edit: COMPONENT_LAYOUTS[uid] } : {}) },
         metadatas,
       });
     } catch (error) {
       strapi.log.error(`[bootstrap] component config failed for ${uid}: ${(error as Error).message}`);
+    }
+  }
+  // Locales created by earlier versions have English display names; the language switcher shows these.
+  for (const [code, name] of Object.entries(LOCALE_NAMES)) {
+    try {
+      await strapi.db.query('plugin::i18n.locale').update({ where: { code }, data: { name } });
+    } catch (error) {
+      strapi.log.error(`[bootstrap] locale name failed for ${code}: ${(error as Error).message}`);
     }
   }
   await store.set({ value: { version: CM_CONFIG_VERSION } });
@@ -487,7 +563,21 @@ async function configureContentManager(strapi: Core.Strapi) {
 }
 
 export default {
-  register() {},
+  register({ strapi }: { strapi: Core.Strapi }) {
+    registerTranslateRoute(strapi);
+    // The example secrets are public in the repo: signing admin tokens with them would open the panel.
+    const placeholders = ['APP_KEYS', 'API_TOKEN_SALT', 'ADMIN_JWT_SECRET', 'TRANSFER_TOKEN_SALT', 'ENCRYPTION_KEY', 'JWT_SECRET'].filter((key) =>
+      /changeMe/i.test(process.env[key] ?? ''),
+    );
+    if (process.env.NODE_ENV === 'production' && placeholders.length) {
+      throw new Error(`Placeholder secrets in production: ${placeholders.join(', ')}. Generate real values.`);
+    }
+
+    // Without it every visitor shares the proxy's IP: ten form submissions in ten minutes for the whole website.
+    if (process.env.NODE_ENV === 'production' && !process.env.FORMS_PROXY_SECRET) {
+      throw new Error('FORMS_PROXY_SECRET is required in production (the same value as the website).');
+    }
+  },
 
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
     try {
@@ -501,6 +591,11 @@ export default {
       strapi.log.error(`[bootstrap] permissions failed: ${(error as Error).message}`);
     }
     try {
+      await restrictEditorRole(strapi);
+    } catch (error) {
+      strapi.log.error(`[bootstrap] editor role failed: ${(error as Error).message}`);
+    }
+    try {
       await configureContentManager(strapi);
     } catch (error) {
       strapi.log.error(`[bootstrap] content-manager config failed: ${(error as Error).message}`);
@@ -509,6 +604,18 @@ export default {
       await seedCatalog(strapi);
     } catch (error) {
       strapi.log.error(`[seed] failed (boot continues): ${(error as Error).stack ?? error}`);
+    }
+    if (process.env.SEED_SAMPLE_TOUR === 'true') {
+      try {
+        await ensureSampleTour(strapi);
+      } catch (error) {
+        strapi.log.error(`[seed] sample tour failed (boot continues): ${(error as Error).stack ?? error}`);
+      }
+    }
+    try {
+      await syncNewTranslations(strapi);
+    } catch (error) {
+      strapi.log.error(`[seed] translation sync failed (boot continues): ${(error as Error).stack ?? error}`);
     }
     try {
       await ensureExtraPages(strapi);

@@ -4,7 +4,7 @@
   "info": {
     "singularName": "media-slot",
     "pluralName": "media-slots",
-    "displayName": "Media — Slot",
+    "displayName": "Medios — Imagen o video de la web",
     "description": "Fixed images and videos used by the site (heroes, banners, stamps). Upload a file or set a URL."
   },
   "options": {

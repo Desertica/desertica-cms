@@ -17,27 +17,32 @@ const sweep = (now: number, windowMs: number) => {
   }
 };
 
-// El frontend (Express) reenvia los formularios; sin esto todas las peticiones compartirian IP.
-// Solo se confia en X-Client-IP si llega con el secreto compartido FORMS_PROXY_SECRET.
-const clientIp = (ctx: any): string => {
+// El frontend (Express) reenvia los formularios con el secreto compartido FORMS_PROXY_SECRET. Con el secreto
+// configurado se exige siempre: sin el, quien llame al CMS directo se salta la validacion y el limite del frontend.
+const viaProxy = (ctx: any): boolean => {
   const secret = process.env.FORMS_PROXY_SECRET;
   const given = String(ctx.get('x-forms-secret') ?? '');
-  const forwarded = String(ctx.get('x-client-ip') ?? '').slice(0, 64);
-  if (secret && forwarded && given.length === secret.length) {
-    if (timingSafeEqual(Buffer.from(given), Buffer.from(secret))) return forwarded;
-  }
-  return ctx.request.ip;
+  return !!secret && given.length === secret.length && timingSafeEqual(Buffer.from(given), Buffer.from(secret));
 };
+
+// X-Client-IP solo se cree si la peticion trae el secreto.
+const clientIp = (ctx: any): string =>
+  viaProxy(ctx) ? String(ctx.get('x-client-ip') ?? '').slice(0, 64) || ctx.request.ip : ctx.request.ip;
 
 export default (config: RateLimitConfig, _deps: { strapi: Core.Strapi }) => {
   const max = config?.max ?? 10;
   const windowMs = config?.windowMs ?? 10 * 60 * 1000;
 
   return async (ctx: any, next: () => Promise<unknown>) => {
+    if (process.env.FORMS_PROXY_SECRET && !viaProxy(ctx)) {
+      return ctx.forbidden();
+    }
+
     const now = Date.now();
     sweep(now, windowMs);
 
-    const key = `${ctx.path}|${clientIp(ctx)}`;
+    // The route, not the raw path: `/API/contact-messages` and `/api/contact-messages/` would each get their own quota.
+    const key = `${ctx.state.route?.handler ?? ctx.path}|${clientIp(ctx)}`;
     const stamps = (hits.get(key) ?? []).filter((s) => now - s < windowMs);
 
     if (stamps.length >= max) {

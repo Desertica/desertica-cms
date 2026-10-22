@@ -47,7 +47,7 @@ Localizados = un valor por idioma (`en` por defecto, `es`). El resto se sincroni
 | Tipo | Campos no localizados | Campos localizados |
 | --- | --- | --- |
 | `destination` | `slug`, `order`, `footerOrder`, `showInFooter`, `image`, `imageUrl` | `title`, `lead`, `allLabel` |
-| `tour` | `slug`, `order`, `destination`, `durationHours`, `priceFrom`, `featured`, `format` (`shared`/`private`/`both`), `languages` (json), `image`, `imageUrl`, `gallery`, `galleryUrls`, `itineraryFile`, `itineraryFileUrl`, `latitude`, `longitude`, `meetingPointUrl` | `title`, `seoTitle`, `seoDescription`, `assurances[]` (opcional, sustituye las globales), `description`, `lead`, `meeting`, `termsSummary`, `paragraphs[]`, `expandedParagraphs[]`, `practices[]`, `itinerary[]`, `videos[]`, `included[]`, `excluded[]`, `pack[]`, `notes[]`, `waiverBody` (Markdown), `faqs[]` (`shared.faq`) |
+| `tour` | `slug`, `order`, `destination`, `durationHours`, `priceFrom`, `featured`, `imageFocus` (`center`/`top`/`bottom`/`left`/`right`, por defecto `center`: parte de la foto que queda visible al recortarla en la tarjeta), `format` (`shared`/`private`/`both`), `languages` (json), `image`, `imageUrl`, `gallery`, `galleryUrls`, `itineraryFile`, `itineraryFileUrl`, `latitude`, `longitude`, `meetingPointUrl` | `title`, `seoTitle`, `seoDescription`, `assurances[]` (opcional, sustituye las globales), `description`, `lead`, `meeting`, `termsSummary`, `paragraphs[]`, `expandedParagraphs[]`, `practices[]`, `itinerary[]`, `videos[]`, `included[]`, `excluded[]`, `pack[]`, `notes[]`, `waiverBody` (Markdown), `faqs[]` (`shared.faq`) |
 | `translation` | `key`, `group`, `page`, `section`, `label`, `note`, `kind` (`short`/`long`) | `value` |
 | `media-slot` | `key`, `page`, `section`, `description`, `image`, `imageUrl`, `video`, `videoUrl`, `videoWebmUrl`, `poster`, `posterUrl` | `alt` |
 | `page` | `slug`, `heroImage`, `heroImageUrl` | `title`, `lead`, `body` (Markdown), `seoTitle`, `seoDescription` |
@@ -86,7 +86,7 @@ En el CMS: `CLIENT_URLS` (CORS) debe incluir el origen del frontend, y `PUBLIC_U
 
 ## Publicacion de cambios
 
-El frontend renderiza todas sus rutas por peticion y lee el CMS con una cache de servidor corta (`STRAPI_CACHE_TTL_MS`, 30 s por defecto): lo publicado se ve en menos de ese tiempo, sin webhook ni reconstruccion. Si el CMS no responde, el frontend sirve la ultima respuesta buena y, si no hay, sus valores por defecto.
+El frontend renderiza todas sus rutas por peticion y lee el CMS con una cache de servidor corta (`STRAPI_CACHE_TTL_MS`, 30 s por defecto): lo publicado se ve en menos de ese tiempo mas los 10 s que la web guarda cada pagina publica en memoria (`PAGE_CACHE_TTL_MS`), unos 40 s en total, sin webhook ni reconstruccion. Si el CMS no responde, el frontend sirve la ultima respuesta buena y, si no hay, sus valores por defecto.
 
 ## Cambios que requiere el mapper de `desertica-web`
 
@@ -108,7 +108,7 @@ Campo nuevo de `booking-setting` (single type, no localizado, sin populate; apar
 
 | Campo | Tipo | Notas |
 | --- | --- | --- |
-| `availabilityMonths` | entero 1..12, por defecto 3 | cuantos meses de calendario muestra la web. Las bases nuevas lo traen en 3; en una base existente puede venir `null` hasta que alguien guarde `Booking rules`, y la web usa 3. El mapper actual ya lo lee (`booking-defaults.ts` lo limita a 1..12) |
+| `availabilityMonths` | entero 1..12, por defecto 3 | cuantos meses de calendario muestra la web. Las bases nuevas lo traen en 3; en una base existente puede venir `null` hasta que alguien guarde `Sitio — Reglas de reserva`, y la web usa 3. El mapper actual ya lo lee (`booking-defaults.ts` lo limita a 1..12) |
 
 `booking-setting.depositRate` esta **obsoleto**: ignorado por el motor de reservas nuevo; se retira cuando la web deje de leerlo. El deposito lo decide el API (`Setting.depositPercent`). No se borra ni se renombra. Hoy lo leen en `desertica-web`: `src/app/core/cms/cms-mapper.ts` (`mapBooking`), `booking-defaults.ts` (`withBookingDefaults`/`DEFAULT_BOOKING`) y `src/app/features/tours/detail/tour-book.ts` (`TOUR_DEPOSIT_RATE`, `tourDuePrice`, formulario de reserva legado). El flujo nuevo (`booking-panel`, `checkout*`) usa `depositCents` del API y no lo lee.
 
@@ -128,7 +128,7 @@ El API (`desertica-api`) guarda un snapshot del texto de cada version al publica
 
 Otras paginas existentes: `complaints`, `legal-mincetur` (el slug real es con guion, no `legal/mincetur`), `products`, `blog`. El texto va en `body` (Markdown) y es localizado (`en`, `es`); el snapshot debe leerse con `?locale=` y `status=published`.
 
-`cancellation` y `cookies` no estan en `seed/catalog.json` (generado, no se edita a mano). Al arrancar, `ensureExtraPages` en `src/index.ts` crea ambas, solo una vez por base de datos (marca en el store `plugin_desertica_extra-pages`), con titulo en `en`/`es`, cuerpo vacio y **en borrador**: no aparecen en la API publica hasta que alguien escriba el texto y pulse `Publish` en cada idioma. Si se borran a proposito no se recrean. Para crearlas a mano: `Pages — Page` > `Create new entry`, slug `cancellation` o `cookies`, titulo y cuerpo en `en` y `es`, `Publish`. Si el slug no esta publicado el API debe tratarlo como "documento sin texto" y no publicar una version vacia.
+`cancellation` y `cookies` no estan en `seed/catalog.json` (generado, no se edita a mano). Al arrancar, `ensureExtraPages` en `src/index.ts` crea ambas, solo una vez por base de datos (marca en el store `plugin_desertica_extra-pages`), con titulo en `en`/`es`, cuerpo vacio y **en borrador**: no aparecen en la API publica hasta que alguien escriba el texto y pulse `Publish` en cada idioma. Si se borran a proposito no se recrean. Para crearlas a mano: `Páginas — Página` > `Create new entry`, slug `cancellation` o `cookies`, titulo y cuerpo en `en` y `es`, `Publish`. Si el slug no esta publicado el API debe tratarlo como "documento sin texto" y no publicar una version vacia.
 
 ## Descargo de los tours (`waiverBody`)
 
@@ -136,7 +136,7 @@ Cada cambio **publicado** del `waiverBody` genera una version nueva en el API (q
 
 ## Paginas legales en el admin
 
-Las siete paginas legales (`terms`, `privacy`, `cancellation`, `cookies`, `conduct`, `complaints`, `legal-mincetur`) son del mismo tipo `page` y comparten campos (`title`, `lead`, `body`, SEO). En `Pages — Page` la lista va ordenada por `slug` (columnas `title`, `slug`, `updatedAt`, mas el estado de Strapi); comparte lista con las paginas hub `blog` y `products`. No hay cambios de contrato.
+Las siete paginas legales (`terms`, `privacy`, `cancellation`, `cookies`, `conduct`, `complaints`, `legal-mincetur`) son del mismo tipo `page` y comparten campos (`title`, `lead`, `body`, SEO). En `Páginas — Página` la lista va ordenada por `slug` (columnas `title`, `slug`, `updatedAt`, mas el estado de Strapi); comparte lista con las paginas hub `blog` y `products`. No hay cambios de contrato.
 
 Textos de ejemplo NO LEGALES para desarrollo: `docs/DEV-LEGAL-SAMPLES.md`.
 
