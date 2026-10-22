@@ -4,6 +4,7 @@ import type { Core } from '@strapi/strapi';
 import { ensureSampleTour } from './sample-tour';
 import { registerTranslateRoute } from './translate';
 import { catalogNeedsSeed, clean, markCatalogSeeded, seedLocalized, syncNewTranslations } from './seed-sync';
+import { registerBookingGuard } from './booking-guard';
 import { registerPlaceholderGuard } from './placeholders';
 import { LOCALE_NAMES, configureContentManager } from './content-manager';
 
@@ -305,6 +306,7 @@ export default {
   register({ strapi }: { strapi: Core.Strapi }) {
     registerTranslateRoute(strapi);
     registerPlaceholderGuard(strapi);
+    registerBookingGuard(strapi);
     // The example secrets are public in the repo: signing admin tokens with them would open the panel.
     const placeholders = ['APP_KEYS', 'API_TOKEN_SALT', 'ADMIN_JWT_SECRET', 'TRANSFER_TOKEN_SALT', 'ENCRYPTION_KEY', 'JWT_SECRET'].filter((key) =>
       /changeMe/i.test(process.env[key] ?? ''),
