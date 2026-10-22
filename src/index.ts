@@ -93,21 +93,41 @@ function seedSource(): string | null {
 }
 
 /**
- * The built-in Editor role is what partners get: tours, destinations, texts, media and pages. Strapi gives it
- * the inbox too, which holds customers' names, e-mails and WhatsApp numbers, so those two types are taken away
- * once; an admin can grant them back from Settings > Roles and the change is kept.
+ * Editor permissions per content type. Strapi's built-in Editor has no locales on its permissions (so every list
+ * comes back empty on a fresh database), can delete everything and reads the inbox (customers' names, e-mails and
+ * WhatsApp numbers). Only a Super Admin deletes tours, destinations and pages; the inbox, company data, colors,
+ * booking rules, forms and menus (the `Sitio` group) are not the Editor's. Applied once; an admin can change the
+ * role from Settings > Roles afterwards and the change is kept.
  */
+const EDITOR_RIGHTS: Record<string, string[]> = {
+  'api::tour.tour': ['create', 'read', 'update', 'publish'],
+  'api::destination.destination': ['create', 'read', 'update', 'publish'],
+  'api::page.page': ['create', 'read', 'update', 'publish'],
+  'api::blog-post.blog-post': ['create', 'read', 'update', 'delete', 'publish'],
+  'api::product.product': ['create', 'read', 'update', 'delete', 'publish'],
+  // Seeded rows the website looks up by key: edited, never created or deleted here.
+  'api::translation.translation': ['read', 'update'],
+  'api::media-slot.media-slot': ['read', 'update'],
+};
+
 async function restrictEditorRole(strapi: Core.Strapi) {
-  const store = strapi.store({ type: 'plugin', name: 'desertica', key: 'editor-role' });
+  const store = strapi.store({ type: 'plugin', name: 'desertica', key: 'editor-permissions' });
   if (await store.get({})) return;
 
   const role = await strapi.db.query('admin::role').findOne({ where: { code: 'strapi-editor' } });
   if (!role) return;
 
-  const subjects = ['api::reservation.reservation', 'api::contact-message.contact-message'];
-  const { count } = (await strapi.db.query('admin::permission').deleteMany({ where: { role: role.id, subject: { $in: subjects } } })) as { count: number };
+  // assignPermissions replaces the whole set: keep what is not content-manager (media library, plugins).
+  const prefix = 'plugin::content-manager.explorer.';
+  const kept = (await strapi.db.query('admin::permission').findMany({ where: { role: role.id } }))
+    .filter((p: any) => !p.action.startsWith(prefix))
+    .map(({ action, subject, properties, conditions }: any) => ({ action, subject, properties, conditions }));
+  const explicit = Object.entries(EDITOR_RIGHTS).flatMap(([subject, actions]) =>
+    actions.map((action) => ({ action: `${prefix}${action}`, subject, properties: { locales: [...LOCALES] }, conditions: [] })),
+  );
+  await strapi.service('admin::role').assignPermissions(role.id, [...kept, ...explicit]);
   await store.set({ value: { done: true } });
-  strapi.log.info(`[bootstrap] Editor role: ${count} inbox permission(s) removed`);
+  strapi.log.info(`[bootstrap] Editor role: ${explicit.length} content permission(s) set`);
 }
 
 async function seedCatalog(strapi: Core.Strapi) {

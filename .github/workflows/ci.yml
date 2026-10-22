@@ -43,14 +43,14 @@ jobs:
       - run: npm test
       - run: npm run seed-check
       - run: npm run build
-      - name: Start Strapi on an empty database and wait for /_health
+      - name: Start Strapi on an empty database, wait for /_health and check the Editor role
         env:
           NODE_ENV: production
         run: |
           npm start > smoke.log 2>&1 &
           pid=$!
           for i in $(seq 1 60); do
-            [ "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:1337/_health)" = 204 ] && exit 0
+            [ "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:1337/_health)" = 204 ] && exec node scripts/verify-editor.mjs
             kill -0 $pid 2>/dev/null || break
             sleep 2
           done
