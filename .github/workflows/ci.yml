@@ -19,7 +19,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
-      NODE_ENV: production
       HOST: 127.0.0.1
       PORT: 1337
       DATABASE_CLIENT: sqlite
@@ -45,6 +44,8 @@ jobs:
       - run: npm run seed-check
       - run: npm run build
       - name: Start Strapi on an empty database and wait for /_health
+        env:
+          NODE_ENV: production
         run: |
           npm start > smoke.log 2>&1 &
           pid=$!
