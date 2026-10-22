@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { deepl, missingPlaceholders, plan, protect, restore } from './translate.ts';
+import { deepl, missingPlaceholders, plan, protect, restore, translateDocument } from './translate.ts';
 
 const strapi = {
   components: {
@@ -42,6 +42,15 @@ test('collects only localized copy and rebuilds it with the translations, keepin
     itinerary: [{ title: 'ES:Stop', body: 'ES:Text', imageUrl: 'https://x/y.jpg', image: 42 }],
     links: [{ label: 'ES:Tours', path: '/tours' }],
   });
+});
+
+test('legal texts never reach DeepL: not the waiver, not any page', async () => {
+  const texts: string[] = [];
+  const waiver = { type: 'customField', customField: 'plugin::ckeditor5.CKEditor', ...localized };
+  assert.equal(plan(strapi, { waiverBody: waiver } as any, { waiverBody: 'I accept the risks' }, true, texts).length, 0);
+  assert.deepEqual(texts, []);
+
+  await assert.rejects(translateDocument({} as any, 'api::page.page', 'doc', 'en', 'es'), { status: 422 });
 });
 
 test('skips empty and missing fields', () => {

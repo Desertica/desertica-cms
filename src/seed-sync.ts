@@ -47,3 +47,16 @@ export async function syncNewTranslations(strapi: Core.Strapi, source: string | 
   if (missing.length) strapi.log.info(`[seed] ${missing.length} new translation(s) added`);
 }
 
+
+const catalogStore = (strapi: Core.Strapi) => strapi.store({ type: 'plugin', name: 'desertica', key: 'catalog-seeded' });
+
+/**
+ * The catalog is seeded once per database. Without the mark, "no published destination" (every one unpublished
+ * or deleted on purpose) looked like an empty database and the seed brought the old catalog back.
+ */
+export async function catalogNeedsSeed(strapi: Core.Strapi, destinationUid: string) {
+  if (await catalogStore(strapi).get({})) return false;
+  return (await strapi.documents(destinationUid as any).count({ locale: 'en' })) === 0;
+}
+
+export const markCatalogSeeded = (strapi: Core.Strapi) => catalogStore(strapi).set({ value: { done: true } });
