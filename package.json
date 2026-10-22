@@ -9,9 +9,11 @@
     "start": "strapi start",
     "strapi": "strapi",
     "seed-check": "node -e \"const c=require('./seed/catalog.json');console.log(c.destinations.length+' destinations, '+c.tours.length+' tours')\"",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test \"src/**/*.test.ts\""
   },
   "dependencies": {
+    "@_sh/strapi-plugin-ckeditor": "8.0.0",
     "@strapi/plugin-color-picker": "5.56.0",
     "@strapi/plugin-users-permissions": "5.56.0",
     "@strapi/provider-upload-aws-s3": "5.56.0",

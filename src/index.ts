@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import type { Core } from '@strapi/strapi';
 import { ensureSampleTour } from './sample-tour';
+import { registerTranslateRoute } from './translate';
 import { COMPONENT_FIELDS, CONTENT_TYPE_FIELDS, type FieldMeta } from './admin-es';
 
 const PUBLIC_ACTIONS = [
@@ -544,7 +545,8 @@ async function configureContentManager(strapi: Core.Strapi) {
 }
 
 export default {
-  register() {
+  register({ strapi }: { strapi: Core.Strapi }) {
+    registerTranslateRoute(strapi);
     // The example secrets are public in the repo: signing admin tokens with them would open the panel.
     const placeholders = ['APP_KEYS', 'API_TOKEN_SALT', 'ADMIN_JWT_SECRET', 'TRANSFER_TOKEN_SALT', 'ENCRYPTION_KEY', 'JWT_SECRET'].filter((key) =>
       /changeMe/i.test(process.env[key] ?? ''),

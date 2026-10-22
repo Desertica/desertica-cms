@@ -1,6 +1,7 @@
 import type { StrapiApp } from '@strapi/strapi/admin';
 import lockup from './extensions/lockup.svg';
 import mark from './extensions/logo.svg';
+import TranslatePanel from './translate-panel';
 
 /**
  * Admin panel: Spanish interface and the Desertica look (olive green from the website palette).
@@ -40,5 +41,7 @@ export default {
       },
     },
   },
-  bootstrap(_app: StrapiApp) {},
+  bootstrap(app: StrapiApp) {
+    (app.getPlugin('content-manager') as any).apis.addEditViewSidePanel([TranslatePanel]);
+  },
 };

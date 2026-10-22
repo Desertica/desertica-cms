@@ -115,3 +115,10 @@ El `Dockerfile`, Postgres (incluido `DATABASE_URL`, con la semilla), las subidas
 
 - `SEED_SAMPLE_TOUR=true` (solo staging) crea una vez el tour `[EJEMPLO] Tour completo` con todos los campos en lorem ipsum, en ingles y espanol, y un PDF de muestra. Es un tour normal: los socios lo duplican para empezar uno nuevo y lo borran cuando no lo necesiten.
 - Al arrancar, los textos que la web gana despues del primer seed (por ejemplo el boton de WhatsApp o el banner de cookies) se agregan solos como filas de *Textos — Texto de la web*. Cada clave se ofrece una sola vez: una fila que un editor borra no vuelve y las existentes no se tocan. Las claves de pago, reservas, reclamaciones y descargo viven solo en el codigo de la web a proposito.
+
+## Editor visual y traduccion automatica
+
+- Los textos largos (`body` de paginas, `content` del blog, `details` de productos y `waiverBody` de los tours) usan el editor visual CKEditor 5 con el preset Markdown: el editor ve negritas, listas y enlaces, y el CMS sigue guardando Markdown, asi que la API y la web no cambian. El contenido existente se abre tal cual.
+- `DEEPL_API_KEY` activa el panel *Traduccion automatica* de la vista de edicion (tours, destinos, paginas, blog, productos, textos, medios, reglas de reserva y menus). Traduce la version abierta (en o es) al otro idioma y la guarda como **borrador**: nunca publica. Texto y componentes se traducen; precio, slug, iconos, rutas e imagenes se conservan. Una clave gratuita (`:fx`) cubre 500 000 caracteres al mes segun DeepL; verifica el limite vigente en su sitio.
+- El endpoint es `POST /desertica/translate`, solo para sesiones del panel con permiso de edicion en ese tipo de contenido.
+
