@@ -81,7 +81,8 @@ jobs:
     environment: staging
     steps:
       - name: Trigger Coolify
-        run: curl -fsS --retry 3 -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" "${{ secrets.COOLIFY_STAGING_WEBHOOK }}"
+        run: |
+          curl -fsS --retry 3 -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" "${{ secrets.COOLIFY_STAGING_WEBHOOK }}"
 
   deploy-production:
     if: startsWith(github.ref, 'refs/tags/v')
@@ -90,4 +91,5 @@ jobs:
     environment: production   # configure required reviewers on this environment
     steps:
       - name: Trigger Coolify
-        run: curl -fsS --retry 3 -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" "${{ secrets.COOLIFY_PRODUCTION_WEBHOOK }}"
+        run: |
+          curl -fsS --retry 3 -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" "${{ secrets.COOLIFY_PRODUCTION_WEBHOOK }}"

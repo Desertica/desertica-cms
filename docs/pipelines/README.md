@@ -7,6 +7,8 @@ mkdir -p .github/workflows && cp docs/pipelines/*.yml .github/workflows/
 git add .github/workflows && git commit -m "Install pipelines" && git push
 ```
 
+`security.yml` has no CodeQL or dependency-review: both need GitHub Advanced Security on private repos. Add them back if the repo becomes public or GHAS is bought.
+
 `docker.yml` replaces the previous one: images come from `develop` (staging) and `v*` tags (production), never from `main` directly.
 
 ## Flow
@@ -15,6 +17,6 @@ git add .github/workflows && git commit -m "Install pipelines" && git push
 ## One-time setup (repo settings)
 1. Environments `staging` and `production`; on `production` add required reviewers and restrict to tags `v*`.
 2. Secrets per environment: `COOLIFY_TOKEN`, `COOLIFY_STAGING_WEBHOOK` / `COOLIFY_PRODUCTION_WEBHOOK` (Coolify: application -> Webhooks -> Deploy webhook).
-3. Rulesets on `main` and `develop`: require PR, 1 approval, code owner review, required checks `commit-policy`, `build`, `codeql`, `dependency-review`, `secrets`, `audit`, `image`; block force-push and deletion; linear history.
+3. Rulesets on `main` and `develop`: require PR, 1 approval, code owner review, required checks in `docs/PROTECCION-RAMAS.md`; block force-push and deletion; linear history.
 4. Enable Dependabot alerts, secret scanning and push protection (Settings -> Code security).
 5. In Coolify, point the app at the GHCR image (`:develop` for staging, the version tag for production) instead of building from Git.
