@@ -60,6 +60,7 @@ const localized = (lang: 'en' | 'es') => ({
 export async function ensureSampleTour(strapi: Core.Strapi) {
   const store = strapi.store({ type: 'plugin', name: 'desertica', key: 'sample-tour' });
   if (await store.get({})) return;
+  strapi.log.warn('[seed] SEED_SAMPLE_TOUR is on: a public example tour with a price is created. Never use it in production.');
 
   const tourUid = 'api::tour.tour' as any;
   const destination = await strapi.documents('api::destination.destination' as any).findFirst({ locale: 'en', filters: { slug: 'huacachina' } });

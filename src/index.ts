@@ -572,6 +572,11 @@ export default {
     if (process.env.NODE_ENV === 'production' && placeholders.length) {
       throw new Error(`Placeholder secrets in production: ${placeholders.join(', ')}. Generate real values.`);
     }
+
+    // Without it every visitor shares the proxy's IP: ten form submissions in ten minutes for the whole website.
+    if (process.env.NODE_ENV === 'production' && !process.env.FORMS_PROXY_SECRET) {
+      throw new Error('FORMS_PROXY_SECRET is required in production (the same value as the website).');
+    }
   },
 
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {

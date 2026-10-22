@@ -6,7 +6,8 @@ const FIELDS = ['tourSlug', 'tourTitle', 'date', 'language', 'format', 'payment'
 
 export default factories.createCoreController('api::reservation.reservation', () => ({
   async create(ctx) {
-    const data = ctx.request.body?.data ?? {};
+    const raw = ctx.request.body?.data;
+    const data = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
     ctx.request.body = { data: Object.fromEntries(FIELDS.filter((key) => key in data).map((key) => [key, data[key]])) };
     return super.create(ctx);
   },

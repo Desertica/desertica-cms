@@ -27,6 +27,7 @@ const TranslatePanel = ({ model, documentId }: { model: string; documentId?: str
   const to = from === 'en' ? 'es' : 'en';
 
   const run = async () => {
+    if (!window.confirm(`Esto reemplaza el borrador en ${NAMES[to]} con la traducción de esta versión. Lo publicado no cambia. ¿Continuar?`)) return;
     setBusy(true);
     try {
       await post('/desertica/translate', { uid: model, documentId, from, to });

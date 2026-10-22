@@ -12,9 +12,9 @@ Pasos que necesitan tus cuentas. El código ya está preparado; aquí está qué
 | `PUBLIC_URL`, `CLIENT_URLS`, `PROXY=true` | `https://cms-stg.desertica.pe`, `https://stg.desertica.pe`, `true` | |
 | `DATABASE_CLIENT`, `DATABASE_URL`, `DATABASE_SSL` | `postgres`, URL interna, `false` | |
 | `APP_KEYS`, `API_TOKEN_SALT`, `ADMIN_JWT_SECRET`, `TRANSFER_TOKEN_SALT`, `ENCRYPTION_KEY`, `JWT_SECRET` | valores aleatorios distintos por entorno | |
-| `FORMS_PROXY_SECRET` | el mismo valor que en la web | Ahora es **obligatorio**: sin la cabecera `X-Forms-Secret` el CMS rechaza los formularios (403) |
+| `FORMS_PROXY_SECRET` | el mismo valor que en la web | **Obligatorio en producción** (si falta, el CMS no arranca): sin la cabecera `X-Forms-Secret` el CMS rechaza los formularios (403) |
 | `SEED_ON_EMPTY` | `false` después del primer arranque | |
-| `SEED_SAMPLE_TOUR` | `true` solo en staging | Crea el tour `[EJEMPLO]` una vez |
+| `SEED_SAMPLE_TOUR` | `true` solo en staging | Crea una vez el tour de ejemplo (`[EJEMPLO] Tour completo` en español, `[EXAMPLE] Complete tour` en inglés), publicado y con precio: **nunca en producción** |
 | `DEEPL_API_KEY` | clave de DeepL (gratis termina en `:fx`) | Activa el panel de traducción automática |
 | `UPLOAD_PROVIDER` y `S3_*` | ver la sección 3 | |
 
@@ -107,3 +107,11 @@ Los socios cargan el contenido en staging. Al lanzar, hay dos caminos; ensáyalo
 - O restaurar una copia de Postgres y apuntar producción al mismo bucket de imágenes.
 
 Los secretos de producción son **distintos** de los de staging (`ENCRYPTION_KEY`, `JWT_SECRET`...): al copiar datos entre entornos, revisa que los tokens de API y de transferencia se vuelvan a crear en producción.
+
+## Cosas que conviene saber
+
+- Al arrancar, el rol Public queda **exactamente** con los permisos que declara el código: un permiso que alguien añada a Public desde el panel se revierte en el siguiente arranque. Es a propósito (ver CLAUDE.md).
+- La primera vez que corre la sincronización de textos en una base con datos, repone una vez, como filas nuevas, las del seed que un editor hubiera borrado antes. Después ya no vuelven.
+- La traducción automática reemplaza el borrador del otro idioma: el panel pide confirmación. Lo publicado no cambia.
+- CKEditor 5 trae `ckeditor5` con licencia GPL-2+ (o comercial). En un panel interno que no se distribuye no suele ser un problema, pero revísalo con el abogado. Antes de usarlo con los textos legales, abre y guarda cada uno en staging y comprueba que el Markdown no cambia: cada publicación de `waiverBody` crea una versión nueva en el API.
+
