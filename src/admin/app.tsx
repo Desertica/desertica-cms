@@ -3,12 +3,16 @@ import lockup from './extensions/lockup.svg';
 import mark from './extensions/logo.svg';
 import TranslatePanel from './translate-panel';
 
-// Strapi follows the operating system by default, and its dark theme has a purple tint. The panel opens in
-// light until each person picks another theme in Profile > Interface mode (a stored choice is kept).
+// Strapi follows the operating system for the theme (its dark theme has a purple tint) and starts in English. Once
+// per browser the panel is set to light and Spanish; what the person picks afterwards in Profile is kept.
 try {
-  if (!localStorage.getItem('STRAPI_THEME')) localStorage.setItem('STRAPI_THEME', 'light');
+  if (!localStorage.getItem('desertica-admin-defaults')) {
+    localStorage.setItem('STRAPI_THEME', 'light');
+    localStorage.setItem('strapi-admin-language', 'es');
+    localStorage.setItem('desertica-admin-defaults', '1');
+  }
 } catch {
-  // storage blocked: Strapi falls back to the system theme
+  // storage blocked: Strapi falls back to the system theme and English
 }
 
 /**

@@ -132,6 +132,17 @@ async function restrictEditorRole(strapi: Core.Strapi) {
   strapi.log.info(`[bootstrap] Editor role: ${explicit.length} content permission(s) set`);
 }
 
+/** The panel is for Spanish-speaking editors; accounts still on Strapi's English default move to Spanish once. */
+async function defaultAdminLanguage(strapi: Core.Strapi) {
+  const store = strapi.store({ type: 'plugin', name: 'desertica', key: 'admin-language' });
+  if (await store.get({})) return;
+
+  const users = await strapi.db.query('admin::user').findMany({ where: { $or: [{ preferedLanguage: null }, { preferedLanguage: 'en' }] } });
+  for (const user of users) await strapi.db.query('admin::user').update({ where: { id: user.id }, data: { preferedLanguage: 'es' } });
+  await store.set({ value: { done: true } });
+  strapi.log.info(`[bootstrap] Admin language: ${users.length} account(s) set to Spanish`);
+}
+
 async function seedCatalog(strapi: Core.Strapi) {
   if (process.env.SEED_ON_EMPTY === 'false') return;
 
@@ -326,6 +337,11 @@ export default {
       await restrictEditorRole(strapi);
     } catch (error) {
       strapi.log.error(`[bootstrap] editor role failed: ${(error as Error).message}`);
+    }
+    try {
+      await defaultAdminLanguage(strapi);
+    } catch (error) {
+      strapi.log.error(`[bootstrap] admin language failed: ${(error as Error).message}`);
     }
     try {
       await configureContentManager(strapi);
