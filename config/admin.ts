@@ -39,9 +39,11 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Admin => 
   secrets: {
     encryptionKey: env('ENCRYPTION_KEY'),
   },
+  // Off by default: promoteEE adds the Releases, Review Workflows, SSO, Audit Logs and Content History "buy" entries
+  // to Settings (paid features nobody here can use); nps is Strapi's satisfaction survey pop-up.
   flags: {
-    nps: env.bool('FLAG_NPS', true),
-    promoteEE: env.bool('FLAG_PROMOTE_EE', true),
+    nps: env.bool('FLAG_NPS', false),
+    promoteEE: env.bool('FLAG_PROMOTE_EE', false),
   },
   ...preview(env),
 });
