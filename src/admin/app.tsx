@@ -25,6 +25,34 @@ try {
 export default {
   config: {
     locales: ['es'],
+    // Only strings seen on screen: the sign-in and invitation pages are in the formal register and still say Strapi, and
+    // the home page keeps some English from the guided tour and the widget editor. Others stay as Strapi ships them.
+    translations: {
+      es: {
+        'Auth.form.welcome.title': '¡Bienvenido!',
+        'Auth.form.welcome.subtitle': 'Entra a tu cuenta de Desertica',
+        'Auth.form.email.placeholder': 'tu@correo.com',
+        'Auth.link.forgot-password': '¿Olvidaste tu contraseña?',
+        'Auth.form.register.subtitle': 'Crea tu contraseña para entrar al panel de Desertica.',
+        'Auth.form.button.register': 'Crear mi cuenta',
+        'global.content-manager': 'Contenido',
+        'HomePage.addWidget.button': 'Añadir widget',
+        'HomePage.addWidget.title': 'Añadir widget',
+        'HomePage.widget.delete': 'Quitar',
+        'HomePage.widget.drag': 'Arrastra para mover',
+        'tours.overview.title': '¡Descubre tu panel!',
+        'tours.overview.subtitle': 'Sigue el recorrido guiado para sacarle partido.',
+        'tours.overview.completed': '{completed}% completado',
+        'tours.overview.close': 'Cerrar el recorrido',
+        'tours.overview.tasks': 'Tus tareas',
+        'tours.overview.tour.link': 'Empezar',
+        'tours.overview.contentManager.label': 'Crea y publica contenido',
+        'tours.overview.contentTypeBuilder.label': 'Crea tu esquema',
+        'tours.overview.apiTokens.label': 'Copia un token de API',
+        'tours.overview.strapiCloud.label': 'Despliega tu aplicación en Strapi Cloud',
+        'tours.overview.strapiCloud.link': 'Leer la documentación',
+      },
+    },
     auth: { logo: lockup },
     menu: { logo: mark },
     head: { favicon: mark },
