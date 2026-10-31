@@ -2,6 +2,7 @@ import type { StrapiApp } from '@strapi/strapi/admin';
 import lockup from './extensions/lockup.svg';
 import mark from './extensions/logo.svg';
 import { Mail, File, Image } from '@strapi/icons';
+import ChecklistPanel from './checklist-panel';
 import TranslatePanel from './translate-panel';
 
 // Strapi follows the operating system for the theme (its dark theme has a purple tint) and starts in English. Once
@@ -74,6 +75,6 @@ export default {
     ]);
   },
   bootstrap(app: StrapiApp) {
-    (app.getPlugin('content-manager') as any).apis.addEditViewSidePanel([TranslatePanel]);
+    (app.getPlugin('content-manager') as any).apis.addEditViewSidePanel([ChecklistPanel, TranslatePanel]);
   },
 };
