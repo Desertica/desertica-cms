@@ -1,6 +1,7 @@
 import type { StrapiApp } from '@strapi/strapi/admin';
 import lockup from './extensions/lockup.svg';
 import mark from './extensions/logo.svg';
+import { Mail, File, Image } from '@strapi/icons';
 import TranslatePanel from './translate-panel';
 
 // Strapi follows the operating system for the theme (its dark theme has a purple tint) and starts in English. Once
@@ -52,6 +53,25 @@ export default {
         },
       },
     },
+  },
+  // `widgets` is only reachable from register(); the bootstrap hook of the app does not receive it.
+  register(app: StrapiApp) {
+    // Home widgets: each one is hidden for people who cannot read that content (the Editor has no inbox).
+    const read = (subject: string) => [{ action: 'plugin::content-manager.explorer.read', subject }];
+    const widget = (id: string, title: string, icon: typeof Mail, subject: string, component: 'InboxWidget' | 'LegalWidget' | 'ToursWidget', link: { label: string; href: string }) => ({
+      id,
+      pluginId: 'desertica',
+      icon,
+      title: { id: `desertica.widget.${id}`, defaultMessage: title },
+      link: { label: { id: `desertica.widget.${id}.link`, defaultMessage: link.label }, href: link.href },
+      permissions: read(subject),
+      component: async () => (await import('./widgets'))[component],
+    });
+    app.widgets.register([
+      widget('inbox', 'Bandeja', Mail, 'api::reservation.reservation', 'InboxWidget', { label: 'Abrir bandeja', href: '/content-manager/collection-types/api::reservation.reservation' }),
+      widget('legal-drafts', 'Páginas legales por publicar', File, 'api::page.page', 'LegalWidget', { label: 'Ver páginas', href: '/content-manager/collection-types/api::page.page' }),
+      widget('tour-gaps', 'Tours sin foto o sin descargo', Image, 'api::tour.tour', 'ToursWidget', { label: 'Ver tours', href: '/content-manager/collection-types/api::tour.tour' }),
+    ]);
   },
   bootstrap(app: StrapiApp) {
     (app.getPlugin('content-manager') as any).apis.addEditViewSidePanel([TranslatePanel]);
