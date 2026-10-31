@@ -10,6 +10,28 @@ import type { Core } from '@strapi/strapi';
  * `UPLOAD_MAX_FILE_SIZE_MB` (default 200) is the plugin limit; `strapi::body` in config/middlewares.ts
  * reads the same variable so both limits always agree.
  */
+/**
+ * E-mail (notices of new reservations and messages, src/notify.ts): SMTP through nodemailer, only when SMTP_HOST is set.
+ * Without it Strapi keeps its default sendmail provider, which nothing here calls.
+ */
+const mail = (env: Core.Config.Shared.ConfigParams['env']) =>
+  env('SMTP_HOST', '')
+    ? {
+        email: {
+          config: {
+            provider: 'nodemailer',
+            providerOptions: {
+              host: env('SMTP_HOST'),
+              port: env.int('SMTP_PORT', 587),
+              secure: env.bool('SMTP_SECURE', false),
+              ...(env('SMTP_USER', '') ? { auth: { user: env('SMTP_USER'), pass: env('SMTP_PASSWORD', '') } } : {}),
+            },
+            settings: { defaultFrom: env('MAIL_FROM', env('SMTP_USER', '')) },
+          },
+        },
+      }
+    : {};
+
 const config = ({ env }: Core.Config.Shared.ConfigParams) => {
   const sizeLimit = env.int('UPLOAD_MAX_FILE_SIZE_MB', 200) * 1024 * 1024;
   const provider = env('UPLOAD_PROVIDER', 'local');
@@ -25,6 +47,7 @@ const config = ({ env }: Core.Config.Shared.ConfigParams) => {
     const acl = env('S3_ACL', '');
     return {
       ...customFields,
+      ...mail(env),
       upload: {
         config: {
           provider: 'aws-s3',
@@ -58,7 +81,7 @@ const config = ({ env }: Core.Config.Shared.ConfigParams) => {
     };
   }
 
-  return { ...customFields, upload: { config: { sizeLimit, security } } };
+  return { ...customFields, ...mail(env), upload: { config: { sizeLimit, security } } };
 };
 
 export default config;

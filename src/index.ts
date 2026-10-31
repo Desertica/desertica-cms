@@ -4,6 +4,7 @@ import type { Core } from '@strapi/strapi';
 import { ensureSampleTour } from './sample-tour';
 import { registerTranslateRoute } from './translate';
 import { registerOverviewRoute } from './overview';
+import { registerNotifications } from './notify';
 import { catalogNeedsSeed, clean, markCatalogSeeded, seedLocalized, syncNewTranslations } from './seed-sync';
 import { assertProductionEnv } from './production-env';
 import { registerBookingGuard } from './booking-guard';
@@ -319,6 +320,7 @@ export default {
   register({ strapi }: { strapi: Core.Strapi }) {
     registerTranslateRoute(strapi);
     registerOverviewRoute(strapi);
+    registerNotifications(strapi);
     registerPlaceholderGuard(strapi);
     registerBookingGuard(strapi);
     assertProductionEnv(process.env);
