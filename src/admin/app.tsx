@@ -3,6 +3,14 @@ import lockup from './extensions/lockup.svg';
 import mark from './extensions/logo.svg';
 import TranslatePanel from './translate-panel';
 
+// Strapi follows the operating system by default, and its dark theme has a purple tint. The panel opens in
+// light until each person picks another theme in Profile > Interface mode (a stored choice is kept).
+try {
+  if (!localStorage.getItem('STRAPI_THEME')) localStorage.setItem('STRAPI_THEME', 'light');
+} catch {
+  // storage blocked: Strapi falls back to the system theme
+}
+
 /**
  * Admin panel: Spanish interface and the Desertica look (olive green from the website palette).
  * Each person picks the language in Profile > Interface language; "es" is enabled here.

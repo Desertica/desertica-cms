@@ -2,11 +2,10 @@ import { useState } from 'react';
 import { Box, Button, Typography } from '@strapi/design-system';
 import { useFetchClient, useNotification } from '@strapi/strapi/admin';
 
-/** Content types whose texts differ by language; others have nothing to translate. */
+/** Content types whose texts differ by language; others have nothing to translate. Pages (legal texts) are left out on purpose. */
 const TRANSLATABLE = new Set([
   'api::tour.tour',
   'api::destination.destination',
-  'api::page.page',
   'api::blog-post.blog-post',
   'api::product.product',
   'api::translation.translation',

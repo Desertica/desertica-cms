@@ -33,12 +33,13 @@
     "typescript-eslint": "^8.72.0"
   },
   "engines": {
-    "node": ">=20.0.0 <=26.x.x",
+    "node": ">=22.0.0",
     "npm": ">=6.0.0"
   },
   "overrides": {
     "markdown-it": "^14.3.3",
     "vite": "^6.4.5",
-    "nodemailer": "^10.2.1"
+    "nodemailer": "^10.2.1",
+    "dompurify": "^3.4.17"
   }
 }

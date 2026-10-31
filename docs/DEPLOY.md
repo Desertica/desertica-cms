@@ -1,6 +1,6 @@
 # Despliegue del CMS (Strapi 5)
 
-Imagen publicada por CI: `ghcr.io/desertica/desertica-cms` (`latest` = main, `sha-<corto>`, `vX.Y.Z`). El contenedor escucha en el puerto 1337, corre como usuario `node` y responde `GET /_health` (204).
+El CI (`.github/workflows/ci.yml`) construye la imagen pero no la publica. Coolify construye el `Dockerfile` desde la rama de cada entorno: staging sigue la rama `staging` y producción la rama `prod` (flujo `develop` > `staging` > `prod`, ver `docs/PROTECCION-RAMAS.md`); `main` es solo la base y no se despliega. El contenedor escucha en el puerto 1337, corre como usuario `node` y responde `GET /_health` (204).
 
 ## Variables de entorno
 
@@ -10,11 +10,11 @@ Imagen publicada por CI: `ghcr.io/desertica/desertica-cms` (`latest` = main, `sh
 | `API_TOKEN_SALT`, `ADMIN_JWT_SECRET`, `TRANSFER_TOKEN_SALT`, `ENCRYPTION_KEY`, `JWT_SECRET` | si | Un secreto distinto cada uno. Cambiar `ADMIN_JWT_SECRET`/`JWT_SECRET` cierra las sesiones; cambiar `ENCRYPTION_KEY` rompe lo cifrado (tokens de transferencia) |
 | `PUBLIC_URL` | si | URL publica del CMS, `https://cms.ejemplo.com` (sin barra final). Define la URL del admin; no vuelve absolutas las URLs de los medios |
 | `PROXY` | si hay proxy | `true` detras de un proxy inverso con TLS (cookies seguras del admin, IP real) |
-| `CLIENT_URLS` | si | Origenes CORS, separados por coma (origen del frontend y del admin si se sirve aparte) |
+| `CLIENT_URLS` | si (sin ella el CMS no arranca en produccion) | Origenes CORS, separados por coma (origen del frontend y del admin si se sirve aparte) |
 | `DATABASE_CLIENT` | si | `postgres` en produccion (`sqlite` solo desarrollo) |
 | `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_NAME`, `DATABASE_USERNAME`, `DATABASE_PASSWORD` | si (postgres) | Conexion. Opcionales: `DATABASE_SSL`, `DATABASE_SSL_REJECT_UNAUTHORIZED`, `DATABASE_SCHEMA`, `DATABASE_POOL_MIN/MAX` |
 | `FORMS_PROXY_SECRET` | si | Mismo valor que en el servidor Angular. Sin el, el limite de peticiones usa la IP del proxy (todos los visitantes comparten cupo) |
-| `SEED_ON_EMPTY` | no | `true` (por defecto) siembra una base vacia. Poner `false` tras el primer arranque |
+| `SEED_ON_EMPTY` | no | `true` (por defecto) siembra una base que nunca se sembro (una vez; queda marcada en la base). Poner `false` tras el primer arranque |
 | `UPLOAD_PROVIDER` | no | `local` (por defecto, `public/uploads`) o `aws-s3` |
 | `UPLOAD_MAX_FILE_SIZE_MB` | no | Limite por archivo, 200 por defecto (cuerpo HTTP y plugin upload); si hay proxy inverso, subir tambien su limite (nginx `client_max_body_size`) |
 | `S3_BUCKET`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | con `aws-s3` | Bucket y credenciales (sin llaves se usa la cadena por defecto del SDK, p. ej. rol IAM) |
@@ -35,7 +35,7 @@ docker compose exec cms node_modules/.bin/strapi admin:create-user \
   --firstname Admin --lastname Desertica --email tu@correo --password '<clave larga>'
 ```
 
-`docker-compose.yml` levanta `cms` + `postgres:16` con volumenes `pgdata` y `uploads` (`/opt/app/public/uploads`). En la primera arranque con la base vacia se siembra el catalogo. Con una imagen ya publicada: `CMS_IMAGE=ghcr.io/desertica/desertica-cms:v1.0.0 docker compose up -d --no-build`.
+`docker-compose.yml` levanta `cms` + `postgres:16` con volumenes `pgdata` y `uploads` (`/opt/app/public/uploads`). En la primera arranque con la base vacia se siembra el catalogo. Con una imagen que tu mismo hayas construido y publicado: `CMS_IMAGE=<registro>/desertica-cms:<etiqueta> docker compose up -d --no-build`.
 
 Sin Docker: `npm ci && npm run build && NODE_ENV=production npm run start` con las mismas variables (Node 22).
 
@@ -62,7 +62,7 @@ En el servidor Angular (no en el navegador): `STRAPI_URL` (URL con la que el ser
 
 ## Actualizaciones
 
-- Usar siempre la imagen de una version (`vX.Y.Z` o `sha-...`) y no `latest` en produccion; respaldar la base antes de actualizar.
+- Producción despliega solo lo que llega a la rama `prod` por PR desde `staging`; no usar etiquetas `latest` ni desplegar desde `main`. Respaldar la base antes de actualizar.
 - Cambios de esquema de Strapi se aplican solos al arrancar; no hay migraciones manuales salvo que `database/migrations` las incluya.
 - Actualizar Strapi: subir las tres dependencias `@strapi/*` juntas a la misma version, `npm install`, `npm run build`, probar en local con una copia de la base.
 - Cambiar un campo del contrato (ver `CONTRACT.md`) requiere desplegar tambien el frontend.
@@ -82,13 +82,13 @@ En el servidor Angular (no en el navegador): `STRAPI_URL` (URL con la que el ser
 
 Para pruebas en entorno real (staging) y una primera produccion pequena.
 
-**Por que Railway:** despliega cada repo privado de GitHub directamente desde su `Dockerfile` (el mismo que construye el CI, sin credenciales de registro), crea Postgres con un clic y entrega `DATABASE_URL`, tiene red privada entre servicios, volumenes, dominios con TLS y entornos separados (staging desde `develop`, produccion desde `main`) con la opcion de esperar a que pase el CI. El costo es por uso; revisa los precios vigentes antes de decidir.
+**Por que Railway:** despliega cada repo privado de GitHub directamente desde su `Dockerfile` (el mismo que construye el CI, sin credenciales de registro), crea Postgres con un clic y entrega `DATABASE_URL`, tiene red privada entre servicios, volumenes, dominios con TLS y entornos separados (staging desde `develop`, produccion desde `prod`) con la opcion de esperar a que pase el CI. El costo es por uso; revisa los precios vigentes antes de decidir.
 **Cloudflare delante:** DNS y CDN gratis, y R2 para los medios (compatible con S3, ver `UPLOAD_PROVIDER=aws-s3`). Si prefieres latencia desde Sao Paulo o mas control, las alternativas son Fly.io (region `gru`) o AWS (ECS + RDS + S3); el contenedor y las variables son los mismos.
 
 ### Pasos
 
 1. Proyecto nuevo en Railway y servicio **PostgreSQL**.
-2. Servicio **cms** desde `Desertica/desertica-cms` (rama `main` en produccion, `develop`/la que uses en staging). Variables:
+2. Servicio **cms** desde `Desertica/desertica-cms` (rama `prod` en produccion, `staging` en staging). Variables:
    - `DATABASE_CLIENT=postgres`, `DATABASE_URL=${{Postgres.DATABASE_URL}}` (referencia al servicio Postgres), `DATABASE_SSL=false` (red privada).
    - `PUBLIC_URL=https://cms.tudominio.com`, `CLIENT_URLS=https://tudominio.com,https://www.tudominio.com`, `PROXY=true`.
    - `APP_KEYS`, `API_TOKEN_SALT`, `ADMIN_JWT_SECRET`, `TRANSFER_TOKEN_SALT`, `ENCRYPTION_KEY`, `JWT_SECRET`: valores aleatorios (`openssl rand -base64 24`; `APP_KEYS` son cuatro separados por coma).

@@ -13,6 +13,8 @@ import type { Core } from '@strapi/strapi';
 const config = ({ env }: Core.Config.Shared.ConfigParams) => {
   const sizeLimit = env.int('UPLOAD_MAX_FILE_SIZE_MB', 200) * 1024 * 1024;
   const provider = env('UPLOAD_PROVIDER', 'local');
+  // The media library holds photos, videos and PDFs; SVG and HTML can run scripts when opened from the CMS origin.
+  const security = { allowedTypes: ['image/*', 'video/*', 'application/pdf'], deniedTypes: ['image/svg+xml', 'text/html'] };
   // Color picker custom field (theme colors): plugin::color-picker.color, stores hex strings.
   // CKEditor 5 (Markdown preset): visual editor for long texts; it still stores Markdown, so the API output is unchanged.
   const customFields = { 'color-picker': { enabled: true }, ckeditor5: { enabled: true } };
@@ -27,6 +29,7 @@ const config = ({ env }: Core.Config.Shared.ConfigParams) => {
         config: {
           provider: 'aws-s3',
           sizeLimit,
+          security,
           providerOptions: {
             // Public base URL of the bucket or CDN (no trailing slash). Empty = the S3 object URL.
             baseUrl: env('S3_PUBLIC_URL', '') || undefined,
@@ -55,7 +58,7 @@ const config = ({ env }: Core.Config.Shared.ConfigParams) => {
     };
   }
 
-  return { ...customFields, upload: { config: { sizeLimit } } };
+  return { ...customFields, upload: { config: { sizeLimit, security } } };
 };
 
 export default config;

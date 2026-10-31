@@ -15,10 +15,12 @@
       "type": "email"
     },
     "phone": {
-      "type": "string"
+      "type": "string",
+      "regex": "^[0-9X+()\\- ]{6,20}$"
     },
     "whatsapp": {
-      "type": "string"
+      "type": "string",
+      "regex": "^[0-9X]{8,15}$"
     },
     "instagram": {
       "type": "string"
@@ -45,7 +47,8 @@
       "type": "string"
     },
     "ruc": {
-      "type": "string"
+      "type": "string",
+      "regex": "^[0-9X]{11}$"
     },
     "brandName": {
       "type": "string",

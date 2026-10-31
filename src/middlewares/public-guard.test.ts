@@ -19,7 +19,7 @@ const run = async (path: string, { multipart = false, query = {} as Record<strin
   return { ctx, reached };
 };
 
-test('anonymous multipart is refused everywhere except the media upload', async () => {
+test('anonymous multipart is refused everywhere, and the media upload needs credentials', async () => {
   for (const path of ['/api/tours', '/admin/login', '//API/Tours', '/content-manager/x']) {
     const { ctx, reached } = await run(path, { multipart: true });
     assert.equal(ctx.thrown, 415, path);
@@ -27,7 +27,10 @@ test('anonymous multipart is refused everywhere except the media upload', async 
   }
 
   for (const path of ['/upload', '/api/upload', '/API/Upload/files']) {
-    assert.equal((await run(path, { multipart: true })).reached, true, path);
+    const anonymous = await run(path, { multipart: true });
+    assert.equal(anonymous.ctx.thrown, 401, path);
+    assert.equal(anonymous.reached, false, path);
+    assert.equal((await run(path, { multipart: true, authorization: 'Bearer x' })).reached, true, path);
   }
 });
 

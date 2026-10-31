@@ -26,7 +26,7 @@ Hoy no hace falta: el frontend lee el CMS con una cache de servidor corta (`STRA
 - No hay firma HMAC: la autenticacion es la cabecera secreta propia. El receptor tiene 10 s para responder, **no hay reintentos** (por eso la cache debe expirar por TTL) y Strapi procesa 5 envios a la vez.
 - Solo `Publish` y `Unpublish` aparecen para tipos con borrador; los demas eventos (`Create`, `Update`, `Delete`, `Media`) son opcionales.
 
-Verificado contra el codigo de Strapi 5.56.0 instalado (`@strapi/core` `webhook-runner` y `document-service/events`), no contra docs.strapi.io (sin acceso desde esta sesion: el proxy lo bloquea). Antes de escribir el receptor, pulsar `Trigger` en el admin: su cuerpo es solo `{ "event": "trigger-test", "createdAt": "..." }` (sin `model` ni `entry`), asi que sirve para probar conectividad y secreto, no el formato de los eventos reales.
+Verificado contra el codigo de Strapi 5.59.0 instalado (`@strapi/core` `webhook-runner` y `document-service/events`), no contra docs.strapi.io (sin acceso desde esta sesion: el proxy lo bloquea). Antes de escribir el receptor, pulsar `Trigger` en el admin: su cuerpo es solo `{ "event": "trigger-test", "createdAt": "..." }` (sin `model` ni `entry`), asi que sirve para probar conectividad y secreto, no el formato de los eventos reales.
 
 ## Notas
 
