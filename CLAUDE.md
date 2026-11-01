@@ -34,6 +34,9 @@ The admin is for Spanish-speaking editors: sidebar names (`displayName` in each 
 - Content Manager list layouts, labels and hints are applied once at bootstrap (`CM_CONFIG_VERSION` in `src/content-manager.ts`); bump it to reapply. A field missing from an `EDIT_LAYOUTS` entry disappears from the form, so list every field of the type (a test compares each `schema.json` with the layouts). The panel look (Spanish locale, olive theme, logos) is `src/admin/app.tsx`.
 - Theme colors are hex strings from the official color picker custom field (`plugin::color-picker.color`, regex `^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$`); fonts, radius and header size are enumerations. Edit-view layouts and hints for `theme-setting` and `theme.palette` live in `EDIT_LAYOUTS`/`COMPONENT_LAYOUTS` in `src/content-manager.ts` and `src/admin-es.ts`. The seed converts the frontend's oklch values to hex in `build-cms-seed.mjs`.
 
+- Admin extras: `config/admin.ts` enables Preview only when `PREVIEW_URL` and `PREVIEW_SECRET` exist (signing in `src/preview.ts`; the website verifies the same `?preview=<exp>.<sig>`); the home widgets live in `src/admin/widgets.tsx` and read `GET /desertica/overview` (`src/overview.ts`); the tour checklist panel (`src/admin/checklist-panel.tsx`) and the widgets share `src/tour-gaps.ts`. Widgets are registered in `register()` of `app.tsx` (the `bootstrap` hook does not get `app.widgets`).
+- E-mail notices (`src/notify.ts`, nodemailer provider configured in `config/plugins.ts` only with `SMTP_HOST`): fire and forget from `afterCreate`; never await the send in a form path.
+
 ## Ramas
 
 `main` es solo la base; el trabajo entra por PR a `develop`, `develop` -> `staging` (pruebas) y `staging` -> `prod` (producción). Rama de trabajo: `feat/*`, `fix/*` o `chore/*`, se borra al mezclar. Los checks y la protección están en `docs/PROTECCION-RAMAS.md`; los workflows son `.github/workflows/{ci,security,policy}.yml` y los editas con un PR normal.

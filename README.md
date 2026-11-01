@@ -38,6 +38,9 @@ docker compose up -d --build   # cms + postgres 16, volumenes pgdata y uploads
 | `PROXY` | `true` detras de un proxy inverso con TLS |
 | `UPLOAD_PROVIDER` (`local`/`aws-s3`), `UPLOAD_MAX_FILE_SIZE_MB` (200), `S3_*`, `MEDIA_HOSTS` | Medios: proveedor, limite por archivo, bucket/credenciales/endpoint/URL publica, hosts extra de la CSP |
 | `FORMS_PROXY_SECRET` | Secreto compartido con el servidor Angular. **Obligatorio en produccion** (el CMS no arranca sin el): los formularios solo se aceptan con la cabecera `X-Forms-Secret`, y el limite de peticiones (10 por IP cada 10 minutos en cada formulario) usa la IP real que reenvia la web |
+| `PREVIEW_URL`, `PREVIEW_SECRET` | Vista previa en el editor: la web recibe `?preview=<exp>.<firma>` (firma = HMAC-SHA256 hex de `<exp>:<ruta>`, 10 minutos). Sin ellas no hay boton |
+| `NOTIFY_EMAIL`, `SMTP_HOST/PORT/USER/PASSWORD/SECURE`, `MAIL_FROM` | Aviso por correo de reservas y mensajes nuevos (solo con `SMTP_HOST` y `NOTIFY_EMAIL`); un fallo de envio nunca afecta al formulario |
+| `FLAG_PROMOTE_EE`, `FLAG_NPS` | Avisos de pago y encuesta del panel (apagados por defecto) |
 | `CMS_HOST_PORT` | Solo Docker Compose: puerto publicado |
 
 ## Medios y verificacion de subidas

@@ -15,6 +15,8 @@ Pasos que necesitan tus cuentas. El código ya está preparado; aquí está qué
 | `FORMS_PROXY_SECRET` | el mismo valor que en la web | **Obligatorio en producción** (si falta, el CMS no arranca): sin la cabecera `X-Forms-Secret` el CMS rechaza los formularios (403) |
 | `SEED_ON_EMPTY` | `false` después del primer arranque | |
 | `SEED_SAMPLE_TOUR` | `true` solo en staging | Crea una vez el tour de ejemplo (`[EJEMPLO] Tour completo` en español, `[EXAMPLE] Complete tour` en inglés), publicado y con precio: **nunca en producción** |
+| `PREVIEW_URL`, `PREVIEW_SECRET` | `https://stg.desertica.pe`, secreto aleatorio igual al de la web | Activa el botón *Abrir previsualización* del editor (tours, destinos, páginas, blog y productos). Sin las dos no hay botón. La web verifica `?preview=<exp>.<firma>` |
+| `NOTIFY_EMAIL`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_SECURE`, `MAIL_FROM` | correos que reciben el aviso (varios con coma) y datos del SMTP | Cada reserva o mensaje nuevo envía un correo corto (tour, fecha, personas, nombre; sin teléfono ni correo del cliente). Sin `SMTP_HOST` o `NOTIFY_EMAIL` no se envía y el log lo dice al arrancar. Si el SMTP falla, solo queda un error en el log: el formulario responde igual |
 | `DEEPL_API_KEY` | clave de DeepL (gratis termina en `:fx`) | Activa el panel de traducción automática |
 | `UPLOAD_PROVIDER` y `S3_*` | ver la sección 3 | |
 
@@ -132,3 +134,10 @@ Si cambias el texto original en el código de una clave que ya existe en la base
 - La traducción automática reemplaza el borrador del otro idioma: el panel pide confirmación. Lo publicado no cambia.
 - CKEditor 5 trae `ckeditor5` con licencia GPL-2+ (o comercial). En un panel interno que no se distribuye no suele ser un problema, pero revísalo con el abogado. Antes de usarlo con los textos legales, abre y guarda cada uno en staging y comprueba que el Markdown no cambia: cada publicación de `waiverBody` crea una versión nueva en el API.
 
+## Qué ve el equipo en el panel
+
+- **Inicio:** widgets *Bandeja* (reservas pendientes y mensajes sin atender), *Páginas legales por publicar* (de las 7, las que no están publicadas en cada idioma) y *Tours sin foto o sin descargo*. Cada uno solo aparece a quien puede leer ese contenido: el Editor no ve la Bandeja. Los datos salen de `GET /desertica/overview` (solo lectura, solo administradores). La página de inicio de Strapi 5 es personalizable: cada persona puede quitar o mover widgets con *Añadir widget*.
+- **Editor del tour:** panel lateral *Antes de publicar* con foto, descripción, punto de encuentro, descargo y preguntas frecuentes. Es solo una guía: no bloquea publicar. Usa `unstable_useContentManagerContext` de Strapi (el nombre indica que la API aún puede cambiar al actualizar Strapi).
+- **Vista previa:** botón *Abrir previsualización* con enlace firmado de 10 minutos; requiere que la web verifique la firma.
+- **Menú de Ajustes:** `FLAG_PROMOTE_EE=false` (por defecto) quita las entradas de pago (Historial, Lanzamientos, Review Workflows, SSO, Registros de auditoría); es una opción soportada de `config/admin.ts`. Lo demás ya depende del rol: el Editor solo ve Inicio, Contenido, Biblioteca de Multimedia y *Descripción general*; Content-Type Builder solo existe en `develop`. No se oculta nada más con CSS/DOM (frágil). *Marketplace* y la casilla de noticias del registro de invitados son de Strapi y no tienen opción de ocultar.
+- **Pantallas de entrada:** inicio de sesión, invitación y recorrido guiado con los textos en español de `translations` en `src/admin/app.tsx`.

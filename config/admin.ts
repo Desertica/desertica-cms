@@ -1,4 +1,28 @@
 import type { Core } from '@strapi/strapi';
+import { previewPath, previewUrl } from '../src/preview';
+
+/**
+ * Preview button in the editor: opens the page on the website (PREVIEW_URL) with a signed, 10-minute token.
+ * Without PREVIEW_URL and PREVIEW_SECRET there is no `preview` key, so the button does not exist.
+ */
+const preview = (env: Core.Config.Shared.ConfigParams['env']) => {
+  const base = env('PREVIEW_URL', '');
+  const secret = env('PREVIEW_SECRET', '');
+  if (!base || !secret) return {};
+  return {
+    preview: {
+      enabled: true,
+      config: {
+        allowedOrigins: [new URL(base).origin],
+        async handler(uid: string, { documentId, locale, status }: { documentId: string; locale?: string; status?: string }) {
+          const row = await strapi.documents(uid as any).findOne({ documentId, locale, status: status === 'published' ? 'published' : 'draft', fields: ['slug'] as any });
+          const path = row?.slug ? previewPath(uid, row.slug as string, locale ?? 'en') : null;
+          return path ? previewUrl(base, path, secret) : null;
+        },
+      },
+    },
+  };
+};
 
 const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Admin => ({
   auth: {
@@ -15,10 +39,13 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Admin => 
   secrets: {
     encryptionKey: env('ENCRYPTION_KEY'),
   },
+  // Off by default: promoteEE adds the Releases, Review Workflows, SSO, Audit Logs and Content History "buy" entries
+  // to Settings (paid features nobody here can use); nps is Strapi's satisfaction survey pop-up.
   flags: {
-    nps: env.bool('FLAG_NPS', true),
-    promoteEE: env.bool('FLAG_PROMOTE_EE', true),
+    nps: env.bool('FLAG_NPS', false),
+    promoteEE: env.bool('FLAG_PROMOTE_EE', false),
   },
+  ...preview(env),
 });
 
 export default config;

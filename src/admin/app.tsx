@@ -1,6 +1,8 @@
 import type { StrapiApp } from '@strapi/strapi/admin';
 import lockup from './extensions/lockup.svg';
 import mark from './extensions/logo.svg';
+import { Mail, File, Image } from '@strapi/icons';
+import ChecklistPanel from './checklist-panel';
 import TranslatePanel from './translate-panel';
 
 // Strapi follows the operating system for the theme (its dark theme has a purple tint) and starts in English. Once
@@ -23,6 +25,34 @@ try {
 export default {
   config: {
     locales: ['es'],
+    // Only strings seen on screen: the sign-in and invitation pages are in the formal register and still say Strapi, and
+    // the home page keeps some English from the guided tour and the widget editor. Others stay as Strapi ships them.
+    translations: {
+      es: {
+        'Auth.form.welcome.title': '¡Bienvenido!',
+        'Auth.form.welcome.subtitle': 'Entra a tu cuenta de Desertica',
+        'Auth.form.email.placeholder': 'tu@correo.com',
+        'Auth.link.forgot-password': '¿Olvidaste tu contraseña?',
+        'Auth.form.register.subtitle': 'Crea tu contraseña para entrar al panel de Desertica.',
+        'Auth.form.button.register': 'Crear mi cuenta',
+        'global.content-manager': 'Contenido',
+        'HomePage.addWidget.button': 'Añadir widget',
+        'HomePage.addWidget.title': 'Añadir widget',
+        'HomePage.widget.delete': 'Quitar',
+        'HomePage.widget.drag': 'Arrastra para mover',
+        'tours.overview.title': '¡Descubre tu panel!',
+        'tours.overview.subtitle': 'Sigue el recorrido guiado para sacarle partido.',
+        'tours.overview.completed': '{completed}% completado',
+        'tours.overview.close': 'Cerrar el recorrido',
+        'tours.overview.tasks': 'Tus tareas',
+        'tours.overview.tour.link': 'Empezar',
+        'tours.overview.contentManager.label': 'Crea y publica contenido',
+        'tours.overview.contentTypeBuilder.label': 'Crea tu esquema',
+        'tours.overview.apiTokens.label': 'Copia un token de API',
+        'tours.overview.strapiCloud.label': 'Despliega tu aplicación en Strapi Cloud',
+        'tours.overview.strapiCloud.link': 'Leer la documentación',
+      },
+    },
     auth: { logo: lockup },
     menu: { logo: mark },
     head: { favicon: mark },
@@ -53,7 +83,26 @@ export default {
       },
     },
   },
+  // `widgets` is only reachable from register(); the bootstrap hook of the app does not receive it.
+  register(app: StrapiApp) {
+    // Home widgets: each one is hidden for people who cannot read that content (the Editor has no inbox).
+    const read = (subject: string) => [{ action: 'plugin::content-manager.explorer.read', subject }];
+    const widget = (id: string, title: string, icon: typeof Mail, subject: string, component: 'InboxWidget' | 'LegalWidget' | 'ToursWidget', link: { label: string; href: string }) => ({
+      id,
+      pluginId: 'desertica',
+      icon,
+      title: { id: `desertica.widget.${id}`, defaultMessage: title },
+      link: { label: { id: `desertica.widget.${id}.link`, defaultMessage: link.label }, href: link.href },
+      permissions: read(subject),
+      component: async () => (await import('./widgets'))[component],
+    });
+    app.widgets.register([
+      widget('inbox', 'Bandeja', Mail, 'api::reservation.reservation', 'InboxWidget', { label: 'Abrir bandeja', href: '/content-manager/collection-types/api::reservation.reservation' }),
+      widget('legal-drafts', 'Páginas legales por publicar', File, 'api::page.page', 'LegalWidget', { label: 'Ver páginas', href: '/content-manager/collection-types/api::page.page' }),
+      widget('tour-gaps', 'Tours sin foto o sin descargo', Image, 'api::tour.tour', 'ToursWidget', { label: 'Ver tours', href: '/content-manager/collection-types/api::tour.tour' }),
+    ]);
+  },
   bootstrap(app: StrapiApp) {
-    (app.getPlugin('content-manager') as any).apis.addEditViewSidePanel([TranslatePanel]);
+    (app.getPlugin('content-manager') as any).apis.addEditViewSidePanel([ChecklistPanel, TranslatePanel]);
   },
 };
