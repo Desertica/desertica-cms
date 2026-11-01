@@ -12,6 +12,7 @@ import { assertProductionEnv } from './production-env';
 import { registerBookingGuard } from './booking-guard';
 import { registerPlaceholderGuard } from './placeholders';
 import { LOCALE_NAMES, configureContentManager } from './content-manager';
+import { backfillSortKeys, registerSortKey } from './sort-key';
 
 const PUBLIC_ACTIONS = [
   'api::destination.destination.find',
@@ -348,6 +349,7 @@ export default {
     registerBookingGuard(strapi);
     registerEditorRules(strapi);
     registerAutoTranslate(strapi);
+    registerSortKey(strapi);
     assertProductionEnv(process.env);
   },
 
@@ -408,6 +410,11 @@ export default {
       await syncNewTranslations(strapi, seedSource());
     } catch (error) {
       strapi.log.error(`[seed] translation sync failed (boot continues): ${(error as Error).stack ?? error}`);
+    }
+    try {
+      await backfillSortKeys(strapi);
+    } catch (error) {
+      strapi.log.error(`[bootstrap] sortKey backfill failed (boot continues): ${(error as Error).message}`);
     }
     try {
       await ensureExtraPages(strapi);

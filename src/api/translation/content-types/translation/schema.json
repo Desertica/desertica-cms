@@ -103,6 +103,14 @@
         "long"
       ],
       "default": "short"
+    },
+    "sortKey": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "string"
     }
   }
 }
