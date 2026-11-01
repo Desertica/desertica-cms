@@ -4,13 +4,13 @@ import { COMPONENT_FIELDS, CONTENT_TYPE_FIELDS, type FieldMeta } from './admin-e
 export const LOCALE_NAMES: Record<string, string> = { en: 'Inglés (en)', es: 'Español (es)' };
 
 const CM_UID = 'plugin::content-manager.content-types';
-const CM_CONFIG_VERSION = 12;
+const CM_CONFIG_VERSION = 13;
 
 type ListConfig = { fields: string[]; mainField?: string; sortBy?: string; sortOrder?: 'ASC' | 'DESC'; pageSize?: number };
 const LIST_CONFIGS: Record<string, ListConfig> = {
-  // Sorted by page; rows of the same page keep seed order, which already groups them by section.
-  'api::translation.translation': { fields: ['page', 'section', 'label', 'value'], mainField: 'label', sortBy: 'page', sortOrder: 'ASC', pageSize: 50 },
-  'api::media-slot.media-slot': { fields: ['page', 'section', 'description', 'image'], mainField: 'description', sortBy: 'page', sortOrder: 'ASC', pageSize: 50 },
+  // Sorted by the hidden `sortKey` (website page order, then section, then key; see src/sort-key.ts).
+  'api::translation.translation': { fields: ['page', 'section', 'label', 'value'], mainField: 'label', sortBy: 'sortKey', sortOrder: 'ASC', pageSize: 50 },
+  'api::media-slot.media-slot': { fields: ['page', 'section', 'description', 'image'], mainField: 'description', sortBy: 'sortKey', sortOrder: 'ASC', pageSize: 50 },
   'api::blog-post.blog-post': { fields: ['title', 'publishedDate', 'featured'], mainField: 'title', sortBy: 'publishedDate', sortOrder: 'DESC' },
   'api::product.product': { fields: ['title', 'price', 'order'], mainField: 'title', sortBy: 'order', sortOrder: 'ASC' },
   'api::tour.tour': { fields: ['title', 'destination', 'featured', 'order', 'priceFrom'], mainField: 'title', sortBy: 'order', sortOrder: 'ASC' },
@@ -146,7 +146,8 @@ export const HIDDEN_FIELDS: Record<string, string[]> = {
   'api::page.page': ['heroImageUrl'],
   'api::blog-post.blog-post': ['coverUrl'],
   'api::product.product': ['imageUrl'],
-  'api::media-slot.media-slot': ['imageUrl', 'posterUrl'],
+  'api::media-slot.media-slot': ['imageUrl', 'posterUrl', 'sortKey'],
+  'api::translation.translation': ['sortKey'],
   'api::site-setting.site-setting': ['shareImageUrl'],
   'shared.stop': ['imageUrl'],
   'shared.video': ['posterUrl'],
