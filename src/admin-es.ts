@@ -9,20 +9,23 @@ type Fields = Record<string, FieldMeta>;
 
 const f = (label: string, description?: string, placeholder?: string): FieldMeta => ({ label, description, placeholder });
 
+const SLUG_HINT = 'Se crea sola a partir del título al guardar por primera vez y no se puede cambiar: la dirección ya publicada dejaría de funcionar.';
+const ICON_HINT =
+  'Elige de la lista. Significado: lucideUsers = personas; lucideLanguages = idiomas; lucideCar = vehículo; lucideBus = bus; lucideWind = viento/arena; lucideCalendar = fecha; lucideClock = horario; lucideCircleDollarSign = precio; lucideMapPin = lugar; lucideCamera = fotos; lucideSun = sol/día; lucideMoon = noche; lucideShieldCheck = seguridad; lucideHeart = cariño; lucideStar = destacado; lucideMountain = montaña/duna; lucideWaves = agua/olas; lucideDroplets = agua; lucideBackpack = mochila; lucideGlasses = lentes; lucideShirt = ropa; lucideUtensils = comida; lucideCheck = incluido; lucideInfo = información; lucideCompass = guía; lucideTent = camping; lucideBinoculars = observación; lucideBadgeCheck = certificado.';
 const COLOR = 'Elige el color con el selector o escribe el código, por ejemplo #5a6b3e.';
 
 /** Content types: uid -> field -> label/description. */
 export const CONTENT_TYPE_FIELDS: Record<string, Fields> = {
   'api::tour.tour': {
     title: f('Nombre del tour', 'Se muestra en la tarjeta, en la ficha y en el menú.'),
-    slug: f('Dirección web (slug)', 'Parte final de la URL del tour, en minúsculas y con guiones. No la cambies una vez publicado el tour.', 'dune-buggy'),
+    slug: f('Dirección web (slug)', 'Se crea sola a partir del nombre al guardar por primera vez y no se puede cambiar: la dirección ya publicada dejaría de funcionar.'),
     destination: f('Destino', 'Ciudad o zona a la que pertenece el tour.'),
     order: f('Orden', 'Posición en las listas. El 0 va primero.'),
     featured: f('Destacado en la portada', 'Actívalo para que el tour salga en la portada.'),
     priceFrom: f('Precio desde (USD)', 'Precio por persona con IGV incluido. Es solo una referencia; el precio de cada salida lo define el sistema de reservas.'),
     durationHours: f('Duración (horas)', 'Número entero de horas.'),
     format: f('Formato', 'shared = grupal, private = privado, both = ambos.'),
-    languages: f('Idiomas del tour', 'Lista de códigos de idioma, por ejemplo ["es","en"].'),
+    languages: f('Idiomas del tour', 'Oculto en el editor: siempre español e inglés.'),
     lead: f('Resumen corto', 'Frase de presentación bajo el título.'),
     description: f('Descripción para la tarjeta', 'Texto breve que aparece en listas y tarjetas.'),
     meeting: f('Punto de encuentro (texto)', 'Dónde se reúne el grupo, escrito para el cliente.'),
@@ -32,7 +35,7 @@ export const CONTENT_TYPE_FIELDS: Record<string, Fields> = {
     image: f('Imagen principal', 'Foto de la tarjeta y de la cabecera. Si subes una, tiene prioridad sobre la dirección de imagen externa.'),
     imageFocus: f('Enfoque de la imagen', 'Qué parte de la foto se ve cuando la tarjeta la recorta: center = centro, top = arriba, bottom = abajo, left = izquierda, right = derecha. No cambia el archivo.'),
     imageUrl: f('Imagen principal (dirección externa)', 'Opcional. Solo se usa si no hay imagen subida.'),
-    gallery: f('Galería de fotos', 'Fotos de la ficha del tour. Arrastra para cambiar el orden.'),
+    gallery: f('Galería de fotos', 'Máximo 6 fotos. Arrastra para cambiar el orden.'),
     galleryUrls: f('Galería (direcciones externas)', 'Opcional. Solo se usa si no hay fotos subidas.'),
     practices: f('Actividades incluidas', 'Bloques con icono, título y texto.'),
     itinerary: f('Itinerario', 'Paradas del recorrido, en orden.'),
@@ -54,7 +57,7 @@ export const CONTENT_TYPE_FIELDS: Record<string, Fields> = {
   },
   'api::destination.destination': {
     title: f('Nombre del destino'),
-    slug: f('Dirección web (slug)', 'Parte final de la URL. No la cambies una vez publicado.', 'huacachina'),
+    slug: f('Dirección web (slug)', SLUG_HINT),
     lead: f('Texto de presentación', 'Frase corta bajo el título del destino.'),
     allLabel: f('Texto del filtro "todos"', 'Etiqueta para ver todos los tours del destino.'),
     image: f('Imagen', 'Foto del destino. Tiene prioridad sobre la dirección externa.'),
@@ -76,7 +79,7 @@ export const CONTENT_TYPE_FIELDS: Record<string, Fields> = {
   },
   'api::blog-post.blog-post': {
     title: f('Título'),
-    slug: f('Dirección web (slug)', 'Parte final de la URL del artículo.'),
+    slug: f('Dirección web (slug)', SLUG_HINT),
     publishedDate: f('Fecha de publicación'),
     featured: f('Destacado'),
     category: f('Categoría'),
@@ -88,7 +91,7 @@ export const CONTENT_TYPE_FIELDS: Record<string, Fields> = {
   },
   'api::product.product': {
     title: f('Nombre del producto'),
-    slug: f('Dirección web (slug)'),
+    slug: f('Dirección web (slug)', SLUG_HINT),
     order: f('Orden'),
     price: f('Precio'),
     featured: f('Destacado'),
@@ -96,23 +99,23 @@ export const CONTENT_TYPE_FIELDS: Record<string, Fields> = {
     details: f('Detalles', 'Texto en Markdown.'),
     image: f('Imagen principal'),
     imageUrl: f('Imagen principal (dirección externa)', 'Opcional. Solo se usa si no hay imagen subida.'),
-    gallery: f('Galería de fotos'),
+    gallery: f('Galería de fotos', 'Máximo 6 fotos.'),
   },
   'api::translation.translation': {
-    key: f('Clave técnica', 'La usa la web. No la cambies.'),
-    group: f('Grupo'),
-    page: f('Página', 'Página donde aparece este texto.'),
-    section: f('Sección', 'Bloque de la página (cabecera, formulario, errores...).'),
-    label: f('Qué es este texto', 'Dónde y para qué se usa.'),
-    note: f('Nota para el equipo', 'Es visible por la API pública aunque la web no la muestre: no escribas datos internos ni pendientes legales.'),
+    key: f('Clave técnica', 'La usa la web. No se puede cambiar.'),
+    group: f('Grupo', 'Solo informativo.'),
+    page: f('Página', 'En qué página de la web aparece este texto.'),
+    section: f('Sección', 'En qué sección de esa página (cabecera, formulario, errores...).'),
+    label: f('Qué es este texto', 'En qué página y sección aparece y para qué sirve. Solo lectura: edita el campo "Texto que se muestra en la web".'),
+    note: f('Nota', 'Ayuda para saber qué poner. Solo lectura.'),
     value: f('Texto que se muestra en la web', 'Un valor por idioma. No borres ni cambies los marcadores entre llaves ({tour}, {price}, {date}...): la web los reemplaza con el dato real y el CMS no deja guardar si falta alguno.'),
-    kind: f('Tipo', 'short = texto corto, long = texto largo.'),
+    kind: f('Tipo', 'Texto corto o largo. Solo lectura.'),
   },
   'api::media-slot.media-slot': {
-    key: f('Clave técnica', 'La usa la web. No la cambies.'),
-    page: f('Página'),
-    section: f('Sección'),
-    description: f('Descripción', 'Para qué sirve esta imagen o video.'),
+    key: f('Clave técnica', 'La usa la web. No se puede cambiar.'),
+    page: f('Página', 'En qué página de la web aparece.'),
+    section: f('Sección', 'En qué sección de esa página.'),
+    description: f('Qué es esta imagen o video', 'En qué página y sección aparece y para qué sirve. Solo lectura: cambia el archivo más abajo.'),
     alt: f('Texto alternativo', 'Describe la imagen para personas con lector de pantalla y para Google. Uno por idioma.'),
     image: f('Imagen', 'Tiene prioridad sobre la dirección externa.'),
     imageUrl: f('Imagen (dirección externa)', 'Opcional. Solo se usa si no hay imagen subida.'),
@@ -139,6 +142,7 @@ export const CONTENT_TYPE_FIELDS: Record<string, Fields> = {
     tripadvisor: f('Tripadvisor'),
     shareImage: f('Imagen al compartir', 'Foto que aparece cuando se comparte la web en redes y mensajes.'),
     shareImageUrl: f('Imagen al compartir (dirección externa)', 'Opcional. Solo se usa si no hay imagen subida.'),
+    placeholderImage: f('Imagen de relleno', 'Imagen de relleno cuando una foto falta o no carga; estilo plantilla/wireframe.'),
   },
   'api::theme-setting.theme-setting': {
     light: f('Colores del tema claro', 'Haz clic en un color para abrir el selector.'),
@@ -154,20 +158,20 @@ export const CONTENT_TYPE_FIELDS: Record<string, Fields> = {
   },
   'api::booking-setting.booking-setting': {
     depositRate: f('Depósito (OBSOLETO)', 'Ya no se usa: el depósito lo define el sistema de reservas. No lo cambies.'),
-    availabilityMonths: f('Meses visibles en el calendario', 'De 1 a 12. Es el mismo para todos los idiomas.'),
-    adultsMin: f('Adultos: mínimo'),
-    adultsDefault: f('Adultos: valor inicial'),
-    childrenMin: f('Niños: mínimo'),
-    childrenDefault: f('Niños: valor inicial'),
-    peopleMax: f('Máximo de personas por reserva', 'Adultos más niños.'),
-    currencyCode: f('Moneda', 'Código de moneda, por ejemplo USD.'),
+    availabilityMonths: f('Meses visibles en el calendario', 'Cuántos meses hacia adelante puede elegir fecha el visitante en el calendario de reservas (de 1 a 12).'),
+    adultsMin: f('Adultos: mínimo', 'Menos adultos que esto no se puede reservar.'),
+    adultsDefault: f('Adultos: valor inicial', 'Cuántos adultos aparecen marcados al abrir el calendario.'),
+    childrenMin: f('Niños: mínimo', 'Normalmente 0.'),
+    childrenDefault: f('Niños: valor inicial', 'Cuántos niños aparecen marcados al abrir el calendario.'),
+    peopleMax: f('Máximo de personas por reserva', 'Adultos más niños. El calendario no deja pasar de aquí.'),
+    currencyCode: f('Moneda', 'Moneda en que se muestran los precios, por ejemplo USD.'),
     assurances: f('Garantías junto al formulario', 'Mensajes de confianza junto al botón de reservar. Un tour puede reemplazarlos.'),
   },
   'api::form-setting.form-setting': {
-    nameMin: f('Nombre: mínimo de caracteres'),
-    nameMax: f('Nombre: máximo de caracteres', 'No puede superar 80, el límite fijo del sistema.'),
-    emailMax: f('Correo: máximo de caracteres', 'No puede superar 254, el límite fijo del sistema.'),
-    messageMax: f('Mensaje: máximo de caracteres', 'Límite del mensaje del formulario de contacto. No puede superar 500, el límite fijo del sistema.'),
+    nameMin: f('Nombre: mínimo de caracteres', 'Largo mínimo del nombre en el formulario de contacto de la web.'),
+    nameMax: f('Nombre: máximo de caracteres', 'Largo máximo del nombre en el formulario de contacto. No puede superar 80, el límite fijo del sistema.'),
+    emailMax: f('Correo: máximo de caracteres', 'Largo máximo del correo en el formulario de contacto. No puede superar 254, el límite fijo del sistema.'),
+    messageMax: f('Mensaje: máximo de caracteres', 'Largo máximo del mensaje en el formulario de contacto. No puede superar 500, el límite fijo del sistema.'),
   },
   'api::navigation.navigation': {
     headerLinks: f('Enlaces de la barra superior', 'El enlace de tipo "tours-menu" es el que despliega los destinos y tours.'),
@@ -208,7 +212,7 @@ export const CONTENT_TYPE_FIELDS: Record<string, Fields> = {
 export const COMPONENT_FIELDS: Record<string, Fields> = {
   'shared.faq': { question: f('Pregunta'), answer: f('Respuesta') },
   'shared.feature': {
-    icon: f('Icono', 'Nombre exacto. Garantías: lucideCalendar, lucideCar, lucideCircleDollarSign, lucideClock, lucideLanguages, lucideMapPin, lucideShield, lucideSun, lucideUsers. Actividades: lucideCar, lucideLanguages, lucideUsers, lucideWind. Con otro nombre no se muestra icono.'),
+    icon: f('Icono', ICON_HINT),
     title: f('Título'),
     body: f('Texto'),
   },

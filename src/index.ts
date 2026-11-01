@@ -2,7 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import type { Core } from '@strapi/strapi';
 import { ensureSampleTour } from './sample-tour';
-import { registerTranslateRoute } from './translate';
+import { registerAutoTranslate, registerTranslateRoute } from './translate';
+import { migrateIcons, registerEditorRules } from './editor-rules';
+import { ensurePlaceholderImage } from './placeholder-image';
 import { registerOverviewRoute } from './overview';
 import { registerNotifications } from './notify';
 import { catalogNeedsSeed, clean, markCatalogSeeded, seedLocalized, syncNewTranslations } from './seed-sync';
@@ -132,6 +134,27 @@ async function restrictEditorRole(strapi: Core.Strapi) {
   await strapi.service('admin::role').assignPermissions(role.id, [...kept, ...explicit]);
   await store.set({ value: { done: true } });
   strapi.log.info(`[bootstrap] Editor role: ${explicit.length} content permission(s) set`);
+}
+
+/**
+ * The admin form shows a field only when the permission lists it in `properties.fields`. `assignPermissions` stores an
+ * empty list when none is given, so the Editor saw every field as "Sin permisos para ver este campo". Fills the list
+ * (all fields, components included) on the Editor's content permissions that lack it; idempotent, keeps later changes.
+ */
+async function fillEditorFields(strapi: Core.Strapi) {
+  const role = await strapi.db.query('admin::role').findOne({ where: { code: 'strapi-editor' } });
+  if (!role) return;
+  const prefix = 'plugin::content-manager.explorer.';
+  const all: any[] = await strapi.db.query('admin::permission').findMany({ where: { role: role.id } });
+  const needsFields = (p: any) => ['create', 'read', 'update'].includes(String(p.action).slice(prefix.length)) && p.action.startsWith(prefix) && !p.properties?.fields?.length;
+  if (!all.some(needsFields)) return;
+  const nested = (subject: string) =>
+    strapi.service('admin::content-type').getNestedFields(strapi.contentTypes[subject as keyof typeof strapi.contentTypes], { components: strapi.components, nestingLevel: 15 });
+  const permissions = all.map(({ action, subject, properties, conditions }: any) => ({
+    action, subject, conditions, properties: needsFields({ action, properties }) && strapi.contentTypes[subject as keyof typeof strapi.contentTypes] ? { ...properties, fields: nested(subject) } : properties,
+  }));
+  await strapi.service('admin::role').assignPermissions(role.id, permissions);
+  strapi.log.info('[bootstrap] Editor role: field lists filled in');
 }
 
 /** The panel is for Spanish-speaking editors; accounts still on Strapi's English default move to Spanish once. */
@@ -323,6 +346,8 @@ export default {
     registerNotifications(strapi);
     registerPlaceholderGuard(strapi);
     registerBookingGuard(strapi);
+    registerEditorRules(strapi);
+    registerAutoTranslate(strapi);
     assertProductionEnv(process.env);
   },
 
@@ -341,6 +366,11 @@ export default {
       await restrictEditorRole(strapi);
     } catch (error) {
       strapi.log.error(`[bootstrap] editor role failed: ${(error as Error).message}`);
+    }
+    try {
+      await fillEditorFields(strapi);
+    } catch (error) {
+      strapi.log.error(`[bootstrap] editor fields failed: ${(error as Error).message}`);
     }
     try {
       await defaultAdminLanguage(strapi);
@@ -363,6 +393,16 @@ export default {
       } catch (error) {
         strapi.log.error(`[seed] sample tour failed (boot continues): ${(error as Error).stack ?? error}`);
       }
+    }
+    try {
+      await migrateIcons(strapi);
+    } catch (error) {
+      strapi.log.error(`[bootstrap] icon migration failed (boot continues): ${(error as Error).message}`);
+    }
+    try {
+      await ensurePlaceholderImage(strapi);
+    } catch (error) {
+      strapi.log.error(`[seed] placeholder image failed (boot continues): ${(error as Error).message}`);
     }
     try {
       await syncNewTranslations(strapi, seedSource());
