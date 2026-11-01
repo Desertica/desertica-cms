@@ -19,13 +19,13 @@ export function buildNotice(uid: string, row: Record<string, any>, panelUrl: str
 }
 
 /**
- * Sends a notice to NOTIFY_EMAIL when a reservation or a contact message is created. Fire and forget: a mail failure is
- * logged and never delays or breaks the visitor's form. Without SMTP_HOST or NOTIFY_EMAIL nothing is sent (one warning).
+ * Sends a notice to the e-mail of "Datos de la empresa" (site-setting) when a reservation or a contact message is created.
+ * Fire and forget: a mail failure is logged and never delays or breaks the visitor's form. Without SMTP_HOST nothing is
+ * sent (one warning); without a company e-mail the notice is skipped with a warning.
  */
 export function registerNotifications(strapi: Core.Strapi, env: Record<string, string | undefined> = process.env) {
-  const to = (env.NOTIFY_EMAIL ?? '').split(',').map((a) => a.trim()).filter(Boolean);
-  if (!env.SMTP_HOST || !to.length) {
-    strapi.log.warn('[notify] e-mail notices are off: set SMTP_HOST and NOTIFY_EMAIL to receive them');
+  if (!env.SMTP_HOST) {
+    strapi.log.warn('[notify] e-mail notices are off: set SMTP_HOST to receive them');
     return;
   }
   strapi.db.lifecycles.subscribe({
@@ -33,7 +33,12 @@ export function registerNotifications(strapi: Core.Strapi, env: Record<string, s
     afterCreate(event: any) {
       const notice = buildNotice(event.model.uid, event.result, env.PUBLIC_URL ?? '');
       // Not awaited on purpose.
-      strapi.plugin('email').service('email').send({ to, ...notice }).catch((error: Error) => strapi.log.error(`[notify] e-mail not sent: ${error.message}`));
+      Promise.resolve(strapi.documents('api::site-setting.site-setting').findFirst({ fields: ['email'] } as any))
+        .then((setting: any) => {
+          if (!setting?.email) return strapi.log.warn('[notify] no e-mail in "Datos de la empresa"; notice not sent');
+          return strapi.plugin('email').service('email').send({ to: setting.email, ...notice });
+        })
+        .catch((error: Error) => strapi.log.error(`[notify] e-mail not sent: ${error.message}`));
     },
   });
 }

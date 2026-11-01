@@ -5,7 +5,7 @@
     "singularName": "form-setting",
     "pluralName": "form-settings",
     "displayName": "Sitio — Formularios",
-    "description": "Validation limits of the contact form."
+    "description": "Largos mínimo y máximo de los campos del formulario de contacto de la web."
   },
   "options": {
     "draftAndPublish": false

@@ -26,7 +26,7 @@ const mail = (env: Core.Config.Shared.ConfigParams['env']) =>
               secure: env.bool('SMTP_SECURE', false),
               ...(env('SMTP_USER', '') ? { auth: { user: env('SMTP_USER'), pass: env('SMTP_PASSWORD', '') } } : {}),
             },
-            settings: { defaultFrom: env('MAIL_FROM', env('SMTP_USER', '')) },
+            settings: { defaultFrom: env('SMTP_USER', '') },
           },
         },
       }

@@ -7,7 +7,37 @@
   "options": {},
   "attributes": {
     "icon": {
-      "type": "string"
+      "type": "enumeration",
+      "enum": [
+        "lucideUsers",
+        "lucideLanguages",
+        "lucideCar",
+        "lucideWind",
+        "lucideCalendar",
+        "lucideClock",
+        "lucideCircleDollarSign",
+        "lucideMapPin",
+        "lucideCamera",
+        "lucideSun",
+        "lucideMoon",
+        "lucideShieldCheck",
+        "lucideHeart",
+        "lucideStar",
+        "lucideMountain",
+        "lucideWaves",
+        "lucideDroplets",
+        "lucideBackpack",
+        "lucideGlasses",
+        "lucideShirt",
+        "lucideUtensils",
+        "lucideBus",
+        "lucideCheck",
+        "lucideInfo",
+        "lucideCompass",
+        "lucideTent",
+        "lucideBinoculars",
+        "lucideBadgeCheck"
+      ]
     },
     "title": {
       "type": "string",

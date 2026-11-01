@@ -2,18 +2,19 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { buildNotice, registerNotifications } from './notify.ts';
 
-function fake(send: (mail: any) => Promise<unknown>) {
+function fake(send: (mail: any) => Promise<unknown>, email: string | null = 'a@x.pe') {
   const logs: string[] = [];
   let handler: any;
   const strapi = {
     log: { warn: (m: string) => logs.push(`warn ${m}`), error: (m: string) => logs.push(`error ${m}`) },
     db: { lifecycles: { subscribe: (s: any) => (handler = s.afterCreate) } },
+    documents: () => ({ findFirst: async () => ({ email }) }),
     plugin: () => ({ service: () => ({ send }) }),
   } as any;
   return { strapi, logs, fire: (uid: string, result: any) => handler({ model: { uid }, result }) };
 }
 
-const env = { SMTP_HOST: 'smtp', NOTIFY_EMAIL: 'a@x.pe, b@x.pe ', PUBLIC_URL: 'https://cms.x.pe/' };
+const env = { SMTP_HOST: 'smtp', PUBLIC_URL: 'https://cms.x.pe/' };
 const reservation = { tourTitle: 'Dune <b>buggy</b>', date: '2026-12-01', adults: 2, children: 1, name: 'Ana & Co', email: 'secret@x.pe', phone: '999', notes: 'private' };
 
 test('the notice is Spanish, escaped and leaves out contact data', () => {
@@ -26,12 +27,13 @@ test('the notice is Spanish, escaped and leaves out contact data', () => {
   assert.match(n.text, /https:\/\/cms\.x\.pe\/admin\/content-manager\/collection-types\/api::reservation\.reservation/);
 });
 
-test('sends to every address without waiting for the mail server', () => {
+test('sends to the company e-mail without waiting for the mail server', async () => {
   const sent: any[] = [];
-  const { strapi, fire } = fake(() => new Promise(() => sent.push('pending'))); // never resolves
+  const { strapi, fire } = fake((mail) => new Promise(() => sent.push(mail.to))); // never resolves
   registerNotifications(strapi, env);
   assert.equal(fire('api::contact-message.contact-message', { name: 'Ana' }), undefined, 'afterCreate returns at once');
-  assert.deepEqual(sent, ['pending']);
+  await new Promise((r) => setImmediate(r));
+  assert.deepEqual(sent, ['a@x.pe']);
 });
 
 test('a failed send is logged and never thrown', async () => {
@@ -42,11 +44,17 @@ test('a failed send is logged and never thrown', async () => {
   assert.deepEqual(logs, ['error [notify] e-mail not sent: smtp down']);
 });
 
-test('without SMTP_HOST or NOTIFY_EMAIL it warns once and subscribes to nothing', () => {
-  for (const partial of [{ NOTIFY_EMAIL: 'a@x.pe' }, { SMTP_HOST: 'smtp' }]) {
-    const { strapi, logs, fire } = fake(async () => {});
-    registerNotifications(strapi, partial);
-    assert.equal(logs.length, 1);
-    assert.throws(() => fire('api::reservation.reservation', reservation), 'no handler registered');
-  }
+test('without a company e-mail the notice is skipped with a warning', async () => {
+  const { strapi, logs, fire } = fake(async () => assert.fail('must not send'), null);
+  registerNotifications(strapi, env);
+  fire('api::reservation.reservation', reservation);
+  await new Promise((r) => setImmediate(r));
+  assert.match(logs[0]!, /^warn \[notify\] no e-mail/);
+});
+
+test('without SMTP_HOST it warns once and subscribes to nothing', () => {
+  const { strapi, logs, fire } = fake(async () => {});
+  registerNotifications(strapi, {});
+  assert.equal(logs.length, 1);
+  assert.throws(() => fire('api::reservation.reservation', reservation), 'no handler registered');
 });

@@ -31,7 +31,7 @@ Todos publicos (rol Public), lectura con `?locale=en|es` y paginacion `paginatio
 Single types (corchetes sin codificar):
 
 ```
-/api/site-setting?populate[shareImage]=true
+/api/site-setting?populate[shareImage]=true&populate[placeholderImage]=true
 /api/theme-setting?populate[light]=true&populate[dark]=true
 /api/booking-setting?locale=es&populate[assurances]=true
 /api/form-setting
@@ -53,7 +53,7 @@ Localizados = un valor por idioma (`en` por defecto, `es`). El resto se sincroni
 | `page` | `slug`, `heroImage`, `heroImageUrl` | `title`, `lead`, `body` (Markdown), `seoTitle`, `seoDescription` |
 | `blog-post` | `slug`, `publishedDate`, `cover`, `coverUrl`, `featured` | `title`, `category`, `excerpt`, `content` (Markdown), `seoDescription` |
 | `product` | `slug`, `order`, `price`, `featured`, `image`, `imageUrl`, `gallery` | `title`, `description`, `details` (Markdown) |
-| `site-setting` (single) | `email`, `phone`, `whatsapp` (solo digitos), `instagram`, `facebook`, `tiktok`, `youtube`, `linkedin`, `google`, `tripadvisor`, `legalName`, `ruc`, `brandName`, `legalYear`, `shareImage`, `shareImageUrl` | - |
+| `site-setting` (single) | `email`, `phone`, `whatsapp` (solo digitos), `instagram`, `facebook`, `tiktok`, `youtube`, `linkedin`, `google`, `tripadvisor`, `legalName`, `ruc`, `brandName`, `legalYear`, `shareImage`, `shareImageUrl`, `placeholderImage` (imagen de relleno cuando una foto falta o no carga; se siembra una gris con icono de foto) | - |
 | `theme-setting` (single) | `light`, `dark` (`theme.palette`), `fontSans`, `fontHeading` (enum: `radio-canada`, `inter`, `poppins`, `montserrat`, `dm-sans`, `playfair-display`, `lora`, `merriweather`, `system`), `radius` (enum: `none`, `small`, `medium`, `large`, `full`), `headerSize` (enum: `compact`, `standard`, `tall`), `introEnabled`, `introAccent` (hex), `introRestScale`, `introFailsafeMs` | - |
 | `booking-setting` (single) | `depositRate` (0..1, **obsoleto**, ver abajo), `availabilityMonths` (1..12, 3 por defecto), `adultsMin`, `adultsDefault`, `childrenMin`, `childrenDefault`, `peopleMax`, `currencyCode` | `assurances[]` (`shared.feature`) |
 | `form-setting` (single) | `nameMin`, `nameMax`, `emailMax`, `messageMax` | - |
@@ -153,3 +153,10 @@ La coleccion `reservation` (y `POST /api/reservations`) sera reemplazada por `de
 `media-slot.page` tenia el valor `brand` y `translation.page` no. Se anadio `brand` al enum de `translation.page` (cambio aditivo: no altera filas existentes ni el contrato: `translation.page` solo organiza el admin). Ambos enums quedan iguales.
 
 Webhook opcional de publicacion para invalidar caches: ver `docs/WEBHOOKS.md`.
+
+## Cambios del editor (sin romper la API)
+
+- `slug` de `tour`, `destination`, `blog-post` y `product` ya no es `required` en el esquema (la API sigue devolviéndolo): se genera del título al crear y el equipo no puede cambiarlo.
+- `shared.feature.icon` es una enumeración: `lucideUsers`, `lucideLanguages`, `lucideCar`, `lucideWind`, `lucideCalendar`, `lucideClock`, `lucideCircleDollarSign`, `lucideMapPin`, `lucideCamera`, `lucideSun`, `lucideMoon`, `lucideShieldCheck`, `lucideHeart`, `lucideStar`, `lucideMountain`, `lucideWaves`, `lucideDroplets`, `lucideBackpack`, `lucideGlasses`, `lucideShirt`, `lucideUtensils`, `lucideBus`, `lucideCheck`, `lucideInfo`, `lucideCompass`, `lucideTent`, `lucideBinoculars`, `lucideBadgeCheck`. La web debe registrar todos.
+- `tour.languages`, `imageUrl`, `galleryUrls`, `itineraryFileUrl` y los demás `*Url` de imagen siguen en la API pero ya no se editan en el panel.
+- La vista previa se firma con `FORMS_PROXY_SECRET` (antes `PREVIEW_SECRET`); el esquema `<exp>:<ruta>` no cambia.

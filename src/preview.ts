@@ -22,6 +22,9 @@ export function previewPath(uid: string, slug: string, locale: string): string |
   }
 }
 
+/** The website the Preview button opens: the first address of CLIENT_URLS (empty when none). */
+export const previewBase = (clientUrls = ''): string => clientUrls.split(',')[0]!.trim();
+
 /** `?preview=<exp>.<sig>`: exp in unix seconds, sig = HMAC-SHA256 hex of `<exp>:<pathname>` (the website verifies the same). */
 export function previewUrl(baseUrl: string, pathname: string, secret: string, nowMs = Date.now()): string {
   const exp = Math.floor(nowMs / 1000) + TTL_SECONDS;

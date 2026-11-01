@@ -22,8 +22,7 @@
           "localized": false
         }
       },
-      "type": "uid",
-      "required": true
+      "type": "uid"
     },
     "order": {
       "pluginOptions": {
