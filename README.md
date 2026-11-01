@@ -32,15 +32,14 @@ docker compose up -d --build   # cms + postgres 16, volumenes pgdata y uploads
 | `PUBLIC_URL` | URL publica del CMS |
 | `APP_KEYS`, `API_TOKEN_SALT`, `ADMIN_JWT_SECRET`, `TRANSFER_TOKEN_SALT`, `ENCRYPTION_KEY`, `JWT_SECRET` | Secretos |
 | `DATABASE_CLIENT` (`sqlite`/`postgres`), `DATABASE_FILENAME`, `DATABASE_HOST/PORT/NAME/USERNAME/PASSWORD/SSL` | Base de datos |
-| `CLIENT_URLS` | Origenes CORS (lista con comas); obligatoria en produccion |
+| `CLIENT_URLS` | Origenes CORS (lista con comas); obligatoria en produccion. El primero es la web a la que abre el boton *Vista previa* |
 | `SEED_ON_EMPTY` | `false` desactiva el seed inicial |
 | `STRAPI_PLUGIN_I18N_INIT_LOCALE_CODE` | Locale por defecto (`en`) |
 | `PROXY` | `true` detras de un proxy inverso con TLS |
 | `UPLOAD_PROVIDER` (`local`/`aws-s3`), `UPLOAD_MAX_FILE_SIZE_MB` (200), `S3_*`, `MEDIA_HOSTS` | Medios: proveedor, limite por archivo, bucket/credenciales/endpoint/URL publica, hosts extra de la CSP |
-| `FORMS_PROXY_SECRET` | Secreto compartido con el servidor Angular. **Obligatorio en produccion** (el CMS no arranca sin el): los formularios solo se aceptan con la cabecera `X-Forms-Secret`, y el limite de peticiones (10 por IP cada 10 minutos en cada formulario) usa la IP real que reenvia la web |
-| `PREVIEW_URL`, `PREVIEW_SECRET` | Vista previa en el editor: la web recibe `?preview=<exp>.<firma>` (firma = HMAC-SHA256 hex de `<exp>:<ruta>`, 10 minutos). Sin ellas no hay boton |
-| `NOTIFY_EMAIL`, `SMTP_HOST/PORT/USER/PASSWORD/SECURE`, `MAIL_FROM` | Aviso por correo de reservas y mensajes nuevos (solo con `SMTP_HOST` y `NOTIFY_EMAIL`); un fallo de envio nunca afecta al formulario |
-| `FLAG_PROMOTE_EE`, `FLAG_NPS` | Avisos de pago y encuesta del panel (apagados por defecto) |
+| `FORMS_PROXY_SECRET` | Secreto compartido con el servidor Angular. **Obligatorio en produccion** (el CMS no arranca sin el): los formularios solo se aceptan con la cabecera `X-Forms-Secret`, el limite de peticiones (10 por IP cada 10 minutos en cada formulario) usa la IP real que reenvia la web, y firma la vista previa del editor (la web verifica `?preview=<exp>.<firma>`, firma = HMAC-SHA256 hex de `<exp>:<ruta>`, 10 minutos) |
+| `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD` (opcionales `SMTP_PORT` 587, `SMTP_SECURE` false) | Aviso por correo de reservas y mensajes nuevos, solo con `SMTP_HOST`: va al correo de *Datos de la empresa* y sale desde `SMTP_USER`; un fallo de envio nunca afecta al formulario |
+| `DEEPL_API_KEY` (opcional `DEEPL_API_URL`) | Traduccion automatica: panel manual y borrador en ingles al publicar en espanol |
 | `CMS_HOST_PORT` | Solo Docker Compose: puerto publicado |
 
 ## Medios y verificacion de subidas

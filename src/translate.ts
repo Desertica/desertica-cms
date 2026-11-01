@@ -155,3 +155,43 @@ export function registerTranslateRoute(strapi: Core.Strapi) {
     ],
   });
 }
+
+/** Entries that get an English draft on their own when the Spanish version is published. Pages (legal texts) are left out. */
+export const AUTO_TRANSLATE = ['api::tour.tour', 'api::destination.destination', 'api::blog-post.blog-post', 'api::product.product'];
+
+/** Publishing Spanish (one locale, or all of them) with DeepL set up and no English version yet; an existing English version is never overwritten. */
+export const shouldAutoTranslate = (a: { uid: string; locale: unknown; hasKey: boolean; enExists: boolean }): boolean =>
+  a.hasKey && !a.enExists && AUTO_TRANSLATE.includes(a.uid) && (a.locale === 'es' || a.locale === '*');
+
+/**
+ * After a publish, creates the English draft by the same path as the "Traducción automática" panel. Runs in the background and
+ * only logs on failure: saving or publishing is never held up or broken by DeepL.
+ */
+export function registerAutoTranslate(strapi: Core.Strapi, env: Record<string, string | undefined> = process.env) {
+  const running = new Set<string>();
+  strapi.documents.use(async (ctx, next) => {
+    const result = await next();
+    const params = ctx.params as { documentId?: string; locale?: unknown };
+    const { documentId } = params;
+    if (ctx.action !== 'publish' || !documentId || !AUTO_TRANSLATE.includes(ctx.uid) || running.has(documentId)) return result;
+    running.add(documentId);
+    const run = async () => {
+      try {
+        const enExists = !!(await strapi.documents(ctx.uid as any).findOne({ documentId, locale: 'en', fields: ['documentId'] as any }));
+        if (!shouldAutoTranslate({ uid: ctx.uid, locale: params.locale, hasKey: !!env.DEEPL_API_KEY, enExists })) return;
+        await translateDocument(strapi, ctx.uid, documentId, 'es', 'en');
+        strapi.log.info(`[translate] English draft created for ${ctx.uid} ${documentId}`);
+      } catch (error) {
+        strapi.log.warn(`[translate] automatic English draft failed for ${ctx.uid} ${documentId}: ${(error as Error).message}`);
+      } finally {
+        running.delete(documentId);
+      }
+    };
+    // The admin publishes inside a database transaction: wait for its commit, or the background work would reuse a finished one.
+    strapi.db.transaction(({ onCommit }) => { onCommit(() => void run()); }).catch((error: Error) => {
+      running.delete(documentId);
+      strapi.log.warn(`[translate] automatic English draft not scheduled: ${error.message}`);
+    });
+    return result;
+  });
+}

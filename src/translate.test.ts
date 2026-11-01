@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { deepl, missingPlaceholders, plan, protect, restore, translateDocument } from './translate.ts';
+import { deepl, missingPlaceholders, plan, protect, registerAutoTranslate, restore, shouldAutoTranslate, translateDocument } from './translate.ts';
 
 const strapi = {
   components: {
@@ -105,4 +105,32 @@ test('missingPlaceholders reports dropped markers and ignores new or repeated on
   assert.deepEqual(missingPlaceholders('Hi, I want {tour} on {date}', 'Quiero {date}'), ['{tour}']);
   assert.deepEqual(missingPlaceholders('{a} {a}', 'x {a}'), []);
   assert.deepEqual(missingPlaceholders('Hola', 'Hola {extra}'), []);
+});
+
+test('English is drafted only for a published Spanish entry, with a key, and with no English version yet', () => {
+  const ok = { uid: 'api::tour.tour', locale: 'es', hasKey: true, enExists: false };
+  assert.equal(shouldAutoTranslate(ok), true);
+  assert.equal(shouldAutoTranslate({ ...ok, locale: '*' }), true);
+  assert.equal(shouldAutoTranslate({ ...ok, uid: 'api::destination.destination' }), true);
+  assert.equal(shouldAutoTranslate({ ...ok, locale: 'en' }), false, 'publishing English does nothing');
+  assert.equal(shouldAutoTranslate({ ...ok, hasKey: false }), false, 'no DEEPL_API_KEY');
+  assert.equal(shouldAutoTranslate({ ...ok, enExists: true }), false, 'never overwrites an English version');
+  assert.equal(shouldAutoTranslate({ ...ok, uid: 'api::page.page' }), false, 'legal pages');
+  assert.equal(shouldAutoTranslate({ ...ok, uid: 'api::translation.translation' }), false);
+});
+
+test('a DeepL failure after publishing is only logged', async () => {
+  const logs: string[] = [];
+  let middleware: any;
+  const fakeStrapi: any = {
+    documents: Object.assign(() => ({ findOne: async () => null }), { use: (fn: unknown) => (middleware = fn) }),
+    db: { transaction: async (cb: any) => cb({ onCommit: (done: () => void) => done() }) },
+    log: { warn: (m: string) => logs.push(m), info: () => {} },
+  };
+  registerAutoTranslate(fakeStrapi, { DEEPL_API_KEY: 'k' });
+  const result = await middleware({ action: 'publish', uid: 'api::tour.tour', params: { documentId: 'd1', locale: 'es' } }, async () => 'published');
+  assert.equal(result, 'published', 'the publish result is untouched');
+  await new Promise((r) => setTimeout(r, 20));
+  assert.equal(logs.length, 1);
+  assert.match(logs[0]!, /automatic English draft failed/);
 });

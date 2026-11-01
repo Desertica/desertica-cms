@@ -12,12 +12,11 @@ Pasos que necesitan tus cuentas. El código ya está preparado; aquí está qué
 | `PUBLIC_URL`, `CLIENT_URLS`, `PROXY=true` | `https://cms-stg.desertica.pe`, `https://stg.desertica.pe`, `true` | |
 | `DATABASE_CLIENT`, `DATABASE_URL`, `DATABASE_SSL` | `postgres`, URL interna, `false` | |
 | `APP_KEYS`, `API_TOKEN_SALT`, `ADMIN_JWT_SECRET`, `TRANSFER_TOKEN_SALT`, `ENCRYPTION_KEY`, `JWT_SECRET` | valores aleatorios distintos por entorno | |
-| `FORMS_PROXY_SECRET` | el mismo valor que en la web | **Obligatorio en producción** (si falta, el CMS no arranca): sin la cabecera `X-Forms-Secret` el CMS rechaza los formularios (403) |
+| `FORMS_PROXY_SECRET` | el mismo valor que en la web | **Obligatorio en producción** (si falta, el CMS no arranca): sin la cabecera `X-Forms-Secret` el CMS rechaza los formularios (403). También firma la vista previa del editor (la abre en el primer `CLIENT_URLS`; sin esa variable o sin el secreto no hay botón) |
 | `SEED_ON_EMPTY` | `false` después del primer arranque | |
 | `SEED_SAMPLE_TOUR` | `true` solo en staging | Crea una vez el tour de ejemplo (`[EJEMPLO] Tour completo` en español, `[EXAMPLE] Complete tour` en inglés), publicado y con precio: **nunca en producción** |
-| `PREVIEW_URL`, `PREVIEW_SECRET` | `https://stg.desertica.pe`, secreto aleatorio igual al de la web | Activa el botón *Abrir previsualización* del editor (tours, destinos, páginas, blog y productos). Sin las dos no hay botón. La web verifica `?preview=<exp>.<firma>` |
-| `NOTIFY_EMAIL`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_SECURE`, `MAIL_FROM` | correos que reciben el aviso (varios con coma) y datos del SMTP | Cada reserva o mensaje nuevo envía un correo corto (tour, fecha, personas, nombre; sin teléfono ni correo del cliente). Sin `SMTP_HOST` o `NOTIFY_EMAIL` no se envía y el log lo dice al arrancar. Si el SMTP falla, solo queda un error en el log: el formulario responde igual |
-| `DEEPL_API_KEY` | clave de DeepL (gratis termina en `:fx`) | Activa el panel de traducción automática |
+| `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD` | datos del SMTP | Cada reserva o mensaje nuevo envía un correo corto (tour, fecha, personas, nombre; sin teléfono ni correo del cliente) al correo de *Datos de la empresa*, desde `SMTP_USER`. Sin `SMTP_HOST` no se envía y el log lo dice al arrancar. Si el SMTP falla, solo queda un error en el log: el formulario responde igual. `SMTP_PORT` (587) y `SMTP_SECURE` (false) solo si el proveedor lo pide |
+| `DEEPL_API_KEY` | clave de DeepL (gratis termina en `:fx`) | Activa el panel de traducción automática y el borrador en inglés al publicar en español (ver *Qué hace cada menú*) |
 | `UPLOAD_PROVIDER` y `S3_*` | ver la sección 3 | |
 
 **Web (`desertica-web:staging`)**
@@ -131,7 +130,7 @@ Si cambias el texto original en el código de una clave que ya existe en la base
 
 - Al arrancar, el rol Public queda **exactamente** con los permisos que declara el código: un permiso que alguien añada a Public desde el panel se revierte en el siguiente arranque. Es a propósito (ver CLAUDE.md).
 - La primera vez que corre la sincronización de textos en una base con datos, repone una vez, como filas nuevas, las del seed que un editor hubiera borrado antes. Después ya no vuelven.
-- La traducción automática reemplaza el borrador del otro idioma: el panel pide confirmación. Lo publicado no cambia.
+- La traducción automática del panel reemplaza el borrador del otro idioma: pide confirmación y lo publicado no cambia. Al publicar en español un tour, destino, artículo o producto que aún no tiene versión en inglés (y con `DEEPL_API_KEY`), el CMS crea solo el borrador en inglés; nunca lo publica ni pisa uno que ya exista. Si DeepL falla, solo queda un aviso en el log.
 - CKEditor 5 trae `ckeditor5` con licencia GPL-2+ (o comercial). En un panel interno que no se distribuye no suele ser un problema, pero revísalo con el abogado. Antes de usarlo con los textos legales, abre y guarda cada uno en staging y comprueba que el Markdown no cambia: cada publicación de `waiverBody` crea una versión nueva en el API.
 
 ## Qué ve el equipo en el panel
@@ -139,5 +138,26 @@ Si cambias el texto original en el código de una clave que ya existe en la base
 - **Inicio:** widgets *Bandeja* (reservas pendientes y mensajes sin atender), *Páginas legales por publicar* (de las 7, las que no están publicadas en cada idioma) y *Tours sin foto o sin descargo*. Cada uno solo aparece a quien puede leer ese contenido: el Editor no ve la Bandeja. Los datos salen de `GET /desertica/overview` (solo lectura, solo administradores). La página de inicio de Strapi 5 es personalizable: cada persona puede quitar o mover widgets con *Añadir widget*.
 - **Editor del tour:** panel lateral *Antes de publicar* con foto, descripción, punto de encuentro, descargo y preguntas frecuentes. Es solo una guía: no bloquea publicar. Usa `unstable_useContentManagerContext` de Strapi (el nombre indica que la API aún puede cambiar al actualizar Strapi).
 - **Vista previa:** botón *Abrir previsualización* con enlace firmado de 10 minutos; requiere que la web verifique la firma.
-- **Menú de Ajustes:** `FLAG_PROMOTE_EE=false` (por defecto) quita las entradas de pago (Historial, Lanzamientos, Review Workflows, SSO, Registros de auditoría); es una opción soportada de `config/admin.ts`. Lo demás ya depende del rol: el Editor solo ve Inicio, Contenido, Biblioteca de Multimedia y *Descripción general*; Content-Type Builder solo existe en `develop`. No se oculta nada más con CSS/DOM (frágil). *Marketplace* y la casilla de noticias del registro de invitados son de Strapi y no tienen opción de ocultar.
+- **Menú de Ajustes:** `promoteEE: false` (fijo en `config/admin.ts`) quita las entradas de pago (Historial, Lanzamientos, Review Workflows, SSO, Registros de auditoría); es una opción soportada de Strapi. Lo demás ya depende del rol: el Editor solo ve Inicio, Contenido, Biblioteca de Multimedia y *Descripción general*; Content-Type Builder solo existe en `develop`. No se oculta nada más con CSS/DOM (frágil). *Marketplace* y la casilla de noticias del registro de invitados son de Strapi y no tienen opción de ocultar.
 - **Pantallas de entrada:** inicio de sesión, invitación y recorrido guiado con los textos en español de `translations` en `src/admin/app.tsx`.
+
+## Qué hace cada menú
+
+El equipo escribe solo en español: el inglés sale en borrador al publicar (ver arriba) y se revisa antes de publicarlo.
+
+| Menú del panel | Para qué sirve | Notas |
+| --- | --- | --- |
+| Catálogo — Tour | Tours: precio, duración, fotos, itinerario, qué incluye, preguntas, descargo | La dirección web (slug) se crea sola con el nombre y no se puede cambiar. Galería: máximo 6 fotos. *Enfoque de la imagen* elige qué parte de la foto queda visible cuando la tarjeta la recorta; no cambia el archivo. Los iconos se eligen de una lista. Las direcciones de imagen externas y los idiomas están ocultos |
+| Catálogo — Destino | Ciudades o zonas que agrupan tours | Slug automático y fijo |
+| Textos — Texto de la web | Cada texto suelto de la web (botones, títulos, avisos). Lista ordenada por página; cada fila dice en qué página y sección aparece | Solo se edita *Texto que se muestra en la web*; no se pueden crear ni borrar filas ni tocar `{marcadores}` |
+| Medios — Imagen o video de la web | Imágenes y videos fijos de la web (portadas, banners) | Solo se cambia el archivo y el texto alternativo |
+| Páginas — Página | Textos legales y portadas de blog y tienda | Los textos legales no se traducen solos |
+| Blog — Artículo / Tienda — Producto | Artículos y productos | Slug automático y fijo; la galería del producto admite 6 fotos |
+| Sitio — Datos de la empresa | Contacto, redes, razón social, imagen al compartir, **imagen de relleno** (se muestra cuando una foto falta o no carga) y correo que recibe los avisos de reservas y mensajes | |
+| Sitio — Colores y estilo | Colores, letras, esquinas y animación de entrada | |
+| Sitio — Reglas de reserva | Cómo se comporta el calendario de reservas: meses visibles, mínimo/inicial/máximo de adultos y niños, moneda y garantías junto al formulario | El depósito ya no se usa aquí |
+| Sitio — Formularios | Largo mínimo y máximo del nombre, correo y mensaje del **formulario de contacto** de la web. Los formularios de reserva y de reclamos tienen límites fijos | Solo puede bajar los límites fijos del sistema, no subirlos |
+| Sitio — Menús | Enlaces de la barra superior y del pie | |
+| Bandeja | Solicitudes de reserva y mensajes de contacto que llegan de la web | Solo el Super Admin |
+
+Imágenes: el CMS guarda el original tal como se sube. La web lo convierte a WebP y lo reduce al vuelo (`/_img`, `src/image-proxy.ts` de `desertica-web`). Al editar un archivo en la *Biblioteca de Multimedia* se puede recortar (rectángulo con asa en las esquinas, bloqueo de proporción, medidas en píxeles, girar 90°) y fijar el punto que siempre debe verse; no hay zoom ni proporciones predefinidas (16:9, 4:3...).

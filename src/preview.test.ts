@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { createHmac } from 'node:crypto';
 import { test } from 'node:test';
-import { previewPath, previewUrl } from './preview.ts';
+import { previewBase, previewPath, previewUrl } from './preview.ts';
 
 test('preview token signs "<exp>:<pathname>" and lasts ten minutes', () => {
   const url = new URL(previewUrl('https://stg.desertica.pe/', '/es/tours/nazca-lines', 's3cret', 1_000_000));
@@ -19,4 +19,10 @@ test('paths follow the website routes', () => {
   assert.equal(previewPath('api::blog-post.blog-post', 'x', 'en'), '/en/blog/x');
   assert.equal(previewPath('api::product.product', 'x', 'en'), '/en/products/x');
   assert.equal(previewPath('api::translation.translation', 'x', 'en'), null);
+});
+
+test('the preview site is the first CLIENT_URLS entry', () => {
+  assert.equal(previewBase('https://stg.desertica.pe, https://cms-stg.desertica.pe'), 'https://stg.desertica.pe');
+  assert.equal(previewBase(''), '');
+  assert.equal(previewBase(undefined), '');
 });

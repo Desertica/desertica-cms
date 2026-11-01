@@ -5,7 +5,7 @@
     "singularName": "site-setting",
     "pluralName": "site-settings",
     "displayName": "Sitio — Datos de la empresa",
-    "description": "Contact details, social links, legal entity, brand name and default share image."
+    "description": "Contact details, social links, legal entity, brand name, default share image and placeholder image."
   },
   "options": {
     "draftAndPublish": false
@@ -67,6 +67,13 @@
     },
     "shareImageUrl": {
       "type": "string"
+    },
+    "placeholderImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
     }
   }
 }

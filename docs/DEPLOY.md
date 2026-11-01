@@ -21,9 +21,7 @@ El CI (`.github/workflows/ci.yml`) construye la imagen pero no la publica. Cooli
 | `S3_ENDPOINT`, `S3_FORCE_PATH_STYLE` | R2/MinIO/Spaces | Endpoint compatible S3; `S3_FORCE_PATH_STYLE=true` para MinIO |
 | `S3_PUBLIC_URL` | recomendada | URL publica del bucket o CDN, prefijo de las URLs de los medios. Se anade a la CSP |
 | `S3_ROOT_PATH`, `S3_ACL` | no | Carpeta dentro del bucket; ACL (vacio si el bucket las tiene desactivadas) |
-| `PREVIEW_URL`, `PREVIEW_SECRET` | no | Boton *Vista previa* del editor: URL base de la web (`https://stg.desertica.pe`) y secreto compartido con ella. Si falta una de las dos, no hay boton |
-| `NOTIFY_EMAIL`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_SECURE`, `MAIL_FROM` | no | Aviso por correo de cada reserva y mensaje nuevo. Solo se envia con `SMTP_HOST` y `NOTIFY_EMAIL` (varias direcciones separadas por coma); si no, el CMS lo avisa una vez en el log |
-| `FLAG_PROMOTE_EE`, `FLAG_NPS` | no | `false` por defecto: ocultan los avisos de funciones de pago en Ajustes y la encuesta de Strapi |
+| `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD` | no | Aviso por correo de cada reserva y mensaje nuevo. Solo se envia con `SMTP_HOST`, al correo de *Datos de la empresa* y desde `SMTP_USER` (`SMTP_PORT` 587 y `SMTP_SECURE` false se pueden cambiar si el proveedor lo pide); si falta `SMTP_HOST`, el CMS lo avisa una vez en el log |
 | `MEDIA_HOSTS` | no | Hosts extra permitidos por la CSP para imagenes y video |
 | `HOST`, `PORT` | no | 0.0.0.0 y 1337 |
 
