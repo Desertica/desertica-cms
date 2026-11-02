@@ -4,7 +4,7 @@ import { COMPONENT_FIELDS, CONTENT_TYPE_FIELDS, type FieldMeta } from './admin-e
 export const LOCALE_NAMES: Record<string, string> = { en: 'Inglés (en)', es: 'Español (es)' };
 
 const CM_UID = 'plugin::content-manager.content-types';
-const CM_CONFIG_VERSION = 14;
+const CM_CONFIG_VERSION = 15;
 
 type ListConfig = { fields: string[]; mainField?: string; sortBy?: string; sortOrder?: 'ASC' | 'DESC'; pageSize?: number };
 const LIST_CONFIGS: Record<string, ListConfig> = {
@@ -110,7 +110,7 @@ export const EDIT_LAYOUTS: Record<string, Array<Array<{ name: string; size: numb
     row(['brandName', 6], ['legalName', 6]),
     row(['ruc', 6], ['legalYear', 6]),
     row(['email', 6], ['phone', 6]),
-    row(['whatsapp', 12]),
+    row(['whatsapp', 6], ['whatsapp2', 6]),
     row(['instagram', 8], ['showInstagram', 4]),
     row(['facebook', 8], ['showFacebook', 4]),
     row(['tiktok', 8], ['showTiktok', 4]),
