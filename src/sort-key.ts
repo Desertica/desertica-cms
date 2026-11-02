@@ -3,7 +3,7 @@ import type { Core } from '@strapi/strapi';
 /** Website walk-through order; the list of "Textos" and "Medios" follows it instead of the alphabet. */
 export const PAGE_ORDER = ['global', 'navigation', 'footer', 'home', 'tours', 'tour-detail', 'booking', 'about', 'contact', 'blog', 'products', 'legal', 'accessibility', 'brand'];
 
-const PAGE_ES: Record<string, string> = {
+export const PAGE_ES: Record<string, string> = {
   global: 'Todo el sitio', navigation: 'Menú', footer: 'Pie de página', home: 'Inicio', tours: 'Tours', 'tour-detail': 'Detalle del tour',
   booking: 'Reserva', about: 'Nosotros', contact: 'Contacto', blog: 'Blog', products: 'Tienda', legal: 'Textos legales', accessibility: 'Accesibilidad', brand: 'Marca',
 };
