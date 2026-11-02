@@ -191,7 +191,8 @@
       },
       "type": "component",
       "repeatable": true,
-      "component": "shared.feature"
+      "component": "shared.feature",
+      "max": 6
     },
     "itinerary": {
       "pluginOptions": {
@@ -279,7 +280,8 @@
       },
       "type": "component",
       "repeatable": true,
-      "component": "shared.video"
+      "component": "shared.video",
+      "max": 2
     },
     "itineraryFile": {
       "pluginOptions": {
