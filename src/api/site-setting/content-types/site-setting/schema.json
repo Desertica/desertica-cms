@@ -22,6 +22,10 @@
       "type": "string",
       "regex": "^[0-9X]{8,15}$"
     },
+    "whatsapp2": {
+      "type": "string",
+      "regex": "^[0-9]{8,15}$"
+    },
     "instagram": {
       "type": "string"
     },
