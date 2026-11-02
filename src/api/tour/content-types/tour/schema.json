@@ -53,6 +53,15 @@
       "required": true,
       "min": 0
     },
+    "pricePen": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "float",
+      "min": 0
+    },
     "featured": {
       "pluginOptions": {
         "i18n": {

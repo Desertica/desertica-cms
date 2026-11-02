@@ -22,6 +22,7 @@ export const CONTENT_TYPE_FIELDS: Record<string, Fields> = {
     destination: f('Destino', 'Ciudad o zona a la que pertenece el tour.'),
     order: f('Orden', 'Posición en las listas. El 0 va primero.'),
     featured: f('Destacado en la portada', 'Actívalo para que el tour salga en la portada.'),
+    pricePen: f('Precio desde (PEN, soles)', 'Opcional. Si lo llenas, la web muestra los dos precios (dólares y soles). Con IGV incluido; es solo una referencia.'),
     priceFrom: f('Precio desde (USD)', 'Precio por persona con IGV incluido. Es solo una referencia; el precio de cada salida lo define el sistema de reservas.'),
     durationHours: f('Duración (horas)', 'Número entero de horas.'),
     format: f('Formato', 'shared = grupal, private = privado, both = ambos.'),
