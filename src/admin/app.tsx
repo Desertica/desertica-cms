@@ -1,7 +1,7 @@
 import type { StrapiApp } from '@strapi/strapi/admin';
 import lockup from './extensions/lockup.svg';
 import mark from './extensions/logo.svg';
-import { Mail, File, Image } from '@strapi/icons';
+import { Mail, File, Image, Pencil } from '@strapi/icons';
 import ChecklistPanel from './checklist-panel';
 import TranslatePanel from './translate-panel';
 
@@ -95,6 +95,13 @@ export default {
       link: { label: { id: `desertica.widget.${id}.link`, defaultMessage: link.label }, href: link.href },
       permissions: read(subject),
       component: async () => (await import('./widgets'))[component],
+    });
+    app.addMenuLink({
+      to: 'textos-por-pagina',
+      icon: Pencil,
+      intlLabel: { id: 'desertica.textos.menu', defaultMessage: 'Textos por página' },
+      Component: () => import('./textos-page'),
+      permissions: read('api::translation.translation'),
     });
     app.widgets.register([
       widget('inbox', 'Bandeja', Mail, 'api::reservation.reservation', 'InboxWidget', { label: 'Abrir bandeja', href: '/content-manager/collection-types/api::reservation.reservation' }),
