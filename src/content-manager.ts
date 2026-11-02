@@ -4,7 +4,7 @@ import { COMPONENT_FIELDS, CONTENT_TYPE_FIELDS, type FieldMeta } from './admin-e
 export const LOCALE_NAMES: Record<string, string> = { en: 'Inglés (en)', es: 'Español (es)' };
 
 const CM_UID = 'plugin::content-manager.content-types';
-const CM_CONFIG_VERSION = 15;
+const CM_CONFIG_VERSION = 16;
 
 type ListConfig = { fields: string[]; mainField?: string; sortBy?: string; sortOrder?: 'ASC' | 'DESC'; pageSize?: number };
 const LIST_CONFIGS: Record<string, ListConfig> = {
@@ -13,7 +13,7 @@ const LIST_CONFIGS: Record<string, ListConfig> = {
   'api::media-slot.media-slot': { fields: ['page', 'section', 'description', 'image'], mainField: 'description', sortBy: 'sortKey', sortOrder: 'ASC', pageSize: 50 },
   'api::blog-post.blog-post': { fields: ['title', 'publishedDate', 'featured'], mainField: 'title', sortBy: 'publishedDate', sortOrder: 'DESC' },
   'api::product.product': { fields: ['title', 'price', 'order'], mainField: 'title', sortBy: 'order', sortOrder: 'ASC' },
-  'api::tour.tour': { fields: ['title', 'destination', 'featured', 'order', 'priceFrom'], mainField: 'title', sortBy: 'order', sortOrder: 'ASC' },
+  'api::tour.tour': { fields: ['title', 'destination', 'featured', 'order', 'priceFrom', 'pricePen'], mainField: 'title', sortBy: 'order', sortOrder: 'ASC' },
   'api::destination.destination': { fields: ['title', 'order', 'footerOrder'], mainField: 'title', sortBy: 'order', sortOrder: 'ASC' },
   // Legal texts and hub pages share this list: sorted by slug so cancellation, complaints, conduct, cookies, legal-mincetur, privacy and terms sit together.
   'api::page.page': { fields: ['title', 'slug', 'updatedAt'], mainField: 'title', sortBy: 'slug', sortOrder: 'ASC', pageSize: 25 },
@@ -34,7 +34,8 @@ export const EDIT_LAYOUTS: Record<string, Array<Array<{ name: string; size: numb
   'api::tour.tour': [
     row(['title', 8], ['slug', 4]),
     row(['destination', 6], ['order', 3], ['featured', 3]),
-    row(['priceFrom', 4], ['durationHours', 4], ['format', 4]),
+    row(['priceFrom', 4], ['pricePen', 4], ['durationHours', 4]),
+    row(['format', 12]),
     row(['lead', 12]),
     row(['description', 12]),
     row(['image', 8], ['imageFocus', 4]),
