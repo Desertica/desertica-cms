@@ -25,23 +25,51 @@
     "instagram": {
       "type": "string"
     },
+    "showInstagram": {
+      "type": "boolean",
+      "default": false
+    },
     "facebook": {
       "type": "string"
+    },
+    "showFacebook": {
+      "type": "boolean",
+      "default": false
     },
     "tiktok": {
       "type": "string"
     },
+    "showTiktok": {
+      "type": "boolean",
+      "default": false
+    },
     "youtube": {
       "type": "string"
+    },
+    "showYoutube": {
+      "type": "boolean",
+      "default": false
     },
     "linkedin": {
       "type": "string"
     },
+    "showLinkedin": {
+      "type": "boolean",
+      "default": false
+    },
     "google": {
       "type": "string"
     },
+    "showGoogle": {
+      "type": "boolean",
+      "default": false
+    },
     "tripadvisor": {
       "type": "string"
+    },
+    "showTripadvisor": {
+      "type": "boolean",
+      "default": false
     },
     "legalName": {
       "type": "string"
