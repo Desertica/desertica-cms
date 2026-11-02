@@ -4,7 +4,7 @@ import { COMPONENT_FIELDS, CONTENT_TYPE_FIELDS, type FieldMeta } from './admin-e
 export const LOCALE_NAMES: Record<string, string> = { en: 'Inglés (en)', es: 'Español (es)' };
 
 const CM_UID = 'plugin::content-manager.content-types';
-const CM_CONFIG_VERSION = 13;
+const CM_CONFIG_VERSION = 14;
 
 type ListConfig = { fields: string[]; mainField?: string; sortBy?: string; sortOrder?: 'ASC' | 'DESC'; pageSize?: number };
 const LIST_CONFIGS: Record<string, ListConfig> = {
@@ -111,10 +111,13 @@ export const EDIT_LAYOUTS: Record<string, Array<Array<{ name: string; size: numb
     row(['ruc', 6], ['legalYear', 6]),
     row(['email', 6], ['phone', 6]),
     row(['whatsapp', 12]),
-    row(['instagram', 6], ['facebook', 6]),
-    row(['tiktok', 6], ['youtube', 6]),
-    row(['linkedin', 6], ['google', 6]),
-    row(['tripadvisor', 12]),
+    row(['instagram', 8], ['showInstagram', 4]),
+    row(['facebook', 8], ['showFacebook', 4]),
+    row(['tiktok', 8], ['showTiktok', 4]),
+    row(['youtube', 8], ['showYoutube', 4]),
+    row(['linkedin', 8], ['showLinkedin', 4]),
+    row(['google', 8], ['showGoogle', 4]),
+    row(['tripadvisor', 8], ['showTripadvisor', 4]),
     row(['shareImage', 12]),
     row(['placeholderImage', 12]),
   ],

@@ -153,7 +153,7 @@ El equipo escribe solo en español: el inglés sale en borrador al publicar (ver
 | Medios — Imagen o video de la web | Imágenes y videos fijos de la web (portadas, banners) | Solo se cambia el archivo y el texto alternativo |
 | Páginas — Página | Textos legales y portadas de blog y tienda | Los textos legales no se traducen solos |
 | Blog — Artículo / Tienda — Producto | Artículos y productos | Slug automático y fijo; la galería del producto admite 6 fotos |
-| Sitio — Datos de la empresa | Contacto, redes, razón social, imagen al compartir, **imagen de relleno** (se muestra cuando una foto falta o no carga) y correo que recibe los avisos de reservas y mensajes | |
+| Sitio — Datos de la empresa | Contacto, redes (cada una con su interruptor «Mostrar en el sitio»; apagado no aparece en la web pero conserva la dirección), razón social, imagen al compartir, **imagen de relleno** (se muestra cuando una foto falta o no carga) y correo que recibe los avisos de reservas y mensajes | |
 | Sitio — Colores y estilo | Colores, letras, esquinas y animación de entrada | |
 | Sitio — Reglas de reserva | Cómo se comporta el calendario de reservas: meses visibles, mínimo/inicial/máximo de adultos y niños, moneda y garantías junto al formulario | El depósito ya no se usa aquí |
 | Sitio — Formularios | Largo mínimo y máximo del nombre, correo y mensaje del **formulario de contacto** de la web. Los formularios de reserva y de reclamos tienen límites fijos | Solo puede bajar los límites fijos del sistema, no subirlos |
