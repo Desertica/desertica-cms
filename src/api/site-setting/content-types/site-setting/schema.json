@@ -18,6 +18,10 @@
       "type": "string",
       "regex": "^[0-9X+()\\- ]{6,20}$"
     },
+    "phone2": {
+      "type": "string",
+      "regex": "^[0-9X+()\\- ]{6,20}$"
+    },
     "whatsapp": {
       "type": "string",
       "regex": "^[0-9X]{8,15}$"
