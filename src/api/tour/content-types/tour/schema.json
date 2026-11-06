@@ -31,7 +31,8 @@
         }
       },
       "type": "integer",
-      "default": 0
+      "default": 1,
+      "min": 1
     },
     "durationHours": {
       "pluginOptions": {
@@ -53,6 +54,15 @@
       "required": true,
       "min": 0
     },
+    "pricePen": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "float",
+      "min": 0
+    },
     "featured": {
       "pluginOptions": {
         "i18n": {
@@ -68,13 +78,10 @@
           "localized": false
         }
       },
-      "type": "enumeration",
-      "enum": [
-        "shared",
-        "private",
-        "both"
-      ],
-      "default": "both"
+      "type": "customField",
+      "customField": "global::format-select",
+      "default": "both",
+      "regex": "^(shared|private|both)$"
     },
     "languages": {
       "pluginOptions": {
@@ -114,15 +121,10 @@
           "localized": false
         }
       },
-      "type": "enumeration",
-      "enum": [
-        "center",
-        "top",
-        "bottom",
-        "left",
-        "right"
-      ],
-      "default": "center"
+      "type": "customField",
+      "customField": "global::focus-select",
+      "default": "center",
+      "regex": "^(center|top|bottom|left|right)$"
     },
     "galleryUrls": {
       "pluginOptions": {
@@ -148,7 +150,8 @@
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::destination.destination",
-      "inversedBy": "tours"
+      "inversedBy": "tours",
+      "required": true
     },
     "title": {
       "pluginOptions": {
@@ -168,6 +171,14 @@
       "type": "text"
     },
     "lead": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "type": "text"
+    },
+    "body": {
       "pluginOptions": {
         "i18n": {
           "localized": true
@@ -338,7 +349,9 @@
           "localized": false
         }
       },
-      "type": "string"
+      "type": "customField",
+      "customField": "global::map-link",
+      "regex": "^https?://\\S+$"
     },
     "latitude": {
       "pluginOptions": {

@@ -47,6 +47,10 @@ for (const locale of ['en', 'es']) {
   assert.ok(list.body.results.length > 0, `tours listed in ${locale}`);
 }
 
+const mine = await call('GET', '/admin/users/me/permissions', token);
+const readTour = mine.body.data.find((p) => p.subject === tour && p.action.endsWith('explorer.read'));
+assert.ok(readTour?.properties?.fields?.length > 20, 'Editor read permission lists the tour fields (else the panel shows "no permission")');
+
 const { documentId, title, slug } = (await call('GET', `${cm}/${tour}?locale=en`, token)).body.results[0];
 const put = await call('PUT', `${cm}/${tour}/${documentId}?locale=en`, token, { title, slug });
 assert.equal(put.status, 200, 'edit tour');

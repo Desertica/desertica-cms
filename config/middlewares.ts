@@ -29,6 +29,8 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Middlewar
             'connect-src': ["'self'", 'https:'],
             'img-src': [...mediaHosts, 'images.unsplash.com', '*.unsplash.com'],
             'media-src': [...mediaHosts, '*.unsplash.com'],
+            // Map preview of the meeting point (the "map-link" field of the admin).
+            'frame-src': ["'self'", 'https://www.openstreetmap.org'],
             upgradeInsecureRequests: null,
           },
         },

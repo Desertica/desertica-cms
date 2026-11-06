@@ -10,6 +10,10 @@ import { registerNotifications } from './notify';
 import { catalogNeedsSeed, clean, markCatalogSeeded, seedLocalized, syncNewTranslations } from './seed-sync';
 import { assertProductionEnv } from './production-env';
 import { registerBookingGuard } from './booking-guard';
+import { registerTourStatusGuard } from './tour-status';
+import { migrateTourBody } from './tour-body';
+import { migrateWhatsapp2 } from './phone2';
+import { migrateOrderFromOne } from './order-from-one';
 import { registerPlaceholderGuard } from './placeholders';
 import { LOCALE_NAMES, configureContentManager } from './content-manager';
 import { backfillSortKeys, registerSortKey } from './sort-key';
@@ -156,6 +160,39 @@ async function fillEditorFields(strapi: Core.Strapi) {
   }));
   await strapi.service('admin::role').assignPermissions(role.id, permissions);
   strapi.log.info('[bootstrap] Editor role: field lists filled in');
+}
+
+/**
+ * A field added to a schema later (e.g. `tour.body`) is not in the Editor's field lists, so the form would hide it.
+ * Appends the fields that are new since the last boot to each Editor permission that has a list; a field an admin
+ * removed by hand stays removed (only fields never seen before are added).
+ */
+async function topUpEditorFields(strapi: Core.Strapi) {
+  const role = await strapi.db.query('admin::role').findOne({ where: { code: 'strapi-editor' } });
+  if (!role) return;
+  const store = strapi.store({ type: 'plugin', name: 'desertica', key: 'editor-known-fields' });
+  const known = ((await store.get({})) as Record<string, string[]> | null) ?? {};
+  const prefix = 'plugin::content-manager.explorer.';
+  const all: any[] = await strapi.db.query('admin::permission').findMany({ where: { role: role.id } });
+  const nested = (subject: string): string[] =>
+    strapi.service('admin::content-type').getNestedFields(strapi.contentTypes[subject as keyof typeof strapi.contentTypes], { components: strapi.components, nestingLevel: 15 });
+  const next: Record<string, string[]> = {};
+  let changed = false;
+  const permissions = all.map(({ action, subject, properties, conditions }: any) => {
+    const model = strapi.contentTypes[subject as keyof typeof strapi.contentTypes];
+    if (!model || !String(action).startsWith(prefix) || !properties?.fields?.length) return { action, subject, properties, conditions };
+    next[subject] = nested(subject);
+    // First run: nothing was seen yet, so every missing field is added (the lists were complete before).
+    const fresh = next[subject].filter((f) => !known[subject]?.includes(f) && !properties.fields.includes(f));
+    if (!fresh.length) return { action, subject, properties, conditions };
+    changed = true;
+    return { action, subject, conditions, properties: { ...properties, fields: [...properties.fields, ...fresh] } };
+  });
+  if (changed) {
+    await strapi.service('admin::role').assignPermissions(role.id, permissions);
+    strapi.log.info('[bootstrap] Editor role: new fields added to the field lists');
+  }
+  await store.set({ value: { ...known, ...next } });
 }
 
 /** The panel is for Spanish-speaking editors; accounts still on Strapi's English default move to Spanish once. */
@@ -350,6 +387,10 @@ export default {
     registerEditorRules(strapi);
     registerAutoTranslate(strapi);
     registerSortKey(strapi);
+    registerTourStatusGuard(strapi);
+    // Server side twin of `register()` in src/admin/app.tsx. The stored value is a plain string.
+    for (const name of ['map-link', 'format-select', 'focus-select']) strapi.customFields.register({ name, type: 'string' });
+    strapi.customFields.register({ name: 'icon-picker', type: 'enumeration' }); // keeps the `enum` list of the attribute
     assertProductionEnv(process.env);
   },
 
@@ -373,6 +414,11 @@ export default {
       await fillEditorFields(strapi);
     } catch (error) {
       strapi.log.error(`[bootstrap] editor fields failed: ${(error as Error).message}`);
+    }
+    try {
+      await topUpEditorFields(strapi);
+    } catch (error) {
+      strapi.log.error(`[bootstrap] editor field top-up failed: ${(error as Error).message}`);
     }
     try {
       await defaultAdminLanguage(strapi);
@@ -400,6 +446,21 @@ export default {
       await migrateIcons(strapi);
     } catch (error) {
       strapi.log.error(`[bootstrap] icon migration failed (boot continues): ${(error as Error).message}`);
+    }
+    try {
+      await migrateOrderFromOne(strapi);
+    } catch (error) {
+      strapi.log.error(`[bootstrap] order migration failed (boot continues): ${(error as Error).message}`);
+    }
+    try {
+      await migrateWhatsapp2(strapi);
+    } catch (error) {
+      strapi.log.error(`[bootstrap] second phone migration failed (boot continues): ${(error as Error).message}`);
+    }
+    try {
+      await migrateTourBody(strapi);
+    } catch (error) {
+      strapi.log.error(`[bootstrap] tour body migration failed (boot continues): ${(error as Error).message}`);
     }
     try {
       await ensurePlaceholderImage(strapi);

@@ -4,7 +4,7 @@ import { COMPONENT_FIELDS, CONTENT_TYPE_FIELDS, type FieldMeta } from './admin-e
 export const LOCALE_NAMES: Record<string, string> = { en: 'Inglés (en)', es: 'Español (es)' };
 
 const CM_UID = 'plugin::content-manager.content-types';
-const CM_CONFIG_VERSION = 15;
+const CM_CONFIG_VERSION = 20;
 
 type ListConfig = { fields: string[]; mainField?: string; sortBy?: string; sortOrder?: 'ASC' | 'DESC'; pageSize?: number };
 const LIST_CONFIGS: Record<string, ListConfig> = {
@@ -13,7 +13,7 @@ const LIST_CONFIGS: Record<string, ListConfig> = {
   'api::media-slot.media-slot': { fields: ['page', 'section', 'description', 'image'], mainField: 'description', sortBy: 'sortKey', sortOrder: 'ASC', pageSize: 50 },
   'api::blog-post.blog-post': { fields: ['title', 'publishedDate', 'featured'], mainField: 'title', sortBy: 'publishedDate', sortOrder: 'DESC' },
   'api::product.product': { fields: ['title', 'price', 'order'], mainField: 'title', sortBy: 'order', sortOrder: 'ASC' },
-  'api::tour.tour': { fields: ['title', 'destination', 'featured', 'order', 'priceFrom'], mainField: 'title', sortBy: 'order', sortOrder: 'ASC' },
+  'api::tour.tour': { fields: ['title', 'destination', 'featured', 'order', 'priceFrom', 'pricePen'], mainField: 'title', sortBy: 'order', sortOrder: 'ASC' },
   'api::destination.destination': { fields: ['title', 'order', 'footerOrder'], mainField: 'title', sortBy: 'order', sortOrder: 'ASC' },
   // Legal texts and hub pages share this list: sorted by slug so cancellation, complaints, conduct, cookies, legal-mincetur, privacy and terms sit together.
   'api::page.page': { fields: ['title', 'slug', 'updatedAt'], mainField: 'title', sortBy: 'slug', sortOrder: 'ASC', pageSize: 25 },
@@ -31,30 +31,29 @@ const row = (...fields: Array<[string, number]>) => fields.map(([name, size]) =>
 
 /** Edit-view layouts (rows of fields, 12 columns wide). Content types: uid -> rows. A field left out of a layout disappears from the form. */
 export const EDIT_LAYOUTS: Record<string, Array<Array<{ name: string; size: number }>>> = {
+  // Same order as the tour page: header, gallery, text, meeting point, side column, how it runs, details, videos, FAQ, legal, Google.
   'api::tour.tour': [
     row(['title', 8], ['slug', 4]),
     row(['destination', 6], ['order', 3], ['featured', 3]),
     row(['priceFrom', 4], ['durationHours', 4], ['format', 4]),
-    row(['lead', 12]),
-    row(['description', 12]),
+    row(['pricePen', 4]),
     row(['image', 8], ['imageFocus', 4]),
     row(['gallery', 12]),
+    row(['body', 12]),
+    row(['description', 12]),
     row(['meeting', 12]),
     row(['meetingPointUrl', 12]),
-    row(['latitude', 6], ['longitude', 6]),
+    row(['assurances', 12]),
+    row(['itineraryFile', 12]),
     row(['itinerary', 12]),
     row(['practices', 12]),
+    row(['notes', 12]),
     row(['included', 12]),
     row(['excluded', 12]),
     row(['pack', 12]),
-    row(['notes', 12]),
-    row(['paragraphs', 12]),
-    row(['expandedParagraphs', 12]),
-    row(['termsSummary', 12]),
     row(['videos', 12]),
-    row(['itineraryFile', 12]),
-    row(['assurances', 12]),
     row(['faqs', 12]),
+    row(['termsSummary', 12]),
     row(['waiverBody', 12]),
     row(['seoTitle', 12]),
     row(['seoDescription', 12]),
@@ -109,8 +108,9 @@ export const EDIT_LAYOUTS: Record<string, Array<Array<{ name: string; size: numb
   'api::site-setting.site-setting': [
     row(['brandName', 6], ['legalName', 6]),
     row(['ruc', 6], ['legalYear', 6]),
-    row(['email', 6], ['phone', 6]),
-    row(['whatsapp', 6], ['whatsapp2', 6]),
+    row(['email', 12]),
+    row(['phone', 6], ['phone2', 6]),
+    row(['whatsapp', 12]),
     row(['instagram', 8], ['showInstagram', 4]),
     row(['facebook', 8], ['showFacebook', 4]),
     row(['tiktok', 8], ['showTiktok', 4]),
@@ -144,14 +144,16 @@ export const EDIT_LAYOUTS: Record<string, Array<Array<{ name: string; size: numb
  * Each layout plus this list must cover every attribute (src/cm-layouts.test.ts).
  */
 export const HIDDEN_FIELDS: Record<string, string[]> = {
-  'api::tour.tour': ['languages', 'imageUrl', 'galleryUrls', 'itineraryFileUrl'],
+  // `body` replaces lead, paragraphs and expandedParagraphs (kept as data, read by the website only when a tour has no body); the map link replaces the coordinates.
+  'api::tour.tour': ['languages', 'imageUrl', 'galleryUrls', 'itineraryFileUrl', 'lead', 'paragraphs', 'expandedParagraphs', 'latitude', 'longitude'],
   'api::destination.destination': ['imageUrl'],
   'api::page.page': ['heroImageUrl'],
   'api::blog-post.blog-post': ['coverUrl'],
   'api::product.product': ['imageUrl'],
   'api::media-slot.media-slot': ['imageUrl', 'posterUrl', 'sortKey'],
   'api::translation.translation': ['sortKey'],
-  'api::site-setting.site-setting': ['shareImageUrl'],
+  // `whatsapp2` is replaced by `phone2` (a second number to call, not a second WhatsApp); kept as data until the website stops reading it.
+  'api::site-setting.site-setting': ['shareImageUrl', 'whatsapp2'],
   'shared.stop': ['imageUrl'],
   'shared.video': ['posterUrl'],
 };
@@ -173,6 +175,15 @@ const SINGLE_TYPE_TITLES: Record<string, string> = {
 };
 
 /** Component layouts: uid -> rows. Grouped as surfaces, brand, text, states, accents. */
+/** Text shown on each collapsed row of a repeatable component; without it the rows look empty. */
+const COMPONENT_MAIN_FIELDS: Record<string, string> = {
+  'shared.list-item': 'text',
+  'shared.feature': 'title',
+  'shared.stop': 'title',
+  'shared.faq': 'question',
+  'shared.nav-link': 'label',
+};
+
 export const COMPONENT_LAYOUTS: Record<string, Array<Array<{ name: string; size: number }>>> = {
   'shared.stop': [row(['image', 12]), row(['title', 12]), row(['body', 12]), row(['expandedBody', 12])],
   'shared.video': [row(['poster', 12]), row(['webm', 6], ['webmUrl', 6]), row(['mp4', 6], ['mp4Url', 6])],
@@ -265,14 +276,14 @@ export async function configureContentManager(strapi: Core.Strapi) {
     }
   }
   const components = strapi.service('plugin::content-manager.components') as any;
-  for (const uid of new Set([...Object.keys(COMPONENT_LAYOUTS), ...Object.keys(COMPONENT_FIELDS)])) {
+  for (const uid of new Set([...Object.keys(COMPONENT_LAYOUTS), ...Object.keys(COMPONENT_FIELDS), ...Object.keys(COMPONENT_MAIN_FIELDS)])) {
     try {
       const component = strapi.components[uid as keyof typeof strapi.components] as any;
       const current = await components.findConfiguration(component);
       const metadatas = { ...current.metadatas };
       applyFieldMeta(metadatas, COMPONENT_FIELDS[uid]);
       await components.updateConfiguration(component, {
-        settings: current.settings,
+        settings: { ...current.settings, ...(COMPONENT_MAIN_FIELDS[uid] ? { mainField: COMPONENT_MAIN_FIELDS[uid] } : {}) },
         layouts: { ...current.layouts, ...(COMPONENT_LAYOUTS[uid] ? { edit: COMPONENT_LAYOUTS[uid] } : {}) },
         metadatas,
       });

@@ -33,6 +33,7 @@ const lorem = (n: number) => Array.from({ length: n }, (_, i) => ({ text: `Lorem
 
 const localized = (lang: 'en' | 'es') => ({
   ...LOREM[lang],
+  body: [LOREM[lang].lead, ...lorem(3).map((p) => p.text)].join('\n\n'),
   paragraphs: lorem(3),
   expandedParagraphs: lorem(2),
   included: lorem(4),
