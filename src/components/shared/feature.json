@@ -7,7 +7,8 @@
   "options": {},
   "attributes": {
     "icon": {
-      "type": "enumeration",
+      "type": "customField",
+      "customField": "global::icon-picker",
       "enum": [
         "lucideUsers",
         "lucideLanguages",

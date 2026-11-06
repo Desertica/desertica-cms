@@ -85,6 +85,21 @@ export default {
   },
   // `widgets` is only reachable from register(); the bootstrap hook of the app does not receive it.
   register(app: StrapiApp) {
+    // Custom fields (server side twin: `register()` in src/index.ts). The stored value is a plain string.
+    for (const [name, component, title, type] of [
+      ['icon-picker', 'IconPicker', 'Icono', 'enumeration'],
+      ['map-link', 'MapLink', 'Enlace de mapa', 'string'],
+      ['format-select', 'FormatSelect', 'Formato del tour', 'string'],
+      ['focus-select', 'FocusSelect', 'Enfoque de la imagen', 'string'],
+    ] as const) {
+      app.customFields.register({
+        name,
+        type,
+        intlLabel: { id: `desertica.${name}.label`, defaultMessage: title },
+        intlDescription: { id: `desertica.${name}.description`, defaultMessage: title },
+        components: { Input: async () => import('./fields').then((m) => ({ default: m[component] as never })) },
+      });
+    }
     // Home widgets: each one is hidden for people who cannot read that content (the Editor has no inbox).
     const read = (subject: string) => [{ action: 'plugin::content-manager.explorer.read', subject }];
     const widget = (id: string, title: string, icon: typeof Mail, subject: string, component: 'InboxWidget' | 'LegalWidget' | 'ToursWidget', link: { label: string; href: string }) => ({
