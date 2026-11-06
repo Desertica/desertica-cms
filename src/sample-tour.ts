@@ -84,6 +84,7 @@ export async function ensureSampleTour(strapi: Core.Strapi) {
     order: 99,
     durationHours: 4,
     priceFrom: 99,
+    pricePen: 370,
     featured: false,
     format: 'both',
     languages: ['es', 'en'],
