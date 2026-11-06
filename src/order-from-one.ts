@@ -7,6 +7,12 @@ const UIDS = ['api::tour.tour', 'api::destination.destination'];
 export const startsAtZero = (orders: Array<number | null>): boolean => orders.some((order) => !order);
 
 /**
+ * The seed (built by the website) numbers from 0, the form wants 1: how much to add to every `order` of one type
+ * in it. Zero when the seed already starts at 1, so a regenerated seed is not shifted twice.
+ */
+export const seedOrderShift = (orders: Array<number | undefined>): number => (startsAtZero(orders.map((order) => order ?? null)) ? 1 : 0);
+
+/**
  * `order` now starts at 1. When a type still has a 0 (or an empty value), moves every row of that type up by one so
  * the lists keep their order. Safe to run on every boot: once nothing is 0 it does nothing. Rows are updated one by
  * one on the database (drafts and published, every language): a language left out would keep the old number.

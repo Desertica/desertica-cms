@@ -13,7 +13,7 @@ import { registerBookingGuard } from './booking-guard';
 import { registerTourStatusGuard } from './tour-status';
 import { migrateTourBody } from './tour-body';
 import { migrateWhatsapp2 } from './phone2';
-import { migrateOrderFromOne } from './order-from-one';
+import { migrateOrderFromOne, seedOrderShift } from './order-from-one';
 import { registerPlaceholderGuard } from './placeholders';
 import { LOCALE_NAMES, configureContentManager } from './content-manager';
 import { backfillSortKeys, registerSortKey } from './sort-key';
@@ -224,11 +224,13 @@ async function seedCatalog(strapi: Core.Strapi) {
     const catalog = JSON.parse(fs.readFileSync(source, 'utf8'));
     strapi.log.info('[seed] seeding catalog...');
 
+    const destinationShift = seedOrderShift(catalog.destinations.map((d: any) => d.order));
+    const tourShift = seedOrderShift(catalog.tours.map((t: any) => t.order));
     const destinationIds = new Map<string, string>();
     for (const d of catalog.destinations) {
       const base = clean({
         slug: d.slug,
-        order: d.order,
+        order: d.order === undefined ? undefined : d.order + destinationShift,
         footerOrder: d.footerOrder,
         showInFooter: d.showInFooter,
         imageUrl: d.imageUrl,
@@ -251,7 +253,7 @@ async function seedCatalog(strapi: Core.Strapi) {
       const destinationId = destinationIds.get(t.destination);
       const base = clean({
         slug: t.slug,
-        order: t.order,
+        order: t.order === undefined ? undefined : t.order + tourShift,
         durationHours: t.durationHours,
         priceFrom: t.priceFrom,
         featured: t.featured,
