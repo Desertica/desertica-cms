@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { deepl, missingPlaceholders, plan, protect, registerAutoTranslate, restore, shouldAutoTranslate, translateDocument } from './translate.ts';
+import { deepl, missingPlaceholders, plan, protect, registerAutoTranslate, restore, shouldAutoTranslate, slugFromEnglish, translateDocument } from './translate.ts';
 
 const strapi = {
   components: {
@@ -107,19 +107,17 @@ test('missingPlaceholders reports dropped markers and ignores new or repeated on
   assert.deepEqual(missingPlaceholders('Hola', 'Hola {extra}'), []);
 });
 
-test('English is drafted only for a published Spanish entry, with a key, and with no English version yet', () => {
-  const ok = { uid: 'api::tour.tour', locale: 'es', hasKey: true, enExists: false };
+test('English is rewritten on every Spanish save, with a key, for the types that translate themselves', () => {
+  const ok = { uid: 'api::tour.tour', locale: 'es', hasKey: true };
   assert.equal(shouldAutoTranslate(ok), true);
-  assert.equal(shouldAutoTranslate({ ...ok, locale: '*' }), true);
   assert.equal(shouldAutoTranslate({ ...ok, uid: 'api::destination.destination' }), true);
-  assert.equal(shouldAutoTranslate({ ...ok, locale: 'en' }), false, 'publishing English does nothing');
+  assert.equal(shouldAutoTranslate({ ...ok, locale: 'en' }), false, 'saving English does nothing, so it cannot loop');
   assert.equal(shouldAutoTranslate({ ...ok, hasKey: false }), false, 'no DEEPL_API_KEY');
-  assert.equal(shouldAutoTranslate({ ...ok, enExists: true }), false, 'never overwrites an English version');
   assert.equal(shouldAutoTranslate({ ...ok, uid: 'api::page.page' }), false, 'legal pages');
-  assert.equal(shouldAutoTranslate({ ...ok, uid: 'api::translation.translation' }), false);
+  assert.equal(shouldAutoTranslate({ ...ok, uid: 'api::translation.translation' }), false, 'site texts keep the manual panel');
 });
 
-test('a DeepL failure after publishing is only logged', async () => {
+test('a DeepL failure after saving is only logged', async () => {
   const logs: string[] = [];
   let middleware: any;
   const fakeStrapi: any = {
@@ -128,9 +126,44 @@ test('a DeepL failure after publishing is only logged', async () => {
     log: { warn: (m: string) => logs.push(m), info: () => {} },
   };
   registerAutoTranslate(fakeStrapi, { DEEPL_API_KEY: 'k' });
-  const result = await middleware({ action: 'publish', uid: 'api::tour.tour', params: { documentId: 'd1', locale: 'es' } }, async () => 'published');
-  assert.equal(result, 'published', 'the publish result is untouched');
+  const result = await middleware({ action: 'update', uid: 'api::tour.tour', params: { documentId: 'd1', locale: 'es' } }, async () => 'saved');
+  assert.equal(result, 'saved', 'the save result is untouched');
   await new Promise((r) => setTimeout(r, 20));
   assert.equal(logs.length, 1);
-  assert.match(logs[0]!, /automatic English draft failed/);
+  assert.match(logs[0]!, /automatic English version failed/);
+});
+
+test('saving English or an unrelated action never schedules a translation', async () => {
+  let scheduled = 0;
+  let middleware: any;
+  const fakeStrapi: any = {
+    documents: Object.assign(() => ({}), { use: (fn: unknown) => (middleware = fn) }),
+    db: { transaction: async () => { scheduled++; } },
+    log: { warn: () => {}, info: () => {} },
+  };
+  registerAutoTranslate(fakeStrapi, { DEEPL_API_KEY: 'k' });
+  await middleware({ action: 'update', uid: 'api::tour.tour', params: { documentId: 'd1', locale: 'en' } }, async () => 1);
+  await middleware({ action: 'publish', uid: 'api::tour.tour', params: { documentId: 'd1', locale: 'es' } }, async () => 1);
+  assert.equal(scheduled, 0);
+});
+
+test('the slug follows the English name until the entry is first published', async () => {
+  const written: unknown[] = [];
+  const fake = (published: number, english: { title: string; slug: string }, taken: Array<{ slug: string; documentId: string }> = []): any => ({
+    db: {
+      query: () => ({
+        count: async () => published,
+        findMany: async () => taken,
+        updateMany: async (q: unknown) => written.push(q),
+      }),
+    },
+    documents: () => ({ findOne: async () => english }),
+  });
+
+  assert.equal(await slugFromEnglish(fake(0, { title: 'Dune Buggy & Sandboarding', slug: 'paseo-en-buggy' }), 'api::tour.tour', 'd1'), 'dune-buggy-sandboarding');
+  assert.equal(written.length, 1);
+  assert.equal(await slugFromEnglish(fake(1, { title: 'Dune Buggy', slug: 'paseo' }), 'api::tour.tour', 'd1'), null, 'published entries keep their address');
+  assert.equal(await slugFromEnglish(fake(0, { title: 'Dune Buggy', slug: 'dune-buggy' }), 'api::tour.tour', 'd1'), null, 'already right');
+  assert.equal(await slugFromEnglish(fake(0, { title: 'Dune Buggy', slug: 'x' }, [{ slug: 'dune-buggy', documentId: 'other' }]), 'api::tour.tour', 'd1'), 'dune-buggy-2', 'another entry has it');
+  assert.equal(await slugFromEnglish(fake(0, { title: 'Terms', slug: 'x' }), 'api::page.page', 'd1'), null, 'only the types with a title-based slug');
 });
