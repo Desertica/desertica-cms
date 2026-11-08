@@ -78,6 +78,25 @@ test('a short DeepL answer is an error, not a half-translated draft', async () =
   );
 });
 
+test('an empty DEEPL_API_URL (as copied from .env.example) falls back to the real endpoint', async () => {
+  const real = globalThis.fetch;
+  process.env.DEEPL_API_KEY = 'k:fx';
+  process.env.DEEPL_API_URL = '';
+  let called = '';
+  globalThis.fetch = (async (url: string) => {
+    called = url;
+    return new Response(JSON.stringify({ translations: [{ text: 'x' }] }));
+  }) as any;
+  try {
+    await deepl(['a'], 'es', 'en');
+    assert.equal(called, 'https://api-free.deepl.com/v2/translate');
+  } finally {
+    globalThis.fetch = real;
+    delete process.env.DEEPL_API_KEY;
+    delete process.env.DEEPL_API_URL;
+  }
+});
+
 test('placeholders are shielded from DeepL and restored, and plain texts go through untouched', async () => {
   assert.equal(restore(protect('Hola {tour} & <b>')), 'Hola {tour} & <b>');
   assert.equal(protect('a {tour}'), 'a <keep>{tour}</keep>');

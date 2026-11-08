@@ -26,7 +26,7 @@ export const restore = (text: string) => text.replace(/<\/?keep>/g, '').replace(
 export async function deepl(texts: string[], from: Locale, to: Locale): Promise<string[]> {
   const key = process.env.DEEPL_API_KEY;
   if (!key) throw Object.assign(new Error('DEEPL_API_KEY is not set'), { status: 503 });
-  const base = process.env.DEEPL_API_URL ?? (key.endsWith(':fx') ? 'https://api-free.deepl.com' : 'https://api.deepl.com');
+  const base = process.env.DEEPL_API_URL || (key.endsWith(':fx') ? 'https://api-free.deepl.com' : 'https://api.deepl.com');
   const placeholders = texts.some((text) => PLACEHOLDER.test(text));
   PLACEHOLDER.lastIndex = 0;
   const out: string[] = [];
