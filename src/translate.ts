@@ -175,13 +175,13 @@ export const shouldAutoTranslate = (a: { uid: string; locale: unknown; hasKey: b
   a.hasKey && AUTO_TRANSLATE.includes(a.uid) && a.locale === 'es';
 
 /**
- * The address follows the English name while the entry has never been published; once published it is fixed (the URL,
- * the API's tour reference and the search engines already know it). Writes every language row, which share the slug.
+ * The address follows the English name. With `SLUGS_LOCKED=true` (production, once the site is live) it only does so until
+ * the entry is first published: the URL, the API's tour reference and the search engines already know it after that.
+ * Writes every language row, which share the slug.
  */
-export async function slugFromEnglish(strapi: Core.Strapi, uid: string, documentId: string): Promise<string | null> {
+export async function slugFromEnglish(strapi: Core.Strapi, uid: string, documentId: string, locked = process.env.SLUGS_LOCKED === 'true'): Promise<string | null> {
   if (!SLUG_TYPES.includes(uid)) return null;
-  const published = await strapi.db.query(uid as any).count({ where: { documentId, publishedAt: { $notNull: true } } });
-  if (published) return null;
+  if (locked && (await strapi.db.query(uid as any).count({ where: { documentId, publishedAt: { $notNull: true } } }))) return null;
   const en = (await strapi.documents(uid as any).findOne({ documentId, locale: 'en', status: 'draft', fields: ['title', 'slug'] as any })) as any;
   const base = typeof en?.title === 'string' ? slugify(en.title) : '';
   if (!base) return null;

@@ -39,7 +39,8 @@ docker compose up -d --build   # cms + postgres 16, volumenes pgdata y uploads
 | `UPLOAD_PROVIDER` (`local`/`aws-s3`), `UPLOAD_MAX_FILE_SIZE_MB` (200), `S3_*`, `MEDIA_HOSTS` | Medios: proveedor, limite por archivo, bucket/credenciales/endpoint/URL publica, hosts extra de la CSP |
 | `FORMS_PROXY_SECRET` | Secreto compartido con el servidor Angular. **Obligatorio en produccion** (el CMS no arranca sin el): los formularios solo se aceptan con la cabecera `X-Forms-Secret`, el limite de peticiones (10 por IP cada 10 minutos en cada formulario) usa la IP real que reenvia la web, y firma la vista previa del editor (la web verifica `?preview=<exp>.<firma>`, firma = HMAC-SHA256 hex de `<exp>:<ruta>`, 10 minutos) |
 | `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD` (opcionales `SMTP_PORT` 587, `SMTP_SECURE` false) | Aviso por correo de reservas y mensajes nuevos, solo con `SMTP_HOST`: va al correo de *Datos de la empresa* y sale desde `SMTP_USER`; un fallo de envio nunca afecta al formulario |
-| `DEEPL_API_KEY` (opcional `DEEPL_API_URL`) | Traduccion automatica: panel manual y borrador en ingles al publicar en espanol |
+| `DEEPL_API_KEY` (opcional `DEEPL_API_URL`) | Traduccion automatica: cada guardado en espanol de tours, destinos, articulos y productos reescribe el ingles; panel manual para textos, medios, reglas de reserva y menus |
+| `SLUGS_LOCKED` | `true` en produccion: el slug queda fijo tras la primera publicacion. Sin ella (staging) sigue al nombre en ingles |
 | `CMS_HOST_PORT` | Solo Docker Compose: puerto publicado |
 
 ## Medios y verificacion de subidas

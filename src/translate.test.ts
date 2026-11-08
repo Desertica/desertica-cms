@@ -147,7 +147,7 @@ test('saving English or an unrelated action never schedules a translation', asyn
   assert.equal(scheduled, 0);
 });
 
-test('the slug follows the English name until the entry is first published', async () => {
+test('the slug follows the English name; locked, only until the first publication', async () => {
   const written: unknown[] = [];
   const fake = (published: number, english: { title: string; slug: string }, taken: Array<{ slug: string; documentId: string }> = []): any => ({
     db: {
@@ -162,7 +162,8 @@ test('the slug follows the English name until the entry is first published', asy
 
   assert.equal(await slugFromEnglish(fake(0, { title: 'Dune Buggy & Sandboarding', slug: 'paseo-en-buggy' }), 'api::tour.tour', 'd1'), 'dune-buggy-sandboarding');
   assert.equal(written.length, 1);
-  assert.equal(await slugFromEnglish(fake(1, { title: 'Dune Buggy', slug: 'paseo' }), 'api::tour.tour', 'd1'), null, 'published entries keep their address');
+  assert.equal(await slugFromEnglish(fake(1, { title: 'Dune Buggy', slug: 'paseo' }), 'api::tour.tour', 'd1', true), null, 'locked: published entries keep their address');
+  assert.equal(await slugFromEnglish(fake(1, { title: 'Dune Buggy', slug: 'paseo' }), 'api::tour.tour', 'd1', false), 'dune-buggy', 'unlocked (staging): it keeps following the English name');
   assert.equal(await slugFromEnglish(fake(0, { title: 'Dune Buggy', slug: 'dune-buggy' }), 'api::tour.tour', 'd1'), null, 'already right');
   assert.equal(await slugFromEnglish(fake(0, { title: 'Dune Buggy', slug: 'x' }, [{ slug: 'dune-buggy', documentId: 'other' }]), 'api::tour.tour', 'd1'), 'dune-buggy-2', 'another entry has it');
   assert.equal(await slugFromEnglish(fake(0, { title: 'Terms', slug: 'x' }), 'api::page.page', 'd1'), null, 'only the types with a title-based slug');
