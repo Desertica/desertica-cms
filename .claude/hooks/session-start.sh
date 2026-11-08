@@ -1,6 +1,5 @@
 #!/bin/bash
 # Prepares cloud sessions: installs dependencies (npm ci, from the lockfile) and creates .env with throwaway secrets.
-# FORMS_PROXY_SECRET is random too, so it will not match the website's: forms sent from a real frontend get 403 in production mode.
 # Does nothing on a local machine. Idempotent.
 set -euo pipefail
 

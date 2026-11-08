@@ -6,7 +6,6 @@ import { registerAutoTranslate, registerTranslateRoute } from './translate';
 import { migrateIcons, registerEditorRules } from './editor-rules';
 import { ensurePlaceholderImage } from './placeholder-image';
 import { registerOverviewRoute } from './overview';
-import { registerNotifications } from './notify';
 import { catalogNeedsSeed, clean, markCatalogSeeded, seedLocalized, syncNewTranslations } from './seed-sync';
 import { assertProductionEnv } from './production-env';
 import { registerBookingGuard } from './booking-guard';
@@ -24,8 +23,6 @@ const PUBLIC_ACTIONS = [
   'api::tour.tour.find',
   'api::tour.tour.findOne',
   ...['site-setting', 'theme-setting', 'booking-setting', 'form-setting', 'navigation'].map((n) => `api::${n}.${n}.find`),
-  'api::reservation.reservation.create',
-  'api::contact-message.contact-message.create',
   ...['translation', 'media-slot', 'page', 'blog-post', 'product'].flatMap((n) => [
     `api::${n}.${n}.find`,
     `api::${n}.${n}.findOne`,
@@ -105,8 +102,7 @@ function seedSource(): string | null {
 
 /**
  * Editor permissions per content type. Strapi's built-in Editor has no locales on its permissions (so every list
- * comes back empty on a fresh database), can delete everything and reads the inbox (customers' names, e-mails and
- * WhatsApp numbers). Only a Super Admin deletes tours, destinations and pages; the inbox, company data, colors,
+ * comes back empty on a fresh database), and can delete everything. Only a Super Admin deletes tours, destinations and pages; company data, colors,
  * booking rules, forms and menus (the `Sitio` group) are not the Editor's. Applied once; an admin can change the
  * role from Settings > Roles afterwards and the change is kept.
  */
@@ -383,7 +379,6 @@ export default {
   register({ strapi }: { strapi: Core.Strapi }) {
     registerTranslateRoute(strapi);
     registerOverviewRoute(strapi);
-    registerNotifications(strapi);
     registerPlaceholderGuard(strapi);
     registerBookingGuard(strapi);
     registerEditorRules(strapi);

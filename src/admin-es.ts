@@ -190,32 +190,6 @@ export const CONTENT_TYPE_FIELDS: Record<string, Fields> = {
     planTripLabel: f('Texto del botón principal', 'Por ejemplo: Planifica tu viaje.'),
     planTripPath: f('Destino del botón principal', 'Ruta dentro de la web, por ejemplo /contact.'),
   },
-  'api::contact-message.contact-message': {
-    name: f('Nombre'),
-    email: f('Correo'),
-    whatsapp: f('WhatsApp'),
-    country: f('País'),
-    message: f('Mensaje'),
-    locale: f('Idioma del visitante'),
-    handled: f('Atendido', 'Márcalo cuando ya hayas respondido.'),
-  },
-  'api::reservation.reservation': {
-    tourSlug: f('Tour (identificador)'),
-    tourTitle: f('Tour'),
-    date: f('Fecha'),
-    language: f('Idioma del tour'),
-    format: f('Formato'),
-    adults: f('Adultos'),
-    children: f('Niños'),
-    payment: f('Forma de pago', 'full = pago completo, deposit = depósito.'),
-    amount: f('Monto'),
-    locale: f('Idioma del visitante'),
-    name: f('Nombre'),
-    email: f('Correo'),
-    phone: f('Teléfono'),
-    status: f('Estado', 'pending = pendiente, confirmed = confirmada, cancelled = cancelada.'),
-    notes: f('Notas'),
-  },
 };
 
 /** Components used inside content types: uid -> field -> label/description. */

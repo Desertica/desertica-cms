@@ -10,9 +10,9 @@ Pasos que necesitan tus cuentas. El código ya está preparado; aquí está qué
 | --- | --- | --- |
 | `NODE_ENV` | ya viene en la imagen | Con secretos `changeMe` el CMS no arranca |
 | `PUBLIC_URL`, `CLIENT_URLS`, `PROXY=true` | `https://cms-stg.desertica.pe`, `https://stg.desertica.pe`, `true` | |
+| `FORMS_PROXY_SECRET` | el mismo valor que en la web | Opcional: firma la vista previa del editor (la abre en el primer `CLIENT_URLS`; sin el no hay boton) |
 | `DATABASE_CLIENT`, `DATABASE_URL`, `DATABASE_SSL` | `postgres`, URL interna, `false` | |
 | `APP_KEYS`, `API_TOKEN_SALT`, `ADMIN_JWT_SECRET`, `TRANSFER_TOKEN_SALT`, `ENCRYPTION_KEY`, `JWT_SECRET` | valores aleatorios distintos por entorno | |
-| `FORMS_PROXY_SECRET` | el mismo valor que en la web | **Obligatorio en producción** (si falta, el CMS no arranca): sin la cabecera `X-Forms-Secret` el CMS rechaza los formularios (403). También firma la vista previa del editor (la abre en el primer `CLIENT_URLS`; sin esa variable o sin el secreto no hay botón) |
 | `SEED_ON_EMPTY` | `false` después del primer arranque | |
 | `SEED_SAMPLE_TOUR` | `true` solo en staging | Crea una vez el tour de ejemplo (`[EJEMPLO] Tour completo` en español, `[EXAMPLE] Complete tour` en inglés), publicado y con precio: **nunca en producción** |
 | `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD` | datos del SMTP | Cada reserva o mensaje nuevo envía un correo corto (tour, fecha, personas, nombre; sin teléfono ni correo del cliente) al correo de *Datos de la empresa*, desde `SMTP_USER`. Sin `SMTP_HOST` no se envía y el log lo dice al arrancar. Si el SMTP falla, solo queda un error en el log: el formulario responde igual. `SMTP_PORT` (587) y `SMTP_SECURE` (false) solo si el proveedor lo pide |
@@ -26,14 +26,13 @@ Pasos que necesitan tus cuentas. El código ya está preparado; aquí está qué
 | `NG_ALLOWED_HOSTS` | `stg.desertica.pe,localhost` | |
 | `SITE_URL` | `https://stg.desertica.pe` | Sin ella el canónico usa el `Host` de la petición |
 | `STRAPI_URL`, `STRAPI_PUBLIC_URL` | `https://cms-stg.desertica.pe` | |
-| `FORMS_PROXY_SECRET` | igual que el CMS | |
 | `TRUST_PROXY` | `1` (`2` cuando Cloudflare esté delante) | **No uses `true`**: cualquiera elegiría su IP y saltaría los límites |
 | `ROBOTS_DISALLOW_ALL` | `true` en staging | |
 | `IMAGE_HOSTS` | host de las imágenes si no es el del CMS (ver sección 3) | |
 | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | de la sección 6 | Sin ellas los formularios dependen solo del límite de envíos |
 | `BOOKING_ENGINE_ENABLED` | `false` hasta desplegar el API | |
 
-**Secretos fuera de la construcción:** en cada variable secreta (los seis secretos de Strapi y `FORMS_PROXY_SECRET`) abre el engranaje y **desmarca *Buildtime***. Así no quedan como argumentos de la construcción de la imagen.
+**Secretos fuera de la construcción:** en cada variable secreta (los seis secretos de Strapi) abre el engranaje y **desmarca *Buildtime***. Así no quedan como argumentos de la construcción de la imagen.
 
 ## 2. Después de desplegar: comprobaciones
 
@@ -45,7 +44,7 @@ curl -sI https://stg.desertica.pe/ | grep -i '^location'                        
 curl -sI https://stg.desertica.pe/es/no-existe | head -1                                     # HTTP/2 404
 ```
 
-Envía un mensaje desde `/es/contact` y comprueba que aparece en *Bandeja*. Si da error, el `FORMS_PROXY_SECRET` no coincide en las dos aplicaciones.
+Envía un mensaje desde `/es/contact` y comprueba que aparece en el backoffice (los mensajes ya no se guardan en Strapi).
 
 ## 3. Imágenes en Cloudflare R2
 
@@ -98,7 +97,7 @@ Según recuerdo, el plan gratuito cubre hasta 50 usuarios; compruébalo en Cloud
 
 - **Turnstile:** Cloudflare > Turnstile > *Add widget* para `stg.desertica.pe`. La *site key* va en `TURNSTILE_SITE_KEY` y la *secret key* en `TURNSTILE_SECRET_KEY` de la web.
 - **DeepL:** cuenta en deepl.com/pro-api (el plan gratuito sirve para empezar); la clave va en `DEEPL_API_KEY` del CMS.
-- **Socios:** *Settings > Administration panel > Users > Invite new user* con el rol **Editor**. El Editor edita y publica tours, destinos, páginas, blog, tienda, textos y medios, en `en` y `es`; no borra tours, destinos ni páginas (solo el Super Admin), ni entra a *Bandeja* (mensajes de clientes) ni a *Sitio* (datos de la empresa, colores, reglas de reserva, formularios, menús). Los permisos se fijan una sola vez al arrancar; si los cambias en *Settings > Roles* se conservan. Si no hay correo configurado, Strapi muestra el enlace de registro para que se lo envíes. Cada persona elige *Español* en su perfil.
+- **Socios:** *Settings > Administration panel > Users > Invite new user* con el rol **Editor**. El Editor edita y publica tours, destinos, páginas, blog, tienda, textos y medios, en `en` y `es`; no borra tours, destinos ni páginas (solo el Super Admin), ni entra a *Sitio* (datos de la empresa, colores, reglas de reserva, formularios, menús). Los permisos se fijan una sola vez al arrancar; si los cambias en *Settings > Roles* se conservan. Si no hay correo configurado, Strapi muestra el enlace de registro para que se lo envíes. Cada persona elige *Español* en su perfil.
 
 ## 7. De staging a producción (al lanzar)
 
@@ -136,7 +135,7 @@ Si cambias el texto original en el código de una clave que ya existe en la base
 
 ## Qué ve el equipo en el panel
 
-- **Inicio:** widgets *Bandeja* (reservas pendientes y mensajes sin atender), *Páginas legales por publicar* (de las 7, las que no están publicadas en cada idioma) y *Tours sin foto o sin descargo*. Cada uno solo aparece a quien puede leer ese contenido: el Editor no ve la Bandeja. Los datos salen de `GET /desertica/overview` (solo lectura, solo administradores). La página de inicio de Strapi 5 es personalizable: cada persona puede quitar o mover widgets con *Añadir widget*.
+- **Inicio:** widgets *Páginas legales por publicar* (de las 7, las que no están publicadas en cada idioma) y *Tours sin foto o sin descargo*. Cada uno solo aparece a quien puede leer ese contenido. Los datos salen de `GET /desertica/overview` (solo lectura, solo administradores). La página de inicio de Strapi 5 es personalizable: cada persona puede quitar o mover widgets con *Añadir widget*.
 - **Editor del tour:** panel lateral *Antes de publicar* con foto, descripción, punto de encuentro, descargo y preguntas frecuentes. Es solo una guía: no bloquea publicar. Usa `unstable_useContentManagerContext` de Strapi (el nombre indica que la API aún puede cambiar al actualizar Strapi).
 - **Vista previa:** botón *Abrir previsualización* con enlace firmado de 10 minutos; requiere que la web verifique la firma.
 - **Menú de Ajustes:** `promoteEE: false` (fijo en `config/admin.ts`) quita las entradas de pago (Historial, Lanzamientos, Review Workflows, SSO, Registros de auditoría); es una opción soportada de Strapi. Lo demás ya depende del rol: el Editor solo ve Inicio, Contenido, Biblioteca de Multimedia y *Descripción general*; Content-Type Builder solo existe en `develop`. No se oculta nada más con CSS/DOM (frágil). *Marketplace* y la casilla de noticias del registro de invitados son de Strapi y no tienen opción de ocultar.
@@ -159,6 +158,5 @@ El equipo escribe solo en español: el inglés sale en borrador al publicar (ver
 | Sitio — Reglas de reserva | Cómo se comporta el calendario de reservas: meses visibles, mínimo/inicial/máximo de adultos y niños, moneda y garantías junto al formulario | El depósito ya no se usa aquí |
 | Sitio — Formularios | Largo mínimo y máximo del nombre, correo y mensaje del **formulario de contacto** de la web. Los formularios de reserva y de reclamos tienen límites fijos | Solo puede bajar los límites fijos del sistema, no subirlos |
 | Sitio — Menús | Enlaces de la barra superior y del pie | |
-| Bandeja | Solicitudes de reserva y mensajes de contacto que llegan de la web | Solo el Super Admin |
 
 Imágenes: el CMS guarda el original tal como se sube. La web lo convierte a WebP y lo reduce al vuelo (`/_img`, `src/image-proxy.ts` de `desertica-web`). Al editar un archivo en la *Biblioteca de Multimedia* se puede recortar (rectángulo con asa en las esquinas, bloqueo de proporción, medidas en píxeles, girar 90°) y fijar el punto que siempre debe verse; no hay zoom ni proporciones predefinidas (16:9, 4:3...).

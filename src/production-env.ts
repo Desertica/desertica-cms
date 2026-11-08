@@ -8,9 +8,6 @@ export function assertProductionEnv(env: Record<string, string | undefined>) {
   );
   if (placeholders.length) throw new Error(`Placeholder secrets in production: ${placeholders.join(', ')}. Generate real values.`);
 
-  // Without it every visitor shares the proxy's IP: ten form submissions in ten minutes for the whole website.
-  if (!env.FORMS_PROXY_SECRET) throw new Error('FORMS_PROXY_SECRET is required in production (the same value as the website).');
-
   // Without it CORS falls back to localhost and the real origins fail with no hint of why.
   if (!env.CLIENT_URLS) throw new Error('CLIENT_URLS is required in production (the origins of the website and the admin).');
 }
