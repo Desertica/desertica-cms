@@ -15,7 +15,6 @@ test('tour gaps: a photo is the media or the seeded URL; meeting is text or map 
 
 const strapi = {
   documents: (uid: string) => ({
-    count: async () => (uid.includes('reservation') ? 3 : 2),
     findMany: async (q: any) =>
       uid.includes('page')
         ? q.locale === 'es' ? [{ slug: 'terms' }] : []
@@ -25,12 +24,11 @@ const strapi = {
 
 test('overview fills only what the person may read', async () => {
   const all = await overview(strapi, () => true);
-  assert.deepEqual(all.inbox, { reservations: 3, messages: 2 });
   assert.equal(all.legalDrafts![0].slugs.includes('terms'), false);
   assert.equal(all.legalDrafts![1].slugs.length, 7);
   assert.deepEqual(all.tours!.map((t) => [t.documentId, t.locale, t.gaps]), [['a', 'es', ['photo', 'waiver']], ['a', 'en', ['photo', 'waiver']]]);
 
-  const editor = await overview(strapi, (_action, uid) => !uid.includes('reservation'));
-  assert.equal(editor.inbox, undefined);
-  assert.ok(editor.tours);
+  const editor = await overview(strapi, (_action, uid) => !uid.includes('tour'));
+  assert.equal(editor.tours, undefined);
+  assert.ok(editor.legalDrafts);
 });

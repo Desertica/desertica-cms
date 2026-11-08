@@ -17,8 +17,6 @@ const LIST_CONFIGS: Record<string, ListConfig> = {
   'api::destination.destination': { fields: ['title', 'order', 'footerOrder'], mainField: 'title', sortBy: 'order', sortOrder: 'ASC' },
   // Legal texts and hub pages share this list: sorted by slug so cancellation, complaints, conduct, cookies, legal-mincetur, privacy and terms sit together.
   'api::page.page': { fields: ['title', 'slug', 'updatedAt'], mainField: 'title', sortBy: 'slug', sortOrder: 'ASC', pageSize: 25 },
-  'api::reservation.reservation': { fields: ['tourTitle', 'date', 'adults', 'children', 'status'], mainField: 'tourTitle', sortBy: 'createdAt', sortOrder: 'DESC' },
-  'api::contact-message.contact-message': { fields: ['name', 'email', 'handled', 'createdAt'], mainField: 'name', sortBy: 'createdAt', sortOrder: 'DESC' },
 };
 
 /** Which field of the related entry relations display (otherwise Strapi picks the first string). */
