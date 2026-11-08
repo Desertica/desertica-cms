@@ -16,7 +16,7 @@ Pasos que necesitan tus cuentas. El código ya está preparado; aquí está qué
 | `SEED_ON_EMPTY` | `false` después del primer arranque | |
 | `SEED_SAMPLE_TOUR` | `true` solo en staging | Crea una vez el tour de ejemplo (`[EJEMPLO] Tour completo` en español, `[EXAMPLE] Complete tour` en inglés), publicado y con precio: **nunca en producción** |
 | `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD` | datos del SMTP | Cada reserva o mensaje nuevo envía un correo corto (tour, fecha, personas, nombre; sin teléfono ni correo del cliente) al correo de *Datos de la empresa*, desde `SMTP_USER`. Sin `SMTP_HOST` no se envía y el log lo dice al arrancar. Si el SMTP falla, solo queda un error en el log: el formulario responde igual. `SMTP_PORT` (587) y `SMTP_SECURE` (false) solo si el proveedor lo pide |
-| `DEEPL_API_KEY` | clave de DeepL (gratis termina en `:fx`) | Activa el panel de traducción automática y el borrador en inglés al publicar en español (ver *Qué hace cada menú*) |
+| `DEEPL_API_KEY` | clave de DeepL (gratis termina en `:fx`) | Activa la traducción automática: el inglés de tours, destinos, artículos y productos se reescribe en cada guardado en español, y el panel manual de textos, medios y menús (ver *Qué hace cada menú*). `SLUGS_LOCKED=true` en producción fija el slug tras la primera publicación |
 | `UPLOAD_PROVIDER` y `S3_*` | ver la sección 3 | |
 
 **Web (`desertica-web:staging`)**
@@ -129,7 +129,8 @@ Si cambias el texto original en el código de una clave que ya existe en la base
 
 - Al arrancar, el rol Public queda **exactamente** con los permisos que declara el código: un permiso que alguien añada a Public desde el panel se revierte en el siguiente arranque. Es a propósito (ver CLAUDE.md).
 - La primera vez que corre la sincronización de textos en una base con datos, repone una vez, como filas nuevas, las del seed que un editor hubiera borrado antes. Después ya no vuelven.
-- La traducción automática del panel reemplaza el borrador del otro idioma: pide confirmación y lo publicado no cambia. Al publicar en español un tour, destino, artículo o producto que aún no tiene versión en inglés (y con `DEEPL_API_KEY`), el CMS crea solo el borrador en inglés; nunca lo publica ni pisa uno que ya exista. Si DeepL falla, solo queda un aviso en el log.
+- Tours, destinos, artículos y productos: tú escribes solo en español. Cada guardado (con `DEEPL_API_KEY`) reescribe el borrador en inglés, solo si el texto en español cambió; no hay que editar el inglés a mano porque se sobrescribe. El slug sale del nombre en inglés. Nunca se publica solo el inglés. Si DeepL falla, solo queda un aviso en el log.
+- El panel manual *Traducción automática* queda para textos del sitio, medios, reglas de reserva y menús: reemplaza el borrador del otro idioma, pide confirmación y lo publicado no cambia.
 - CKEditor 5 trae `ckeditor5` con licencia GPL-2+ (o comercial). En un panel interno que no se distribuye no suele ser un problema, pero revísalo con el abogado. Antes de usarlo con los textos legales, abre y guarda cada uno en staging y comprueba que el Markdown no cambia: cada publicación de `waiverBody` crea una versión nueva en el API.
 
 ## Qué ve el equipo en el panel

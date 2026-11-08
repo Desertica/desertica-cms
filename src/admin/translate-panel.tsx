@@ -4,10 +4,6 @@ import { useFetchClient, useNotification } from '@strapi/strapi/admin';
 
 /** Content types whose texts differ by language; others have nothing to translate. Pages (legal texts) are left out on purpose. */
 const TRANSLATABLE = new Set([
-  'api::tour.tour',
-  'api::destination.destination',
-  'api::blog-post.blog-post',
-  'api::product.product',
   'api::translation.translation',
   'api::media-slot.media-slot',
   'api::booking-setting.booking-setting',
