@@ -11,8 +11,8 @@ import type { Core } from '@strapi/strapi';
  * reads the same variable so both limits always agree.
  */
 /**
- * E-mail (notices of new reservations and messages, src/notify.ts): SMTP through nodemailer, only when SMTP_HOST is set.
- * Without it Strapi keeps its default sendmail provider, which nothing here calls.
+ * E-mail (admin password recovery): SMTP through nodemailer, only when SMTP_HOST is set.
+ * Without it Strapi keeps its default sendmail provider.
  */
 const mail = (env: Core.Config.Shared.ConfigParams['env']) =>
   env('SMTP_HOST', '')

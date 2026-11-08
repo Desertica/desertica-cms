@@ -7,4 +7,4 @@
 ## Checks
 - [ ] `npm run typecheck && npm run build && npm run seed-check`
 - [ ] No `.env`, `.tmp/` or uploads committed
-- [ ] Public role permissions unchanged (read + create-only for `reservation` and `contact-message`)
+- [ ] Public role permissions unchanged (read-only)

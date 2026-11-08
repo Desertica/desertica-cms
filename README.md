@@ -33,11 +33,11 @@ docker compose up -d --build   # cms + postgres 16, volumenes pgdata y uploads
 | `APP_KEYS`, `API_TOKEN_SALT`, `ADMIN_JWT_SECRET`, `TRANSFER_TOKEN_SALT`, `ENCRYPTION_KEY`, `JWT_SECRET` | Secretos |
 | `DATABASE_CLIENT` (`sqlite`/`postgres`), `DATABASE_FILENAME`, `DATABASE_HOST/PORT/NAME/USERNAME/PASSWORD/SSL` | Base de datos |
 | `CLIENT_URLS` | Origenes CORS (lista con comas); obligatoria en produccion. El primero es la web a la que abre el boton *Vista previa* |
+| `FORMS_PROXY_SECRET` | Secreto compartido con el servidor Angular. Opcional: firma la vista previa del editor (la web verifica `?preview=<exp>.<firma>`, firma = HMAC-SHA256 hex de `<exp>:<ruta>`, 10 minutos); sin el no hay boton de vista previa |
 | `SEED_ON_EMPTY` | `false` desactiva el seed inicial |
 | `STRAPI_PLUGIN_I18N_INIT_LOCALE_CODE` | Locale por defecto (`en`) |
 | `PROXY` | `true` detras de un proxy inverso con TLS |
 | `UPLOAD_PROVIDER` (`local`/`aws-s3`), `UPLOAD_MAX_FILE_SIZE_MB` (200), `S3_*`, `MEDIA_HOSTS` | Medios: proveedor, limite por archivo, bucket/credenciales/endpoint/URL publica, hosts extra de la CSP |
-| `FORMS_PROXY_SECRET` | Secreto compartido con el servidor Angular. **Obligatorio en produccion** (el CMS no arranca sin el): los formularios solo se aceptan con la cabecera `X-Forms-Secret`, el limite de peticiones (10 por IP cada 10 minutos en cada formulario) usa la IP real que reenvia la web, y firma la vista previa del editor (la web verifica `?preview=<exp>.<firma>`, firma = HMAC-SHA256 hex de `<exp>:<ruta>`, 10 minutos) |
 | `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD` (opcionales `SMTP_PORT` 587, `SMTP_SECURE` false) | Aviso por correo de reservas y mensajes nuevos, solo con `SMTP_HOST`: va al correo de *Datos de la empresa* y sale desde `SMTP_USER`; un fallo de envio nunca afecta al formulario |
 | `DEEPL_API_KEY` (opcional `DEEPL_API_URL`) | Traduccion automatica: panel manual y borrador en ingles al publicar en espanol |
 | `CMS_HOST_PORT` | Solo Docker Compose: puerto publicado |
@@ -63,8 +63,6 @@ Usa una base de pruebas o local: crea y borra un token de API temporal, y el log
 | --- | --- | --- | --- |
 | `destination` | si | si | no localizados: `slug`, `order`, `footerOrder`, `showInFooter`, `imageUrl`, `image`; localizados: `title`, `lead`, `allLabel`; relacion `tours` |
 | `tour` | si | si | no localizados: `slug`, `order`, `durationHours`, `priceFrom`, `featured`, `format`, `languages`, `imageUrl`, `image`, `galleryUrls`, `gallery`, `itineraryFile`, `itineraryFileUrl`, `destination`; localizados: `title`, `description`, `lead`, `meeting`, `termsSummary`, `seoTitle`, `seoDescription`, `assurances` (`shared.feature`, opcional: sustituye las de `booking-setting`), `paragraphs`, `expandedParagraphs` (`shared.list-item`), `practices` (`shared.feature`), `itinerary` (`shared.stop`: `image`, `imageUrl`, `title`, `body`, `expandedBody`), `videos` (`shared.video`: `poster`/`posterUrl`, `webm`/`webmUrl`, `mp4`/`mp4Url`), `included`, `excluded`, `pack`, `notes` (`shared.list-item`) |
-| `reservation` (legado, ver nota) | no | no | `tourSlug`, `tourTitle`, `date`, `language`, `format`, `adults`, `children`, `payment`, `amount`, `locale`, `name`, `email`, `phone`, `status`, `notes` |
-| `contact-message` | no | no | `name`, `email`, `whatsapp`, `country`, `message`, `locale`, `handled` |
 | `site-setting` (single) | no | no | `email`, `phone`, `whatsapp`, redes (`instagram`, `facebook`, `tiktok`, `youtube`, `linkedin`, `google`, `tripadvisor`; cada una con su interruptor booleano `showInstagram`... `showTripadvisor`, por defecto apagado), `legalName`, `ruc`, `brandName`, `legalYear`, `shareImage`/`shareImageUrl` |
 | `theme-setting` (single) | no | no | `light`, `dark` (componente `theme.palette`, 22 colores en hex con selector de color, plugin oficial `@strapi/plugin-color-picker` 5.59.0, habilitado en `config/plugins.ts`), `fontSans`, `fontHeading` (selector de 9 fuentes), `radius` (none/small/medium/large/full), `headerSize` (compact/standard/tall), `introEnabled`, `introAccent`, `introRestScale`, `introFailsafeMs` |
 | `booking-setting` (single) | si | no | no localizados: `depositRate` (0..1, obsoleto: el deposito lo decide el API), `availabilityMonths` (1..12, por defecto 3), `adultsMin`, `adultsDefault`, `childrenMin`, `childrenDefault`, `peopleMax`, `currencyCode`; localizado: `assurances` (`shared.feature`) |
@@ -81,14 +79,13 @@ Las imagenes pueden venir de `imageUrl`/`galleryUrls`/`itineraryFileUrl` (URLs e
 Notas del modelo:
 
 - `tour` incluye ademas `waiverBody` (descargo de responsabilidad, localizado), `latitude`, `longitude`, `meetingPointUrl` y `faqs[]` (`shared.faq`, localizado); todos opcionales. Detalle y populate en `CONTRACT.md`.
-- `reservation` es **legado**: `desertica-api` la reemplazara cuando el checkout nuevo se active. Hasta entonces se queda como esta y sus permisos publicos (`create`) no se retiran.
 - Para probar con textos de ejemplo NO LEGALES (descargo, cancelacion, cookies) en un CMS de desarrollo: `docs/DEV-LEGAL-SAMPLES.md`.
 - Las paginas legales `cancellation` y `cookies` se crean vacias y en borrador al arrancar (una vez); hay que redactarlas y publicarlas. Slugs por documento legal en `CONTRACT.md`.
 - Webhook de publicacion (opcional): `docs/WEBHOOKS.md`.
 
 ## Organizacion del admin
 
-El Content Manager agrupa por area gracias al `displayName` (orden alfabetico): `Sitio — ...` (Datos de la empresa, Colores y estilo, Reglas de reserva, Formularios, Menús), `Catálogo — ...` (Destino, Tour), `Textos — Texto de la web`, `Medios — Imagen o video de la web`, `Páginas — Página`, `Blog — Artículo`, `Tienda — Producto`, `Bandeja — ...` (Solicitud de reserva, Mensaje de contacto). `singularName`/`pluralName`/uid no cambian (las rutas de la API son las mismas). En el bootstrap (una sola vez, marcado en el store `plugin_desertica_content-manager-config`; subir `CM_CONFIG_VERSION` en `src/index.ts` para reaplicar) se configuran columnas, orden y tamano de pagina de las listas, y para cada campo su nombre, ayuda y ejemplo en español (`src/admin-es.ts`) y el orden de los formularios (`EDIT_LAYOUTS`). El panel se activa en español en `src/admin/app.tsx`; cada persona elige el idioma en Perfil > Idioma de la interfaz. Limite de Strapi: el orden por defecto admite un solo campo (traducciones y media-slots se ordenan por `page`; dentro de cada pagina, por orden de alta, que sigue el orden alfabetico de `key`).
+El Content Manager agrupa por area gracias al `displayName` (orden alfabetico): `Sitio — ...` (Datos de la empresa, Colores y estilo, Reglas de reserva, Formularios, Menús), `Catálogo — ...` (Destino, Tour), `Textos — Texto de la web`, `Medios — Imagen o video de la web`, `Páginas — Página`, `Blog — Artículo`, `Tienda — Producto`. `singularName`/`pluralName`/uid no cambian (las rutas de la API son las mismas). En el bootstrap (una sola vez, marcado en el store `plugin_desertica_content-manager-config`; subir `CM_CONFIG_VERSION` en `src/index.ts` para reaplicar) se configuran columnas, orden y tamano de pagina de las listas, y para cada campo su nombre, ayuda y ejemplo en español (`src/admin-es.ts`) y el orden de los formularios (`EDIT_LAYOUTS`). El panel se activa en español en `src/admin/app.tsx`; cada persona elige el idioma en Perfil > Idioma de la interfaz. Limite de Strapi: el orden por defecto admite un solo campo (traducciones y media-slots se ordenan por `page`; dentro de cada pagina, por orden de alta, que sigue el orden alfabetico de `key`).
 
 ## Seed
 
@@ -107,7 +104,7 @@ Para resembrar, borrar `.tmp/data.db` (solo desarrollo) y reiniciar.
 
 ## Permisos publicos
 
-El rol Public solo recibe: `destination` find/findOne, `tour` find/findOne, `site-setting`, `theme-setting`, `booking-setting`, `form-setting` y `navigation` find, `reservation` create `contact-message` create y find/findOne de `translation`, `media-slot`, `page`, `blog-post` y `product`. Las altas (`create`) tienen limite por IP (`global::rate-limit`): 10 reservas y 5 mensajes cada 10 minutos (en memoria, por instancia).
+El rol Public solo recibe: `destination` find/findOne, `tour` find/findOne, `site-setting`, `theme-setting`, `booking-setting`, `form-setting` y `navigation` find y find/findOne de `translation`, `media-slot`, `page`, `blog-post` y `product`. Las altas (`create`) tienen limite por IP (`global::rate-limit`): 10 reservas y 5 mensajes cada 10 minutos (en memoria, por instancia).
 
 ## Consumo desde Angular
 
@@ -122,15 +119,13 @@ La app usa `STRAPI_URL` y estos endpoints:
 - `GET /api/navigation?locale=es&populate[headerLinks]=true&populate[footerBrandLinks]=true&populate[footerLegalLinks]=true`
 - `GET /api/translations?locale=es&pagination[pageSize]=200&pagination[page]=1&fields[0]=key&fields[1]=value` (229 claves)
 - `GET /api/media-slots?locale=es&populate=image,video,poster`, `GET /api/pages?locale=es`, `/api/blog-posts`, `/api/products`
-- `POST /api/reservations` con `{ "data": { ... } }`
-- `POST /api/contact-messages` con `{ "data": { ... } }`
 
 ## Publicar contenido
 
-En el admin, `Content Manager` > `Destination`/`Tour`: editar, cambiar de idioma con el selector de locale (los campos no localizados se comparten) y pulsar `Publish` en cada idioma. Solo el contenido publicado aparece en la API publica. Reservas y mensajes se gestionan en el admin (`status`, `handled`).
+En el admin, `Content Manager` > `Destination`/`Tour`: editar, cambiar de idioma con el selector de locale (los campos no localizados se comparten) y pulsar `Publish` en cada idioma. Solo el contenido publicado aparece en la API publica.
 
-## Formularios y limite de peticiones
+## Formularios
 
-El frontend no llama a Strapi desde el navegador: `POST /api/forms/reservation` y `/api/forms/contact` (Express) validan y reenvian a `POST /api/reservations` y `/api/contact-messages`. Como todas las peticiones llegan desde el servidor Angular, el limite de `global::rate-limit` usa la IP real del visitante solo si la peticion trae `X-Forms-Secret` igual a `FORMS_PROXY_SECRET` (definir el mismo valor aqui y en el servidor Angular). Sin secreto, el limite se aplica por IP del proxy.
+Strapi no recibe formularios: los mensajes de contacto, las reclamaciones y las reservas van a `desertica-api` y se gestionan en el backoffice. El frontend no escribe nunca en Strapi.
 
 Nota: en Strapi 5 `populate=*` solo baja un nivel (componentes si, pero NO los media anidados como `itinerary[].image` o `videos[].poster`); para esos usar `populate[itinerary][populate]=image` y `populate[videos][populate]=poster,webm,mp4`.

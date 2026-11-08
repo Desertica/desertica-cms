@@ -13,7 +13,6 @@ Todos publicos (rol Public), lectura con `?locale=en|es` y paginacion `paginatio
 | GET | `/api/media-slots`, `/api/pages`, `/api/blog-posts`, `/api/products` | imagenes, paginas legales/hubs, blog, productos |
 | GET | `/api/site-setting` | contacto, redes, razon social, marca, imagen para compartir |
 | GET | `/api/theme-setting`, `/api/booking-setting`, `/api/form-setting`, `/api/navigation` | tema, reglas de reserva, limites de formularios, menus (`booking-setting` y `navigation` son localizados: se leen con `?locale=`; `site-setting`, `theme-setting` y `form-setting` no) |
-| POST | `/api/reservations`, `/api/contact-messages` | formularios (cuerpo `{ "data": { ... } }`) |
 
 `populate=*` solo llega al primer nivel: los medios dentro de componentes necesitan rutas explicitas. Consulta de tours que usa el frontend (corchetes sin codificar por legibilidad):
 
@@ -58,8 +57,6 @@ Localizados = un valor por idioma (`en` por defecto, `es`). El resto se sincroni
 | `booking-setting` (single) | `depositRate` (0..1, **obsoleto**, ver abajo), `availabilityMonths` (1..12, 3 por defecto), `adultsMin`, `adultsDefault`, `childrenMin`, `childrenDefault`, `peopleMax`, `currencyCode` | `assurances[]` (`shared.feature`) |
 | `form-setting` (single) | `nameMin`, `nameMax`, `emailMax`, `messageMax` | - |
 | `navigation` (single) | - | `headerLinks[]`, `footerBrandLinks[]`, `footerLegalLinks[]` (`shared.nav-link`), `planTripLabel`, `planTripPath` |
-| `reservation` (solo `create`, **legado**, ver abajo) | `tourSlug`, `tourTitle`, `date`, `language`, `format`, `adults`, `children`, `payment`, `amount`, `locale`, `name`, `email`, `phone`, `notes`, `status` | - |
-| `contact-message` (solo `create`) | `name`, `email`, `whatsapp`, `country`, `message`, `locale`, `handled` | - |
 
 Componentes: `theme.palette` {background, foreground, card, cardForeground, popover, popoverForeground, primary, primaryForeground, secondary, secondaryForeground, muted, mutedForeground, accent, accentForeground, destructive, border, input, ring, tierra, tierraForeground, arena, arenaForeground} (cada uno un hex `#rrggbb` o `#rrggbbaa`, validado por regex, elegido con el selector de color `plugin::color-picker.color`; `light` se aplica en `:root`, `dark` bajo la clase `.dark`). Equivalencias: `radius` none=0, small=0.25rem, medium=0.625rem, large=1rem, full=pill; `headerSize` compact=3rem/3.5rem/4rem, standard=3.5rem/4rem/5rem, tall=4rem/5rem/6rem (movil/640px/1024px) — la tabla exacta la define el frontend. `shared.nav-link` {label, path, fragment, kind: `link`|`tours-menu`}: `tours-menu` marca el item del header cuyo desplegable el frontend construye con destinos y tours. `shared.*`: `feature` {icon, title, body}, `stop` {image, imageUrl, title, body, expandedBody}, `video` {poster, posterUrl, webm, webmUrl, mp4, mp4Url}, `list-item` {text}, `faq` {question, answer}.
 
@@ -80,9 +77,8 @@ En el servidor Angular (no en el navegador):
 | `STRAPI_URL` | URL base del CMS; vacia = el frontend usa su catalogo estatico |
 | `STRAPI_PUBLIC_URL` | URL desde la que el navegador carga los medios (por defecto `STRAPI_URL`) |
 | `STRAPI_API_TOKEN` | opcional, token de solo lectura si se quita el permiso publico |
-| `STRAPI_FORMS_TOKEN` | opcional, token para reenviar formularios |
-| `FORMS_PROXY_SECRET` | mismo valor aqui y en el frontend: el limite de peticiones usa la IP real del visitante |
 | `STRAPI_CACHE_TTL_MS` | cache del servidor, por defecto 30000 |
+| `FORMS_PROXY_SECRET` | mismo valor aqui y en el frontend: solo firma la vista previa de borradores (opcional) |
 
 En el CMS: `CLIENT_URLS` (CORS) debe incluir el origen del frontend, y `PUBLIC_URL` la URL publica del CMS.
 
@@ -143,10 +139,6 @@ Las siete paginas legales (`terms`, `privacy`, `cancellation`, `cookies`, `condu
 Las siete se siembran **en borrador y con el texto del seed sin revisar**: en una base nueva no aparecen en la API publica (ni en la web) hasta que alguien las redacte y pulse `Publish` en `en` y en `es`. Checklist de lanzamiento en `docs/OPERACION.md` (seccion 7). Una base que ya existia conserva lo que tenia publicado.
 
 Textos de ejemplo NO LEGALES para desarrollo: `docs/DEV-LEGAL-SAMPLES.md`.
-
-## `reservation` es legado
-
-La coleccion `reservation` (y `POST /api/reservations`) sera reemplazada por `desertica-api` (dinero, cupos y reservas) cuando se active el checkout nuevo. Hasta entonces se mantiene tal cual y **sus permisos publicos (`create`) no se retiran**: el frontend actual la sigue usando. Al activar el checkout nuevo se retirara el permiso y la coleccion pasara a solo lectura/archivo en un cambio aparte, coordinado con `desertica-web`. `contact-message` no cambia.
 
 ## Inconsistencia `translation.page` vs `media-slot.page`
 

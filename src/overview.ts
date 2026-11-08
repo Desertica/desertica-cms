@@ -12,17 +12,9 @@ export async function overview(strapi: Core.Strapi, can: Can) {
   const docs = (uid: string) => strapi.documents(uid as any) as any;
   const read = (uid: string) => can('plugin::content-manager.explorer.read', uid);
   const out: {
-    inbox?: { reservations: number; messages: number };
     legalDrafts?: { locale: string; slugs: string[] }[];
     tours?: { documentId: string; locale: string; title: string; gaps: Gap[] }[];
   } = {};
-
-  if (read('api::reservation.reservation') && read('api::contact-message.contact-message')) {
-    out.inbox = {
-      reservations: await docs('api::reservation.reservation').count({ filters: { status: 'pending' } }),
-      messages: await docs('api::contact-message.contact-message').count({ filters: { $or: [{ handled: false }, { handled: { $null: true } }] } }),
-    };
-  }
 
   if (read('api::page.page')) {
     out.legalDrafts = [];
