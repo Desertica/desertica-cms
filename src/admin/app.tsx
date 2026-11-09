@@ -1,7 +1,7 @@
 import type { StrapiApp } from '@strapi/strapi/admin';
 import lockup from './extensions/lockup.svg';
 import mark from './extensions/logo.svg';
-import { Mail, File, Image, Pencil } from '@strapi/icons';
+import { File, Image, Pencil } from '@strapi/icons';
 import ChecklistPanel from './checklist-panel';
 import TranslatePanel from './translate-panel';
 
@@ -100,9 +100,9 @@ export default {
         components: { Input: async () => import('./fields').then((m) => ({ default: m[component] as never })) },
       });
     }
-    // Home widgets: each one is hidden for people who cannot read that content (the Editor has no inbox).
+    // Home widgets: each one is hidden for people who cannot read that content (the Editor cannot read Sitio).
     const read = (subject: string) => [{ action: 'plugin::content-manager.explorer.read', subject }];
-    const widget = (id: string, title: string, icon: typeof Mail, subject: string, component: 'InboxWidget' | 'LegalWidget' | 'ToursWidget', link: { label: string; href: string }) => ({
+    const widget = (id: string, title: string, icon: typeof File, subject: string, component: 'LegalWidget' | 'ToursWidget', link: { label: string; href: string }) => ({
       id,
       pluginId: 'desertica',
       icon,
@@ -119,7 +119,6 @@ export default {
       permissions: read('api::translation.translation'),
     });
     app.widgets.register([
-      widget('inbox', 'Bandeja', Mail, 'api::reservation.reservation', 'InboxWidget', { label: 'Abrir bandeja', href: '/content-manager/collection-types/api::reservation.reservation' }),
       widget('legal-drafts', 'Páginas legales por publicar', File, 'api::page.page', 'LegalWidget', { label: 'Ver páginas', href: '/content-manager/collection-types/api::page.page' }),
       widget('tour-gaps', 'Tours sin foto o sin descargo', Image, 'api::tour.tour', 'ToursWidget', { label: 'Ver tours', href: '/content-manager/collection-types/api::tour.tour' }),
     ]);

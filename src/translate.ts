@@ -1,4 +1,6 @@
+import { createHash } from 'node:crypto';
 import type { Core } from '@strapi/strapi';
+import { SLUG_TYPES, slugify, uniqueSlug } from './editor-rules.ts';
 
 const LOCALES = ['en', 'es'] as const;
 type Locale = (typeof LOCALES)[number];
@@ -24,7 +26,7 @@ export const restore = (text: string) => text.replace(/<\/?keep>/g, '').replace(
 export async function deepl(texts: string[], from: Locale, to: Locale): Promise<string[]> {
   const key = process.env.DEEPL_API_KEY;
   if (!key) throw Object.assign(new Error('DEEPL_API_KEY is not set'), { status: 503 });
-  const base = process.env.DEEPL_API_URL ?? (key.endsWith(':fx') ? 'https://api-free.deepl.com' : 'https://api.deepl.com');
+  const base = process.env.DEEPL_API_URL || (key.endsWith(':fx') ? 'https://api-free.deepl.com' : 'https://api.deepl.com');
   const placeholders = texts.some((text) => PLACEHOLDER.test(text));
   PLACEHOLDER.lastIndex = 0;
   const out: string[] = [];
@@ -95,7 +97,11 @@ export function plan(strapi: Core.Strapi, attrs: Record<string, Attr>, value: Re
   return steps;
 }
 
-export async function translateDocument(strapi: Core.Strapi, uid: string, documentId: string, from: Locale, to: Locale, userAbility?: unknown) {
+/**
+ * `onlyIfChanged`: skips (returns `null`) when the translatable text is the same one already translated, so saving a photo or a
+ * price does not spend DeepL characters. The hash of the last translated text is kept per document in the plugin store.
+ */
+export async function translateDocument(strapi: Core.Strapi, uid: string, documentId: string, from: Locale, to: Locale, userAbility?: unknown, onlyIfChanged = false) {
   if (NOT_TRANSLATED.has(uid)) throw Object.assign(new Error('Legal texts are not machine translated'), { status: 422 });
   const model = strapi.contentType(uid as any) as any;
   const populate = Object.fromEntries(
@@ -119,12 +125,17 @@ export async function translateDocument(strapi: Core.Strapi, uid: string, docume
   const steps = plan(strapi, model.attributes, source as any, true, texts);
   if (!texts.length) throw Object.assign(new Error('Nothing to translate'), { status: 422 });
 
+  const store = onlyIfChanged ? strapi.store({ type: 'plugin', name: 'desertica', key: `translated-${documentId}` }) : null;
+  const hash = createHash('sha1').update(JSON.stringify(texts)).digest('hex');
+  if (store && (await store.get({})) === hash) return null;
+
   const translated = await deepl(texts, from, to);
   let index = 0;
   const built = Object.fromEntries(steps.map((step) => step(() => translated[index++]!)));
   const data = checker ? checker.sanitizeUpdateInput(source)(built) : built;
   // The target version is saved as a draft: a person reviews and publishes it.
   await strapi.documents(uid as any).update({ documentId, locale: to, data } as any);
+  if (store) await store.set({ value: hash });
   return { fields: steps.length, characters: texts.reduce((sum, text) => sum + text.length, 0) };
 }
 
@@ -156,41 +167,67 @@ export function registerTranslateRoute(strapi: Core.Strapi) {
   });
 }
 
-/** Entries that get an English draft on their own when the Spanish version is published. Pages (legal texts) are left out. */
+/** Entries whose English version is written by DeepL from the Spanish one on every save. Pages (legal texts) are left out. */
 export const AUTO_TRANSLATE = ['api::tour.tour', 'api::destination.destination', 'api::blog-post.blog-post', 'api::product.product'];
 
-/** Publishing Spanish (one locale, or all of them) with DeepL set up and no English version yet; an existing English version is never overwritten. */
-export const shouldAutoTranslate = (a: { uid: string; locale: unknown; hasKey: boolean; enExists: boolean }): boolean =>
-  a.hasKey && !a.enExists && AUTO_TRANSLATE.includes(a.uid) && (a.locale === 'es' || a.locale === '*');
+/** Saving the Spanish version, with DeepL set up, of a type that translates itself. English edits are overwritten: it is never typed by hand. */
+export const shouldAutoTranslate = (a: { uid: string; locale: unknown; hasKey: boolean }): boolean =>
+  a.hasKey && AUTO_TRANSLATE.includes(a.uid) && a.locale === 'es';
 
 /**
- * After a publish, creates the English draft by the same path as the "Traducción automática" panel. Runs in the background and
- * only logs on failure: saving or publishing is never held up or broken by DeepL.
+ * The address follows the English name. With `SLUGS_LOCKED=true` (production, once the site is live) it only does so until
+ * the entry is first published: the URL, the API's tour reference and the search engines already know it after that.
+ * Writes every language row, which share the slug.
+ */
+export async function slugFromEnglish(strapi: Core.Strapi, uid: string, documentId: string, locked = process.env.SLUGS_LOCKED === 'true'): Promise<string | null> {
+  if (!SLUG_TYPES.includes(uid)) return null;
+  if (locked && (await strapi.db.query(uid as any).count({ where: { documentId, publishedAt: { $notNull: true } } }))) return null;
+  const en = (await strapi.documents(uid as any).findOne({ documentId, locale: 'en', status: 'draft', fields: ['title', 'slug'] as any })) as any;
+  const base = typeof en?.title === 'string' ? slugify(en.title) : '';
+  if (!base) return null;
+  const rows: Array<{ slug: string | null; documentId: string }> = await strapi.db.query(uid as any).findMany({ where: { slug: { $startsWith: base } }, select: ['slug', 'documentId'] });
+  const others = rows.filter((r) => r.documentId !== documentId && r.slug).map((r) => r.slug!);
+  const slug = uniqueSlug(base, others);
+  if (slug === en.slug) return null;
+  await strapi.db.query(uid as any).updateMany({ where: { documentId }, data: { slug } });
+  return slug;
+}
+
+/**
+ * After each save of a Spanish entry, rewrites its English draft with DeepL and then the slug from the English name. Runs in the
+ * background and only logs on failure: saving is never held up or broken by DeepL. Saves that arrive while it runs trigger one more pass.
  */
 export function registerAutoTranslate(strapi: Core.Strapi, env: Record<string, string | undefined> = process.env) {
-  const running = new Set<string>();
+  const running = new Map<string, boolean>();
   strapi.documents.use(async (ctx, next) => {
     const result = await next();
     const params = ctx.params as { documentId?: string; locale?: unknown };
-    const { documentId } = params;
-    if (ctx.action !== 'publish' || !documentId || !AUTO_TRANSLATE.includes(ctx.uid) || running.has(documentId)) return result;
-    running.add(documentId);
+    const documentId = params.documentId ?? (result as { documentId?: string } | null)?.documentId;
+    if (!['create', 'update'].includes(ctx.action) || !documentId) return result;
+    if (!shouldAutoTranslate({ uid: ctx.uid, locale: params.locale, hasKey: !!env.DEEPL_API_KEY })) return result;
+    if (running.has(documentId)) {
+      running.set(documentId, true);
+      return result;
+    }
+    running.set(documentId, false);
     const run = async () => {
       try {
-        const enExists = !!(await strapi.documents(ctx.uid as any).findOne({ documentId, locale: 'en', fields: ['documentId'] as any }));
-        if (!shouldAutoTranslate({ uid: ctx.uid, locale: params.locale, hasKey: !!env.DEEPL_API_KEY, enExists })) return;
-        await translateDocument(strapi, ctx.uid, documentId, 'es', 'en');
-        strapi.log.info(`[translate] English draft created for ${ctx.uid} ${documentId}`);
+        do {
+          running.set(documentId, false);
+          const done = await translateDocument(strapi, ctx.uid, documentId, 'es', 'en', undefined, true);
+          const slug = await slugFromEnglish(strapi, ctx.uid, documentId);
+          if (done || slug) strapi.log.info(`[translate] English updated for ${ctx.uid} ${documentId}${slug ? `, slug ${slug}` : ''}`);
+        } while (running.get(documentId));
       } catch (error) {
-        strapi.log.warn(`[translate] automatic English draft failed for ${ctx.uid} ${documentId}: ${(error as Error).message}`);
+        strapi.log.warn(`[translate] automatic English version failed for ${ctx.uid} ${documentId}: ${(error as Error).message}`);
       } finally {
         running.delete(documentId);
       }
     };
-    // The admin publishes inside a database transaction: wait for its commit, or the background work would reuse a finished one.
+    // The admin saves inside a database transaction: wait for its commit, or the background work would reuse a finished one.
     strapi.db.transaction(({ onCommit }) => { onCommit(() => void run()); }).catch((error: Error) => {
       running.delete(documentId);
-      strapi.log.warn(`[translate] automatic English draft not scheduled: ${error.message}`);
+      strapi.log.warn(`[translate] automatic English version not scheduled: ${error.message}`);
     });
     return result;
   });

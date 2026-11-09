@@ -6,7 +6,6 @@ import { NavLink } from 'react-router-dom';
 import { GAP_LABELS } from '../tour-gaps';
 
 type Overview = {
-  inbox?: { reservations: number; messages: number };
   legalDrafts?: { locale: string; slugs: string[] }[];
   tours?: { documentId: string; locale: string; title: string; gaps: (keyof typeof GAP_LABELS)[] }[];
 };
@@ -54,16 +53,6 @@ const view = (render: (data: Overview) => JSX.Element) => () => {
   if (!data) return <Widget.Loading />;
   return render(data);
 };
-
-export const InboxWidget = view(({ inbox }) => (
-  <Rows
-    empty="Nada pendiente."
-    rows={[
-      ...(inbox?.reservations ? [{ key: 'r', to: '/content-manager/collection-types/api::reservation.reservation', text: `${inbox.reservations} solicitud(es) de reserva pendientes` }] : []),
-      ...(inbox?.messages ? [{ key: 'm', to: '/content-manager/collection-types/api::contact-message.contact-message', text: `${inbox.messages} mensaje(s) sin atender` }] : []),
-    ]}
-  />
-));
 
 export const LegalWidget = view(({ legalDrafts = [] }) => (
   <Rows

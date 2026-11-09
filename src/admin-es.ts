@@ -9,7 +9,7 @@ type Fields = Record<string, FieldMeta>;
 
 const f = (label: string, description?: string, placeholder?: string): FieldMeta => ({ label, description, placeholder });
 
-const SLUG_HINT = 'Se crea sola a partir del título al guardar por primera vez y no se puede cambiar: la dirección ya publicada dejaría de funcionar.';
+const SLUG_HINT = 'Se crea sola a partir del nombre en inglés (que se traduce solo del español) y se actualiza cuando lo cambias. En producción, al publicar por primera vez queda fija: la dirección ya publicada dejaría de funcionar.';
 const ICON_HINT = 'Elige el dibujo que acompaña al título. Si no eliges ninguno, el bloque sale sin icono.';
 const COLOR = 'Elige el color con el selector o escribe el código, por ejemplo #5a6b3e.';
 
@@ -17,7 +17,7 @@ const COLOR = 'Elige el color con el selector o escribe el código, por ejemplo 
 export const CONTENT_TYPE_FIELDS: Record<string, Fields> = {
   'api::tour.tour': {
     title: f('Nombre del tour', 'Se muestra en la tarjeta, en la ficha y en el menú.'),
-    slug: f('Dirección web (slug)', 'Se crea sola a partir del nombre al guardar por primera vez y no se puede cambiar: la dirección ya publicada dejaría de funcionar.'),
+    slug: f('Dirección web (slug)', 'Se crea sola a partir del nombre en inglés (que se traduce solo del español) y se actualiza cuando lo cambias. En producción, al publicar por primera vez queda fija: la dirección ya publicada dejaría de funcionar.'),
     destination: f('Destino', 'Obligatorio y solo uno: la ciudad o zona del tour. Si eliges otro, reemplaza al actual. Sin destino el tour no aparece en la web.'),
     order: f('Orden', 'Posición en las listas. El 1 va primero.'),
     featured: f('Destacado en la portada', 'Actívalo para que el tour salga en la portada.'),
@@ -189,32 +189,6 @@ export const CONTENT_TYPE_FIELDS: Record<string, Fields> = {
     footerLegalLinks: f('Enlaces del pie (legales)'),
     planTripLabel: f('Texto del botón principal', 'Por ejemplo: Planifica tu viaje.'),
     planTripPath: f('Destino del botón principal', 'Ruta dentro de la web, por ejemplo /contact.'),
-  },
-  'api::contact-message.contact-message': {
-    name: f('Nombre'),
-    email: f('Correo'),
-    whatsapp: f('WhatsApp'),
-    country: f('País'),
-    message: f('Mensaje'),
-    locale: f('Idioma del visitante'),
-    handled: f('Atendido', 'Márcalo cuando ya hayas respondido.'),
-  },
-  'api::reservation.reservation': {
-    tourSlug: f('Tour (identificador)'),
-    tourTitle: f('Tour'),
-    date: f('Fecha'),
-    language: f('Idioma del tour'),
-    format: f('Formato'),
-    adults: f('Adultos'),
-    children: f('Niños'),
-    payment: f('Forma de pago', 'full = pago completo, deposit = depósito.'),
-    amount: f('Monto'),
-    locale: f('Idioma del visitante'),
-    name: f('Nombre'),
-    email: f('Correo'),
-    phone: f('Teléfono'),
-    status: f('Estado', 'pending = pendiente, confirmed = confirmada, cancelled = cancelada.'),
-    notes: f('Notas'),
   },
 };
 

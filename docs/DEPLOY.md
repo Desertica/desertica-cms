@@ -11,9 +11,9 @@ El CI (`.github/workflows/ci.yml`) construye la imagen pero no la publica. Cooli
 | `PUBLIC_URL` | si | URL publica del CMS, `https://cms.ejemplo.com` (sin barra final). Define la URL del admin; no vuelve absolutas las URLs de los medios |
 | `PROXY` | si hay proxy | `true` detras de un proxy inverso con TLS (cookies seguras del admin, IP real) |
 | `CLIENT_URLS` | si (sin ella el CMS no arranca en produccion) | Origenes CORS, separados por coma (origen del frontend y del admin si se sirve aparte) |
+| `FORMS_PROXY_SECRET` | opcional | Mismo valor que en el servidor Angular. Solo firma la vista previa de borradores; sin el no hay boton |
 | `DATABASE_CLIENT` | si | `postgres` en produccion (`sqlite` solo desarrollo) |
 | `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_NAME`, `DATABASE_USERNAME`, `DATABASE_PASSWORD` | si (postgres) | Conexion. Opcionales: `DATABASE_SSL`, `DATABASE_SSL_REJECT_UNAUTHORIZED`, `DATABASE_SCHEMA`, `DATABASE_POOL_MIN/MAX` |
-| `FORMS_PROXY_SECRET` | si | Mismo valor que en el servidor Angular. Sin el, el limite de peticiones usa la IP del proxy (todos los visitantes comparten cupo) |
 | `SEED_ON_EMPTY` | no | `true` (por defecto) siembra una base que nunca se sembro (una vez; queda marcada en la base). Poner `false` tras el primer arranque |
 | `UPLOAD_PROVIDER` | no | `local` (por defecto, `public/uploads`) o `aws-s3` |
 | `UPLOAD_MAX_FILE_SIZE_MB` | no | Limite por archivo, 200 por defecto (cuerpo HTTP y plugin upload); si hay proxy inverso, subir tambien su limite (nginx `client_max_body_size`) |
@@ -30,7 +30,7 @@ Docker Compose usa ademas `CMS_HOST_PORT` (puerto publicado, 1337) y exige `DATA
 ## Arranque con Docker Compose
 
 ```bash
-cp .env.example .env     # secretos, DATABASE_PASSWORD, PUBLIC_URL, CLIENT_URLS, FORMS_PROXY_SECRET
+cp .env.example .env     # secretos, DATABASE_PASSWORD, PUBLIC_URL, CLIENT_URLS
 docker compose up -d --build
 docker compose exec cms node_modules/.bin/strapi admin:create-user \
   --firstname Admin --lastname Desertica --email tu@correo --password '<clave larga>'
@@ -52,7 +52,7 @@ Sin Docker: `npm ci && npm run build && NODE_ENV=production npm run start` con l
 
 ## Frontend
 
-En el servidor Angular (no en el navegador): `STRAPI_URL` (URL con la que el servidor llega al CMS, puede ser interna), `STRAPI_PUBLIC_URL` (URL publica desde la que el navegador carga `/uploads/...`; las URLs de los medios son relativas con el proveedor local) y `FORMS_PROXY_SECRET` igual que en el CMS. Con `aws-s3` las URLs ya son absolutas (`S3_PUBLIC_URL`). Ver `CONTRACT.md`.
+En el servidor Angular (no en el navegador): `STRAPI_URL` (URL con la que el servidor llega al CMS, puede ser interna), `STRAPI_PUBLIC_URL` (URL publica desde la que el navegador carga `/uploads/...`; las URLs de los medios son relativas con el proveedor local). Con `aws-s3` las URLs ya son absolutas (`S3_PUBLIC_URL`). Ver `CONTRACT.md`.
 
 ## Respaldos
 
@@ -71,8 +71,8 @@ En el servidor Angular (no en el navegador): `STRAPI_URL` (URL con la que el ser
 ## Seguridad
 
 - Servir el admin solo por HTTPS (proxy inverso con TLS y `PROXY=true`); considerar limitar `/admin` por IP/VPN.
-- `server.url` = `PUBLIC_URL`. Tras un proxy, reenviar `X-Forwarded-Proto` y `X-Forwarded-For`. El limite de peticiones de formularios usa `X-Client-IP` solo si llega con `X-Forms-Secret` igual a `FORMS_PROXY_SECRET`; el proxy publico no debe reenviar esas cabeceras de clientes externos.
-- El rol Public solo tiene lectura mas `create` de `reservation` y `contact-message` (se vuelve a conceder en cada arranque). No ampliarlo; si se quita la lectura publica, usar `STRAPI_API_TOKEN` en el frontend.
+- `server.url` = `PUBLIC_URL`. Tras un proxy, reenviar `X-Forwarded-Proto` y `X-Forwarded-For`.
+- El rol Public solo tiene lectura (se vuelve a conceder en cada arranque). No ampliarlo; si se quita la lectura publica, usar `STRAPI_API_TOKEN` en el frontend.
 - Desactivar el seed en produccion tras el primer arranque; no subir `.env`.
 - Rotar secretos si se filtran (invalida sesiones del admin y tokens). Crear tokens de API con el minimo permiso y vencimiento; eliminar los usados para pruebas.
 - El login del admin tiene limite de intentos (429 tras varios fallos); no automatizar logins repetidos.
@@ -93,7 +93,6 @@ Para pruebas en entorno real (staging) y una primera produccion pequena.
    - `DATABASE_CLIENT=postgres`, `DATABASE_URL=${{Postgres.DATABASE_URL}}` (referencia al servicio Postgres), `DATABASE_SSL=false` (red privada).
    - `PUBLIC_URL=https://cms.tudominio.com`, `CLIENT_URLS=https://tudominio.com,https://www.tudominio.com`, `PROXY=true`.
    - `APP_KEYS`, `API_TOKEN_SALT`, `ADMIN_JWT_SECRET`, `TRANSFER_TOKEN_SALT`, `ENCRYPTION_KEY`, `JWT_SECRET`: valores aleatorios (`openssl rand -base64 24`; `APP_KEYS` son cuatro separados por coma).
-   - `FORMS_PROXY_SECRET`: aleatorio, el mismo valor en el sitio.
    - Medios: un volumen montado en `/opt/app/public/uploads`, o bien R2/S3 con `UPLOAD_PROVIDER=aws-s3` y las variables `S3_*`.
    - Ajustes del servicio: puerto 1337, healthcheck en `/_health`.
 3. Crear el administrador una sola vez desde el shell del servicio: `node_modules/.bin/strapi admin:create-user --firstname ... --lastname ... --email ... --password ...` (evita dejar `/admin` abierto a que cualquiera registre el primer usuario). Despues `SEED_ON_EMPTY=false`.
@@ -107,7 +106,6 @@ El `Dockerfile`, Postgres (incluido `DATABASE_URL`, con la semilla), las subidas
 
 ## Seguridad de la API publica
 
-- Con `FORMS_PROXY_SECRET` definido, `POST /api/reservations` y `POST /api/contact-messages` exigen la cabecera `X-Forms-Secret` con ese valor (403 sin ella): solo la web puede enviar formularios, y el limite de peticiones usa la IP real que ella reenvia. Para probar a mano con curl hay que enviar la cabecera.
 - `global::public-guard` rechaza (415) cuerpos multipart anonimos fuera de `/api/upload` y fuerza `status=published` en peticiones sin `Authorization`, para que el rol Public no lea borradores.
 - Al arrancar, el rol Public queda exactamente con `PUBLIC_ACTIONS` (se borra el registro de usuarios y demas rutas de users-permissions).
 - En produccion, Strapi no arranca si algun secreto conserva el valor `changeMe` de `.env.example`.
@@ -120,6 +118,6 @@ El `Dockerfile`, Postgres (incluido `DATABASE_URL`, con la semilla), las subidas
 ## Editor visual y traduccion automatica
 
 - Los textos largos (`body` de paginas, `content` del blog, `details` de productos y `waiverBody` de los tours) usan el editor visual CKEditor 5 con el preset Markdown: el editor ve negritas, listas y enlaces, y el CMS sigue guardando Markdown, asi que la API y la web no cambian. El contenido existente se abre tal cual.
-- `DEEPL_API_KEY` activa el panel *Traduccion automatica* de la vista de edicion (tours, destinos, paginas, blog, productos, textos, medios, reglas de reserva y menus). Traduce la version abierta (en o es) al otro idioma y la guarda como **borrador**: nunca publica. Texto y componentes se traducen; precio, slug, iconos, rutas e imagenes se conservan. Una clave gratuita (`:fx`) cubre 500 000 caracteres al mes segun DeepL; verifica el limite vigente en su sitio.
+- `DEEPL_API_KEY` activa la traduccion automatica. En tours, destinos, articulos y productos, cada guardado de la version en espanol reescribe el borrador en ingles y el slug sale del nombre en ingles; con `SLUGS_LOCKED=true` (produccion, sitio ya publicado) el slug queda fijo desde la primera publicacion. Para textos, medios, reglas de reserva y menus queda el panel manual *Traduccion automatica* de la vista de edicion (traduce la version abierta al otro idioma y la guarda como **borrador**: nunca publica). Texto y componentes se traducen; precio, slug, iconos, rutas e imagenes se conservan. Una clave gratuita (`:fx`) cubre 500 000 caracteres al mes segun DeepL; verifica el limite vigente en su sitio.
 - El endpoint es `POST /desertica/translate`, solo para sesiones del panel con permiso de edicion en ese tipo de contenido.
 
