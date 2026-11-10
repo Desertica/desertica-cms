@@ -152,7 +152,7 @@ test('a DeepL failure after saving is only logged', async () => {
   assert.match(logs[0]!, /automatic English version failed/);
 });
 
-test('saving English or an unrelated action never schedules a translation', async () => {
+test('an unrelated action never schedules work; saving English schedules only the slug', async () => {
   let scheduled = 0;
   let middleware: any;
   const fakeStrapi: any = {
@@ -161,9 +161,11 @@ test('saving English or an unrelated action never schedules a translation', asyn
     log: { warn: () => {}, info: () => {} },
   };
   registerAutoTranslate(fakeStrapi, { DEEPL_API_KEY: 'k' });
-  await middleware({ action: 'update', uid: 'api::tour.tour', params: { documentId: 'd1', locale: 'en' } }, async () => 1);
   await middleware({ action: 'publish', uid: 'api::tour.tour', params: { documentId: 'd1', locale: 'es' } }, async () => 1);
+  await middleware({ action: 'update', uid: 'api::page.page', params: { documentId: 'd1', locale: 'en' } }, async () => 1);
   assert.equal(scheduled, 0);
+  await middleware({ action: 'update', uid: 'api::tour.tour', params: { documentId: 'd1', locale: 'en' } }, async () => 1);
+  assert.equal(scheduled, 1, 'saving the English name schedules only the slug update');
 });
 
 test('the slug follows the English name; locked, only until the first publication', async () => {

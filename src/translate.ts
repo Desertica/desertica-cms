@@ -204,6 +204,15 @@ export function registerAutoTranslate(strapi: Core.Strapi, env: Record<string, s
     const params = ctx.params as { documentId?: string; locale?: unknown };
     const documentId = params.documentId ?? (result as { documentId?: string } | null)?.documentId;
     if (!['create', 'update'].includes(ctx.action) || !documentId) return result;
+    // Editing the English name by hand also moves the slug (the Spanish path does it after translating).
+    if (params.locale === 'en' && SLUG_TYPES.includes(ctx.uid)) {
+      strapi.db
+        .transaction(({ onCommit }) => {
+          onCommit(() => void slugFromEnglish(strapi, ctx.uid, documentId).catch((error: Error) => strapi.log.warn(`[translate] slug not updated for ${documentId}: ${error.message}`)));
+        })
+        .catch((error: Error) => strapi.log.warn(`[translate] slug update not scheduled: ${error.message}`));
+      return result;
+    }
     if (!shouldAutoTranslate({ uid: ctx.uid, locale: params.locale, hasKey: !!env.DEEPL_API_KEY })) return result;
     if (running.has(documentId)) {
       running.set(documentId, true);
