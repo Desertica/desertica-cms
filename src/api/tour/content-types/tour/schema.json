@@ -51,7 +51,6 @@
         }
       },
       "type": "float",
-      "required": true,
       "min": 0
     },
     "pricePen": {
