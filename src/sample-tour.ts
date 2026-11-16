@@ -9,7 +9,6 @@ const LOREM = {
     title: '[EXAMPLE] Complete tour',
     lead: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.',
     description: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-    meeting: 'Lorem ipsum plaza, next to the main fountain.',
     termsSummary: 'Lorem ipsum: duis aute irure dolor in reprehenderit in voluptate velit esse.',
     seoTitle: 'Complete example tour | Desertica',
     seoDescription: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. This page is an example for editors.',
@@ -18,7 +17,6 @@ const LOREM = {
     title: '[EJEMPLO] Tour completo',
     lead: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.',
     description: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-    meeting: 'Plaza lorem ipsum, junto a la fuente principal.',
     termsSummary: 'Lorem ipsum: duis aute irure dolor in reprehenderit in voluptate velit esse.',
     seoTitle: 'Tour de ejemplo completo | Desértica',
     seoDescription: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Esta página es un ejemplo para editores.',
@@ -64,7 +62,7 @@ export async function ensureSampleTour(strapi: Core.Strapi) {
   const store = strapi.store({ type: 'plugin', name: 'desertica', key: 'sample-tour' });
   const done = (await store.get({})) as { v?: number } | null;
   if (done && (done.v ?? 1) >= VERSION) return;
-  strapi.log.warn('[seed] SEED_SAMPLE_TOUR is on: a public example tour with a price is created. Never use it in production.');
+  strapi.log.warn('[seed] SEED_SAMPLE_TOUR is on: a public example tour is created. Never use it in production.');
 
   const tourUid = 'api::tour.tour' as any;
   const destination = await strapi.documents('api::destination.destination' as any).findFirst({ locale: 'en', filters: { slug: 'huacachina' } });
@@ -82,18 +80,10 @@ export async function ensureSampleTour(strapi: Core.Strapi) {
   const base = {
     slug: SLUG,
     order: 99,
-    durationHours: 4,
-    priceFrom: 99,
-    pricePen: 370,
     featured: false,
-    format: 'both',
-    languages: ['es', 'en'],
     imageUrl: PHOTO(PHOTOS[0], 1200, 1200),
     galleryUrls: PHOTOS.map((id) => PHOTO(id, 1800, 1200)),
     imageFocus: 'center',
-    latitude: -14.0875,
-    longitude: -75.7626,
-    meetingPointUrl: 'https://maps.app.goo.gl/lorem-ipsum',
     ...(uploaded ? { itineraryFile: uploaded.id } : {}),
     ...(destination ? { destination: { connect: [{ documentId: destination.documentId }] } } : {}),
   };

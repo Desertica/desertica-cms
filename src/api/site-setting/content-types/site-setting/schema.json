@@ -5,7 +5,7 @@
     "singularName": "site-setting",
     "pluralName": "site-settings",
     "displayName": "Sitio — Datos de la empresa",
-    "description": "Contact details, social links, legal entity, brand name, default share image and placeholder image."
+    "description": "Contact details, social links, brand name, default share image and placeholder image."
   },
   "options": {
     "draftAndPublish": false
@@ -78,13 +78,6 @@
     "showTripadvisor": {
       "type": "boolean",
       "default": false
-    },
-    "legalName": {
-      "type": "string"
-    },
-    "ruc": {
-      "type": "string",
-      "regex": "^[0-9X]{11}$"
     },
     "brandName": {
       "type": "string",

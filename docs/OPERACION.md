@@ -14,7 +14,7 @@ Pasos que necesitan tus cuentas. El código ya está preparado; aquí está qué
 | `DATABASE_CLIENT`, `DATABASE_URL`, `DATABASE_SSL` | `postgres`, URL interna, `false` | |
 | `APP_KEYS`, `API_TOKEN_SALT`, `ADMIN_JWT_SECRET`, `TRANSFER_TOKEN_SALT`, `ENCRYPTION_KEY`, `JWT_SECRET` | valores aleatorios distintos por entorno | |
 | `SEED_ON_EMPTY` | `false` después del primer arranque | |
-| `SEED_SAMPLE_TOUR` | `true` solo en staging | Crea una vez el tour de ejemplo (`[EJEMPLO] Tour completo` en español, `[EXAMPLE] Complete tour` en inglés), publicado y con precio: **nunca en producción** |
+| `SEED_SAMPLE_TOUR` | `true` solo en staging | Crea una vez el tour de ejemplo (`[EJEMPLO] Tour completo` en español, `[EXAMPLE] Complete tour` en inglés), publicado: **nunca en producción** |
 | `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD` | datos del SMTP | Cada reserva o mensaje nuevo envía un correo corto (tour, fecha, personas, nombre; sin teléfono ni correo del cliente) al correo de *Datos de la empresa*, desde `SMTP_USER`. Sin `SMTP_HOST` no se envía y el log lo dice al arrancar. Si el SMTP falla, solo queda un error en el log: el formulario responde igual. `SMTP_PORT` (587) y `SMTP_SECURE` (false) solo si el proveedor lo pide |
 | `DEEPL_API_KEY` | clave de DeepL (gratis termina en `:fx`) | Activa la traducción automática: el inglés de tours, destinos, artículos y productos se reescribe en cada guardado en español, y el panel manual de textos, medios y menús (ver *Qué hace cada menú*). `SLUGS_LOCKED=true` en producción fija el slug tras la primera publicación |
 | `UPLOAD_PROVIDER` y `S3_*` | ver la sección 3 | |
@@ -106,11 +106,11 @@ Los socios cargan el contenido en staging. Al lanzar, hay dos caminos; ensáyalo
 - `npx strapi export --no-encrypt -f staging` en staging y `npx strapi import -f staging.tar.gz` en producción (contenido y archivos). No lo he probado en este proyecto.
 - O restaurar una copia de Postgres y apuntar producción al mismo bucket de imágenes.
 
-**Checklist de lanzamiento: páginas legales.** En una base nueva las siete (`terms`, `privacy`, `cancellation`, `cookies`, `conduct`, `complaints`, `legal-mincetur`) están en **borrador** y la web no las muestra hasta publicarlas. Antes de lanzar, en *Páginas — Página*:
+**Checklist de lanzamiento: páginas legales.** Términos, privacidad, cancelación, cookies y conducta se publican desde el backoffice (Configuración), no aquí. En el CMS quedan `complaints` y `legal-mincetur`, que en una base nueva están en **borrador**. Antes de lanzar, en *Páginas — Página*:
 
-1. Redacta el texto definitivo (revisado por el abogado) de las siete, en **inglés y español**.
-2. Pulsa `Publish` en cada una, en cada idioma (14 publicaciones). Solo `blog` y `products` salen publicadas del seed.
-3. Comprueba sin credenciales: `curl -s "https://<cms>/api/pages?locale=es&filters[slug][$eq]=terms"` devuelve la página con `body`, y lo mismo para las otras seis y para `en`.
+1. Redacta el texto definitivo de las dos, en **inglés y español**.
+2. Pulsa `Publish` en cada una, en cada idioma (4 publicaciones).
+3. Comprueba sin credenciales: `curl -s "https://<cms>/api/pages?locale=es&filters[slug][$eq]=complaints"` devuelve la página con `body`, y lo mismo para `legal-mincetur` y para `en`.
 
 Los secretos de producción son **distintos** de los de staging (`ENCRYPTION_KEY`, `JWT_SECRET`...): al copiar datos entre entornos, revisa que los tokens de API y de transferencia se vuelvan a crear en producción.
 
@@ -135,8 +135,8 @@ Si cambias el texto original en el código de una clave que ya existe en la base
 
 ## Qué ve el equipo en el panel
 
-- **Inicio:** widgets *Páginas legales por publicar* (de las 7, las que no están publicadas en cada idioma) y *Tours sin foto o sin descargo*. Cada uno solo aparece a quien puede leer ese contenido. Los datos salen de `GET /desertica/overview` (solo lectura, solo administradores). La página de inicio de Strapi 5 es personalizable: cada persona puede quitar o mover widgets con *Añadir widget*.
-- **Editor del tour:** panel lateral *Antes de publicar* con foto, descripción, punto de encuentro, descargo y preguntas frecuentes. Es solo una guía: no bloquea publicar. Usa `unstable_useContentManagerContext` de Strapi (el nombre indica que la API aún puede cambiar al actualizar Strapi).
+- **Inicio:** widgets *Páginas legales por publicar* (Libro de reclamaciones y Mincetur, si no están publicadas en cada idioma) y *Tours sin foto o sin descargo*. Cada uno solo aparece a quien puede leer ese contenido. Los datos salen de `GET /desertica/overview` (solo lectura, solo administradores). La página de inicio de Strapi 5 es personalizable: cada persona puede quitar o mover widgets con *Añadir widget*.
+- **Editor del tour:** panel lateral *Antes de publicar* con foto, descripción, descargo y preguntas frecuentes. Es solo una guía: no bloquea publicar. Usa `unstable_useContentManagerContext` de Strapi (el nombre indica que la API aún puede cambiar al actualizar Strapi).
 - **Vista previa:** botón *Abrir previsualización* con enlace firmado de 10 minutos; requiere que la web verifique la firma.
 - **Menú de Ajustes:** `promoteEE: false` (fijo en `config/admin.ts`) quita las entradas de pago (Historial, Lanzamientos, Review Workflows, SSO, Registros de auditoría); es una opción soportada de Strapi. Lo demás ya depende del rol: el Editor solo ve Inicio, Contenido, Biblioteca de Multimedia y *Descripción general*; Content-Type Builder solo existe en `develop`. No se oculta nada más con CSS/DOM (frágil). *Marketplace* y la casilla de noticias del registro de invitados son de Strapi y no tienen opción de ocultar.
 - **Pantallas de entrada:** inicio de sesión, invitación y recorrido guiado con los textos en español de `translations` en `src/admin/app.tsx`.
@@ -147,15 +147,15 @@ El equipo escribe solo en español: el inglés sale en borrador al publicar (ver
 
 | Menú del panel | Para qué sirve | Notas |
 | --- | --- | --- |
-| Catálogo — Tour | Tours: precio, duración, fotos, itinerario, qué incluye, preguntas, descargo | La dirección web (slug) se crea sola con el nombre y no se puede cambiar. Galería: máximo 6 fotos. *Enfoque de la imagen* elige qué parte de la foto queda visible cuando la tarjeta la recorta; no cambia el archivo. Los iconos se eligen de una lista. Las direcciones de imagen externas y los idiomas están ocultos |
+| Catálogo — Tour | Tours: textos, fotos, itinerario, qué incluye, preguntas, descargo. Precio, duración, formato, idiomas y punto de encuentro se cargan en el backoffice | La dirección web (slug) se crea sola con el nombre y no se puede cambiar. Galería: máximo 6 fotos. *Enfoque de la imagen* elige qué parte de la foto queda visible cuando la tarjeta la recorta; no cambia el archivo. Los iconos se eligen de una lista. Las direcciones de imagen externas están ocultas |
 | Catálogo — Destino | Ciudades o zonas que agrupan tours | Slug automático y fijo |
 | Textos — Texto de la web | Cada texto suelto de la web (botones, títulos, avisos). Lista ordenada por página; cada fila dice en qué página y sección aparece | Solo se edita *Texto que se muestra en la web*; no se pueden crear ni borrar filas ni tocar `{marcadores}` |
 | Medios — Imagen o video de la web | Imágenes y videos fijos de la web (portadas, banners) | Solo se cambia el archivo y el texto alternativo |
-| Páginas — Página | Textos legales y portadas de blog y tienda | Los textos legales no se traducen solos |
+| Páginas — Página | Libro de reclamaciones, Mincetur y portadas de blog y tienda | No se traducen solos; el resto de textos legales está en el backoffice |
 | Blog — Artículo / Tienda — Producto | Artículos y productos | Slug automático y fijo; la galería del producto admite 6 fotos |
-| Sitio — Datos de la empresa | Contacto, redes (cada una con su interruptor «Mostrar en el sitio»; apagado no aparece en la web pero conserva la dirección), razón social, imagen al compartir, **imagen de relleno** (se muestra cuando una foto falta o no carga) y correo que recibe los avisos de reservas y mensajes | |
+| Sitio — Datos de la empresa | Contacto, redes (cada una con su interruptor «Mostrar en el sitio»; apagado no aparece en la web pero conserva la dirección), nombre de la marca, imagen al compartir, **imagen de relleno** (se muestra cuando una foto falta o no carga) y correo que recibe los avisos de reservas y mensajes | El RUC y la razón social se cargan en el backoffice |
 | Sitio — Colores y estilo | Colores, letras, esquinas y animación de entrada | |
-| Sitio — Reglas de reserva | Cómo se comporta el calendario de reservas: meses visibles, mínimo/inicial/máximo de adultos y niños, moneda y garantías junto al formulario | El depósito ya no se usa aquí |
+| Sitio — Reglas de reserva | Cuántos adultos y niños aparecen marcados al abrir el calendario, moneda y garantías junto al formulario | Meses visibles, mínimos, máximo de personas y depósito se definen en el backoffice |
 | Sitio — Formularios | Largo mínimo y máximo del nombre, correo y mensaje del **formulario de contacto** de la web. Los formularios de reserva y de reclamos tienen límites fijos | Solo puede bajar los límites fijos del sistema, no subirlos |
 | Sitio — Menús | Enlaces de la barra superior y del pie | |
 

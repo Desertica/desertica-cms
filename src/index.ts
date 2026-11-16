@@ -8,7 +8,6 @@ import { ensurePlaceholderImage } from './placeholder-image';
 import { registerOverviewRoute } from './overview';
 import { catalogNeedsSeed, clean, markCatalogSeeded, seedLocalized, syncNewTranslations } from './seed-sync';
 import { assertProductionEnv } from './production-env';
-import { registerBookingGuard } from './booking-guard';
 import { registerTourStatusGuard } from './tour-status';
 import { migrateTourBody } from './tour-body';
 import { migrateWhatsapp2 } from './phone2';
@@ -250,11 +249,7 @@ async function seedCatalog(strapi: Core.Strapi) {
       const base = clean({
         slug: t.slug,
         order: t.order === undefined ? undefined : t.order + tourShift,
-        durationHours: t.durationHours,
-        priceFrom: t.priceFrom,
         featured: t.featured,
-        format: t.format,
-        languages: t.languages,
         imageUrl: t.imageUrl,
         galleryUrls: t.galleryUrls,
         itineraryFileUrl: t.itineraryFileUrl,
@@ -267,7 +262,6 @@ async function seedCatalog(strapi: Core.Strapi) {
           seoTitle: l.seoTitle,
           seoDescription: l.seoDescription,
           assurances: features(l.assurances),
-          meeting: l.meeting,
           paragraphs: items(l.paragraphs),
           expandedParagraphs: items(l.expandedParagraphs),
           termsSummary: l.termsSummary,
@@ -308,9 +302,13 @@ async function seedSingles(strapi: Core.Strapi, source: string) {
   const exists = (uid: string, locale?: string) =>
     strapi.documents(uid as any).findFirst(locale ? { locale } : {});
 
+  // seed/catalog.json may still carry data that moved to the backoffice (fiscal identity, booking rules); it is not seeded here.
+  const moved = ['legalName', 'ruc', 'depositRate', 'availabilityMonths', 'adultsMin', 'childrenMin', 'peopleMax'];
+  const kept = (o: Record<string, any>) => clean(Object.fromEntries(Object.entries(o).filter(([k]) => !moved.includes(k))));
+
   const siteUid = 'api::site-setting.site-setting';
   if (catalog.siteSetting && !(await exists(siteUid))) {
-    await strapi.documents(siteUid).create({ data: clean(catalog.siteSetting) as any });
+    await strapi.documents(siteUid).create({ data: kept(catalog.siteSetting) as any });
     strapi.log.info('[seed] site-setting created');
   }
 
@@ -332,8 +330,8 @@ async function seedSingles(strapi: Core.Strapi, source: string) {
   if (catalog.bookingSetting && !(await exists(bookingUid, 'en'))) {
     const { i18n, ...base } = catalog.bookingSetting;
     const localized = (l: any) => ({ assurances: features(l.assurances) });
-    const created = await strapi.documents(bookingUid).create({ locale: 'en', data: { ...clean(base), ...localized(i18n.en) } as any });
-    await strapi.documents(bookingUid).update({ documentId: created.documentId, locale: 'es', data: { ...clean(base), ...localized(i18n.es) } as any });
+    const created = await strapi.documents(bookingUid).create({ locale: 'en', data: { ...kept(base), ...localized(i18n.en) } as any });
+    await strapi.documents(bookingUid).update({ documentId: created.documentId, locale: 'es', data: { ...kept(base), ...localized(i18n.es) } as any });
     strapi.log.info('[seed] booking-setting created');
   }
 
@@ -355,23 +353,20 @@ async function seedSingles(strapi: Core.Strapi, source: string) {
   }
 }
 
-/** Legal pages created empty (as drafts) when missing, once per database; editors fill and publish them. */
-const EXTRA_PAGES = [
-  { slug: 'cancellation', title: { en: 'Cancellation and refund policy', es: 'Política de cancelación y reembolso' } },
-  { slug: 'cookies', title: { en: 'Cookie policy', es: 'Política de cookies' } },
-];
+/** Legal texts moved to the backoffice (API `LegalDocument`): their CMS pages are deleted, once per database. */
+const MOVED_LEGAL_SLUGS = ['terms', 'privacy', 'cancellation', 'cookies', 'conduct'];
 
-async function ensureExtraPages(strapi: Core.Strapi) {
-  const store = strapi.store({ type: 'plugin', name: 'desertica', key: 'extra-pages' });
+async function removeMovedLegalPages(strapi: Core.Strapi) {
+  const store = strapi.store({ type: 'plugin', name: 'desertica', key: 'legal-pages-removed' });
   if (await store.get({})) return;
-  const uid = 'api::page.page' as any;
-  for (const { slug, title } of EXTRA_PAGES) {
-    const found = await strapi.documents(uid).findFirst({ locale: 'en', filters: { slug } });
-    if (found) continue;
-    const created = await strapi.documents(uid).create({ locale: 'en', data: { slug, title: title.en } as any });
-    await strapi.documents(uid).update({ documentId: created.documentId, locale: 'es', data: { slug, title: title.es } as any });
-    strapi.log.info(`[seed] empty draft page "${slug}" created`);
+  const pages = strapi.documents('api::page.page' as any) as any;
+  const ids = new Set<string>();
+  for (const locale of ['en', 'es']) {
+    const found: { documentId: string }[] = await pages.findMany({ locale, status: 'draft', filters: { slug: { $in: MOVED_LEGAL_SLUGS } }, fields: ['slug'], limit: 50 });
+    for (const page of found) ids.add(page.documentId);
   }
+  for (const documentId of ids) await pages.delete({ documentId, locale: '*' });
+  strapi.log.info(`[bootstrap] ${ids.size} legal pages removed (they live in the backoffice now)`);
   await store.set({ value: { done: true } });
 }
 
@@ -380,13 +375,12 @@ export default {
     registerTranslateRoute(strapi);
     registerOverviewRoute(strapi);
     registerPlaceholderGuard(strapi);
-    registerBookingGuard(strapi);
     registerEditorRules(strapi);
     registerAutoTranslate(strapi);
     registerSortKey(strapi);
     registerTourStatusGuard(strapi);
     // Server side twin of `register()` in src/admin/app.tsx. The stored value is a plain string.
-    for (const name of ['map-link', 'format-select', 'focus-select']) strapi.customFields.register({ name, type: 'string' });
+    strapi.customFields.register({ name: 'focus-select', type: 'string' });
     strapi.customFields.register({ name: 'icon-picker', type: 'enumeration' }); // keeps the `enum` list of the attribute
     assertProductionEnv(process.env);
   },
@@ -475,9 +469,9 @@ export default {
       strapi.log.error(`[bootstrap] sortKey backfill failed (boot continues): ${(error as Error).message}`);
     }
     try {
-      await ensureExtraPages(strapi);
+      await removeMovedLegalPages(strapi);
     } catch (error) {
-      strapi.log.error(`[seed] extra pages failed (boot continues): ${(error as Error).message}`);
+      strapi.log.error(`[bootstrap] legal page removal failed (boot continues): ${(error as Error).message}`);
     }
   },
 };

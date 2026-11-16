@@ -1,8 +1,8 @@
 import type { Core } from '@strapi/strapi';
 import { type Gap, tourGaps } from './tour-gaps.ts';
 
-/** The seven legal pages the website links from its footer; the hub pages (blog, products) are not part of it. */
-export const LEGAL_SLUGS = ['terms', 'privacy', 'complaints', 'conduct', 'legal-mincetur', 'cancellation', 'cookies'];
+/** The legal pages still written here; terms, privacy, cancellation, cookies and conduct live in the backoffice. */
+export const LEGAL_SLUGS = ['complaints', 'legal-mincetur'];
 const LOCALES = ['es', 'en'];
 
 type Can = (action: string, uid: string) => boolean;
