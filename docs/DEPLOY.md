@@ -9,14 +9,14 @@ El CI (`.github/workflows/ci.yml`) construye la imagen pero no la publica. Cooli
 | `APP_KEYS` | si | 4 secretos separados por coma (`openssl rand -base64 16` cuatro veces) |
 | `API_TOKEN_SALT`, `ADMIN_JWT_SECRET`, `TRANSFER_TOKEN_SALT`, `ENCRYPTION_KEY`, `JWT_SECRET` | si | Un secreto distinto cada uno. Cambiar `ADMIN_JWT_SECRET`/`JWT_SECRET` cierra las sesiones; cambiar `ENCRYPTION_KEY` rompe lo cifrado (tokens de transferencia) |
 | `PUBLIC_URL` | si | URL publica del CMS, `https://cms.ejemplo.com` (sin barra final). Define la URL del admin; no vuelve absolutas las URLs de los medios |
-| `PROXY` | si hay proxy | `true` detras de un proxy inverso con TLS (cookies seguras del admin, IP real) |
+| `PROXY` | si (produccion) | `true` detras de un proxy inverso con TLS (cookies seguras del admin, IP real); con `NODE_ENV=production` el CMS no arranca sin el |
 | `CLIENT_URLS` | si (sin ella el CMS no arranca en produccion) | Origenes CORS, separados por coma (origen del frontend y del admin si se sirve aparte) |
-| `FORMS_PROXY_SECRET` | opcional | Mismo valor que en el servidor Angular. Solo firma la vista previa de borradores; sin el no hay boton |
+| `FORMS_PROXY_SECRET` | opcional | Mismo valor que en el servidor Angular. Solo firma la vista previa de borradores; sin el no hay boton. En produccion, 32 caracteres o mas (`openssl rand -hex 32`) |
 | `DATABASE_CLIENT` | si | `postgres` en produccion (`sqlite` solo desarrollo) |
 | `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_NAME`, `DATABASE_USERNAME`, `DATABASE_PASSWORD` | si (postgres) | Conexion. Opcionales: `DATABASE_SSL`, `DATABASE_SSL_REJECT_UNAUTHORIZED`, `DATABASE_SCHEMA`, `DATABASE_POOL_MIN/MAX` |
 | `SEED_ON_EMPTY` | no | `true` (por defecto) siembra una base que nunca se sembro (una vez; queda marcada en la base). Poner `false` tras el primer arranque |
 | `UPLOAD_PROVIDER` | no | `local` (por defecto, `public/uploads`) o `aws-s3` |
-| `UPLOAD_MAX_FILE_SIZE_MB` | no | Limite por archivo, 200 por defecto (cuerpo HTTP y plugin upload); si hay proxy inverso, subir tambien su limite (nginx `client_max_body_size`) |
+| `UPLOAD_MAX_FILE_SIZE_MB` | no | Limite por archivo, 100 por defecto (cuerpo HTTP y plugin upload); si hay proxy inverso, subir tambien su limite (nginx `client_max_body_size`) |
 | `S3_BUCKET`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | con `aws-s3` | Bucket y credenciales (sin llaves se usa la cadena por defecto del SDK, p. ej. rol IAM) |
 | `S3_ENDPOINT`, `S3_FORCE_PATH_STYLE` | R2/MinIO/Spaces | Endpoint compatible S3; `S3_FORCE_PATH_STYLE=true` para MinIO |
 | `S3_PUBLIC_URL` | recomendada | URL publica del bucket o CDN, prefijo de las URLs de los medios. Se anade a la CSP |
