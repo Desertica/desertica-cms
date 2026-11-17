@@ -1,6 +1,5 @@
-import { Box, Button, Field, Flex, SingleSelect, SingleSelectOption, TextInput, Typography } from '@strapi/design-system';
+import { Button, Field, Flex, SingleSelect, SingleSelectOption, Typography } from '@strapi/design-system';
 import { useField } from '@strapi/strapi/admin';
-import { parseMapLink } from '../map-url';
 import { ICONS } from './icons';
 
 type Props = { name: string; label?: string; hint?: string; required?: boolean; disabled?: boolean };
@@ -91,12 +90,6 @@ const choiceField = (choices: Array<[string, string]>) =>
     );
   };
 
-export const FormatSelect = choiceField([
-  ['both', 'Grupal y privado'],
-  ['shared', 'Solo grupal'],
-  ['private', 'Solo privado'],
-]);
-
 export const FocusSelect = choiceField([
   ['center', 'Centro'],
   ['top', 'Arriba'],
@@ -104,38 +97,3 @@ export const FocusSelect = choiceField([
   ['left', 'Izquierda'],
   ['right', 'Derecha'],
 ]);
-
-/** Google Maps link with a live check and, when the link says where it points, a small map. */
-export const MapLink = ({ name, label, hint, required, disabled }: Props) => {
-  const field = useField(name);
-  const link = parseMapLink(typeof field.value === 'string' ? field.value : '');
-  return (
-    <Field.Root name={name} id={name} error={field.error} hint={hint} required={required}>
-      <Flex direction="column" alignItems="stretch" gap={2}>
-        <Field.Label>{label}</Field.Label>
-        <TextInput
-          name={name}
-          value={String(field.value ?? '')}
-          placeholder="https://maps.app.goo.gl/..."
-          disabled={disabled}
-          onChange={(event: { target: { value: string } }) => field.onChange(name, event.target.value)}
-        />
-        {link.kind === 'invalid' && <Typography variant="pi" textColor="danger600">Eso no parece un enlace. Pega el enlace de Google Maps completo, que empieza con https://</Typography>}
-        {link.kind === 'other' && <Typography variant="pi" textColor="warning600">No se puede previsualizar aquí (no es de Google Maps o no trae coordenadas). El enlace sirve igual: ábrelo para comprobarlo.</Typography>}
-        {link.kind === 'short' && <Typography variant="pi" textColor="neutral600">Enlace corto de Google Maps: no se puede previsualizar aquí. Ábrelo para comprobar que llega al punto de encuentro.</Typography>}
-        {link.kind === 'place' && (
-          <Box borderColor="neutral200" hasRadius overflow="hidden" height="220px">
-            <iframe title="Vista previa del mapa" src={link.embed} width="100%" height="220" style={{ border: 0 }} loading="lazy" referrerPolicy="no-referrer" sandbox="allow-scripts allow-same-origin" />
-          </Box>
-        )}
-        {(link.kind === 'place' || link.kind === 'short' || link.kind === 'other') && (
-          <a href={link.url} target="_blank" rel="noopener noreferrer">
-            <Typography variant="pi" textColor="primary600">Abrir en una pestaña nueva</Typography>
-          </a>
-        )}
-        <Field.Hint />
-        <Field.Error />
-      </Flex>
-    </Field.Root>
-  );
-};

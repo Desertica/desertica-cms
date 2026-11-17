@@ -63,10 +63,10 @@ Usa una base de pruebas o local: crea y borra un token de API temporal, y el log
 | Tipo | i18n | Draft/Publish | Campos |
 | --- | --- | --- | --- |
 | `destination` | si | si | no localizados: `slug`, `order`, `footerOrder`, `showInFooter`, `imageUrl`, `image`; localizados: `title`, `lead`, `allLabel`; relacion `tours` |
-| `tour` | si | si | no localizados: `slug`, `order`, `durationHours`, `priceFrom`, `featured`, `format`, `languages`, `imageUrl`, `image`, `galleryUrls`, `gallery`, `itineraryFile`, `itineraryFileUrl`, `destination`; localizados: `title`, `description`, `lead`, `meeting`, `termsSummary`, `seoTitle`, `seoDescription`, `assurances` (`shared.feature`, opcional: sustituye las de `booking-setting`), `paragraphs`, `expandedParagraphs` (`shared.list-item`), `practices` (`shared.feature`), `itinerary` (`shared.stop`: `image`, `imageUrl`, `title`, `body`, `expandedBody`), `videos` (`shared.video`: `poster`/`posterUrl`, `webm`/`webmUrl`, `mp4`/`mp4Url`), `included`, `excluded`, `pack`, `notes` (`shared.list-item`) |
-| `site-setting` (single) | no | no | `email`, `phone`, `whatsapp`, redes (`instagram`, `facebook`, `tiktok`, `youtube`, `linkedin`, `google`, `tripadvisor`; cada una con su interruptor booleano `showInstagram`... `showTripadvisor`, por defecto apagado), `legalName`, `ruc`, `brandName`, `legalYear`, `shareImage`/`shareImageUrl` |
+| `tour` | si | si | no localizados: `slug`, `order`, `featured`, `imageUrl`, `image`, `galleryUrls`, `gallery`, `itineraryFile`, `itineraryFileUrl`, `destination`; localizados: `title`, `description`, `lead`, `termsSummary`, `seoTitle`, `seoDescription`, `assurances` (`shared.feature`, opcional: sustituye las de `booking-setting`), `paragraphs`, `expandedParagraphs` (`shared.list-item`), `practices` (`shared.feature`), `itinerary` (`shared.stop`: `image`, `imageUrl`, `title`, `body`, `expandedBody`), `videos` (`shared.video`: `poster`/`posterUrl`, `webm`/`webmUrl`, `mp4`/`mp4Url`), `included`, `excluded`, `pack`, `notes` (`shared.list-item`) |
+| `site-setting` (single) | no | no | `email`, `phone`, `whatsapp`, redes (`instagram`, `facebook`, `tiktok`, `youtube`, `linkedin`, `google`, `tripadvisor`; cada una con su interruptor booleano `showInstagram`... `showTripadvisor`, por defecto apagado), `brandName`, `legalYear`, `shareImage`/`shareImageUrl` |
 | `theme-setting` (single) | no | no | `light`, `dark` (componente `theme.palette`, 22 colores en hex con selector de color, plugin oficial `@strapi/plugin-color-picker` 5.59.0, habilitado en `config/plugins.ts`), `fontSans`, `fontHeading` (selector de 9 fuentes), `radius` (none/small/medium/large/full), `headerSize` (compact/standard/tall), `introEnabled`, `introAccent`, `introRestScale`, `introFailsafeMs` |
-| `booking-setting` (single) | si | no | no localizados: `depositRate` (0..1, obsoleto: el deposito lo decide el API), `availabilityMonths` (1..12, por defecto 3), `adultsMin`, `adultsDefault`, `childrenMin`, `childrenDefault`, `peopleMax`, `currencyCode`; localizado: `assurances` (`shared.feature`) |
+| `booking-setting` (single) | si | no | no localizados: `adultsDefault`, `childrenDefault`, `currencyCode`; localizado: `assurances` (`shared.feature`) |
 | `form-setting` (single) | no | no | `nameMin`, `nameMax`, `emailMax`, `messageMax` |
 | `navigation` (single) | si | no | localizados: `headerLinks`, `footerBrandLinks`, `footerLegalLinks` (`shared.nav-link`: `label`, `path`, `fragment`, `kind` = `link`/`tours-menu`), `planTripLabel`, `planTripPath` |
 | `translation` | si | no | no localizados: `key`, `group`, `page`, `section`, `label`, `note`, `kind` (`short`/`long`); localizado: `value` (cadenas de interfaz de `src/locales/{en,es}.json`, sin las claves de tours y destinos) |
@@ -79,9 +79,10 @@ Las imagenes pueden venir de `imageUrl`/`galleryUrls`/`itineraryFileUrl` (URLs e
 
 Notas del modelo:
 
-- `tour` incluye ademas `waiverBody` (descargo de responsabilidad, localizado), `latitude`, `longitude`, `meetingPointUrl` y `faqs[]` (`shared.faq`, localizado); todos opcionales. Detalle y populate en `CONTRACT.md`.
-- Para probar con textos de ejemplo NO LEGALES (descargo, cancelacion, cookies) en un CMS de desarrollo: `docs/DEV-LEGAL-SAMPLES.md`.
-- Las paginas legales `cancellation` y `cookies` se crean vacias y en borrador al arrancar (una vez); hay que redactarlas y publicarlas. Slugs por documento legal en `CONTRACT.md`.
+- `tour` incluye ademas `waiverBody` (descargo de responsabilidad, localizado) y `faqs[]` (`shared.faq`, localizado); opcionales. Detalle y populate en `CONTRACT.md`.
+- Precios, duracion, formato, idiomas y punto de encuentro de cada tour, las reglas de reserva (meses, minimos, maximo, deposito) y la identidad fiscal (RUC, razon social) viven en el backoffice (`desertica-api`), no aqui. Campos retirados y orden de despliegue en `CONTRACT.md`.
+- Para probar con un descargo de ejemplo NO LEGAL en un CMS de desarrollo: `docs/DEV-LEGAL-SAMPLES.md`.
+- Terminos, privacidad, cancelacion, cookies y conducta se escriben en el backoffice, no aqui; sus paginas se borran al arrancar (una vez). En el CMS quedan `complaints` y `legal-mincetur`. Detalle en `CONTRACT.md`.
 - Webhook de publicacion (opcional): `docs/WEBHOOKS.md`.
 
 ## Organizacion del admin

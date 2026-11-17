@@ -88,8 +88,6 @@ export default {
     // Custom fields (server side twin: `register()` in src/index.ts). The stored value is a plain string.
     for (const [name, component, title, type] of [
       ['icon-picker', 'IconPicker', 'Icono', 'enumeration'],
-      ['map-link', 'MapLink', 'Enlace de mapa', 'string'],
-      ['format-select', 'FormatSelect', 'Formato del tour', 'string'],
       ['focus-select', 'FocusSelect', 'Enfoque de la imagen', 'string'],
     ] as const) {
       app.customFields.register({

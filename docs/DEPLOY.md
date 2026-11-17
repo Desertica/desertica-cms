@@ -43,7 +43,7 @@ Sin Docker: `npm ci && npm run build && NODE_ENV=production npm run start` con l
 ## Lista de primera puesta en marcha
 
 1. Crear el administrador (comando de arriba o `/admin` si no hay ninguno).
-2. Editar **Sitio — Datos de la empresa**: email, telefono, WhatsApp (solo digitos), redes y datos legales (el seed trae marcadores `XXXX`). Revisar Colores y estilo, Reglas de reserva, Formularios y Menús.
+2. Editar **Sitio — Datos de la empresa**: email, telefono, WhatsApp (solo digitos), redes (el seed trae marcadores `XXXX`). Revisar Colores y estilo, Reglas de reserva, Formularios y Menús. El RUC, la razon social, los precios y las reglas de reserva se cargan en el backoffice, no aqui.
 3. Subir los medios en **Media Library** y asignarlos (tours: `image`, `gallery`, `itineraryFile`, `itinerary[].image`, `videos`; destinos, `media-slot`, paginas, blog, productos, `shareImage`). Publicar cada idioma (`en` y `es`). Un medio subido tiene prioridad sobre su campo `*Url`.
 4. Poner `SEED_ON_EMPTY=false` y reiniciar (evita resembrar si algun dia la base queda vacia).
 5. No hace falta webhook ni reconstruir el frontend: todas sus rutas se renderizan por peticion y leen el CMS con una cache corta (30 s por defecto, `STRAPI_CACHE_TTL_MS` en el frontend).
@@ -64,7 +64,7 @@ En el servidor Angular (no en el navegador): `STRAPI_URL` (URL con la que el ser
 ## Actualizaciones
 
 - Producción despliega solo lo que llega a la rama `prod` por PR desde `staging`; no usar etiquetas `latest` ni desplegar desde `main`. Respaldar la base antes de actualizar.
-- Cambios de esquema de Strapi se aplican solos al arrancar; no hay migraciones manuales salvo que `database/migrations` las incluya.
+- Cambios de esquema de Strapi se aplican solos al arrancar; no hay migraciones manuales salvo que `database/migrations` las incluya. Quitar un atributo **borra su columna** al arrancar: antes de desplegar una version que retira campos, seguir el "Orden de despliegue" de `CONTRACT.md`.
 - Actualizar Strapi: subir las tres dependencias `@strapi/*` juntas a la misma version, `npm install`, `npm run build`, probar en local con una copia de la base.
 - Cambiar un campo del contrato (ver `CONTRACT.md`) requiere desplegar tambien el frontend.
 

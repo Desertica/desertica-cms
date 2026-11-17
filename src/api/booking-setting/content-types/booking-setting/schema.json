@@ -5,7 +5,7 @@
     "singularName": "booking-setting",
     "pluralName": "booking-settings",
     "displayName": "Sitio — Reglas de reserva",
-    "description": "Calendar months shown, party size limits, currency and the assurances shown next to the booking form. The deposit is decided by the booking API."
+    "description": "Initial party size, currency and the assurances shown next to the booking form. The booking rules (months, limits, deposit) live in the backoffice."
   },
   "options": {
     "draftAndPublish": false
@@ -16,38 +16,6 @@
     }
   },
   "attributes": {
-    "depositRate": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      },
-      "type": "decimal",
-      "min": 0,
-      "max": 1,
-      "default": 0.2
-    },
-    "availabilityMonths": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      },
-      "type": "integer",
-      "min": 1,
-      "max": 12,
-      "default": 3
-    },
-    "adultsMin": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      },
-      "type": "integer",
-      "min": 0,
-      "default": 1
-    },
     "adultsDefault": {
       "pluginOptions": {
         "i18n": {
@@ -58,16 +26,6 @@
       "min": 0,
       "default": 1
     },
-    "childrenMin": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      },
-      "type": "integer",
-      "min": 0,
-      "default": 0
-    },
     "childrenDefault": {
       "pluginOptions": {
         "i18n": {
@@ -77,16 +35,6 @@
       "type": "integer",
       "min": 0,
       "default": 0
-    },
-    "peopleMax": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      },
-      "type": "integer",
-      "min": 1,
-      "default": 12
     },
     "currencyCode": {
       "pluginOptions": {
