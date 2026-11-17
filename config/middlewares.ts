@@ -15,7 +15,7 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Middlewar
   ].filter(Boolean);
 
   // Same variable as the upload plugin limit (config/plugins.ts): both limits always agree.
-  const maxFileSize = env.int('UPLOAD_MAX_FILE_SIZE_MB', 200) * 1024 * 1024;
+  const maxFileSize = env.int('UPLOAD_MAX_FILE_SIZE_MB', 100) * 1024 * 1024;
 
   return [
     'strapi::logger',
@@ -26,7 +26,8 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Middlewar
         contentSecurityPolicy: {
           useDefaults: true,
           directives: {
-            'connect-src': ["'self'", 'https:'],
+            // Only our own hosts: injected script in the panel cannot send data to any other server.
+            'connect-src': mediaHosts,
             'img-src': [...mediaHosts, 'images.unsplash.com', '*.unsplash.com'],
             'media-src': [...mediaHosts, '*.unsplash.com'],
             upgradeInsecureRequests: null,

@@ -37,7 +37,7 @@ docker compose up -d --build   # cms + postgres 16, volumenes pgdata y uploads
 | `SEED_ON_EMPTY` | `false` desactiva el seed inicial |
 | `STRAPI_PLUGIN_I18N_INIT_LOCALE_CODE` | Locale por defecto (`en`) |
 | `PROXY` | `true` detras de un proxy inverso con TLS |
-| `UPLOAD_PROVIDER` (`local`/`aws-s3`), `UPLOAD_MAX_FILE_SIZE_MB` (200), `S3_*`, `MEDIA_HOSTS` | Medios: proveedor, limite por archivo, bucket/credenciales/endpoint/URL publica, hosts extra de la CSP |
+| `UPLOAD_PROVIDER` (`local`/`aws-s3`), `UPLOAD_MAX_FILE_SIZE_MB` (100), `S3_*`, `MEDIA_HOSTS` | Medios: proveedor, limite por archivo, bucket/credenciales/endpoint/URL publica, hosts extra de la CSP |
 | `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD` (opcionales `SMTP_PORT` 587, `SMTP_SECURE` false) | Aviso por correo de reservas y mensajes nuevos, solo con `SMTP_HOST`: va al correo de *Datos de la empresa* y sale desde `SMTP_USER`; un fallo de envio nunca afecta al formulario |
 | `DEEPL_API_KEY` (opcional `DEEPL_API_URL`) | Traduccion automatica: cada guardado en espanol de tours, destinos, articulos y productos reescribe el ingles; panel manual para textos, medios, reglas de reserva y menus |
 | `SLUGS_LOCKED` | `true` en produccion: el slug queda fijo tras la primera publicacion. Sin ella (staging) sigue al nombre en ingles |
@@ -45,7 +45,7 @@ docker compose up -d --build   # cms + postgres 16, volumenes pgdata y uploads
 
 ## Medios y verificacion de subidas
 
-Con el proveedor local los medios quedan en `public/uploads` y la API devuelve `url` **relativa** (`/uploads/<nombre>_<hash>.<ext>`); el frontend la resuelve con `STRAPI_PUBLIC_URL`. `PUBLIC_URL` no la vuelve absoluta; con `UPLOAD_PROVIDER=aws-s3` la URL es absoluta (`S3_PUBLIC_URL`). Los videos se sirven con `Accept-Ranges: bytes` (206 para `Range`), necesario para reproducir y buscar. El limite por archivo es `UPLOAD_MAX_FILE_SIZE_MB` (200 por defecto). Las imagenes se optimizan y generan miniaturas (`formats`: thumbnail/small/medium/large).
+Con el proveedor local los medios quedan en `public/uploads` y la API devuelve `url` **relativa** (`/uploads/<nombre>_<hash>.<ext>`); el frontend la resuelve con `STRAPI_PUBLIC_URL`. `PUBLIC_URL` no la vuelve absoluta; con `UPLOAD_PROVIDER=aws-s3` la URL es absoluta (`S3_PUBLIC_URL`). Los videos se sirven con `Accept-Ranges: bytes` (206 para `Range`), necesario para reproducir y buscar. El limite por archivo es `UPLOAD_MAX_FILE_SIZE_MB` (100 por defecto). Las imagenes se optimizan y generan miniaturas (`formats`: thumbnail/small/medium/large).
 
 `scripts/verify-uploads.mjs` (Node >= 20, sin dependencias) prueba todo esto contra una instancia en marcha: sube imagen, PNG, PDF, WebM y MP4 por `POST /api/upload`, los adjunta a tour `dune-buggy`, destino `huacachina`, media-slots `about.video`/`about.trio`, pagina `terms`, `site-setting`, y a un blog-post y un producto nuevos (en y es), lee la API publica con los mismos populate del frontend, descarga cada URL (estado, content-type, tamano, Range de video) y restaura/borra todo lo que toco.
 
