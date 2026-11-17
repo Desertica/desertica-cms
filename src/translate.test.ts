@@ -44,12 +44,7 @@ test('collects only localized copy and rebuilds it with the translations, keepin
   });
 });
 
-test('legal texts never reach DeepL: not the waiver, not any page', async () => {
-  const texts: string[] = [];
-  const waiver = { type: 'customField', customField: 'plugin::ckeditor5.CKEditor', ...localized };
-  assert.equal(plan(strapi, { waiverBody: waiver } as any, { waiverBody: 'I accept the risks' }, true, texts).length, 0);
-  assert.deepEqual(texts, []);
-
+test('legal pages never reach DeepL', async () => {
   await assert.rejects(translateDocument({} as any, 'api::page.page', 'doc', 'en', 'es'), { status: 422 });
 });
 

@@ -29,7 +29,7 @@ export async function overview(strapi: Core.Strapi, can: Can) {
     for (const locale of LOCALES) {
       const tours: any[] = await docs('api::tour.tour').findMany({ locale, status: 'draft', populate: { image: true, faqs: true }, limit: 500 });
       for (const t of tours) {
-        const gaps = tourGaps(t).filter((g) => g === 'photo' || g === 'waiver');
+        const gaps = tourGaps(t).filter((g) => g === 'photo');
         if (gaps.length) out.tours.push({ documentId: t.documentId, locale, title: t.title, gaps });
       }
     }

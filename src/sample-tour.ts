@@ -51,7 +51,6 @@ const localized = (lang: 'en' | 'es') => ({
   })),
   videos: [PHOTOS[0], PHOTOS[3]].map((id) => ({ posterUrl: PHOTO(id, 1200, 675), mp4Url: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4' })),
   faqs: [1, 2, 3, 4].map((n) => ({ question: `Lorem ipsum question ${n}?`, answer: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.' })),
-  waiverBody: '## Lorem ipsum waiver\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. **Example text, not legal.**\n\n- Sed do eiusmod tempor\n- Ut labore et dolore magna aliqua',
 });
 
 /**

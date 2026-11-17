@@ -43,7 +43,6 @@ export const CONTENT_TYPE_FIELDS: Record<string, Fields> = {
     itineraryFileUrl: f('Itinerario en PDF (dirección externa)', 'Opcional. Solo se usa si no hay archivo subido.'),
     assurances: f('Garantías de este tour', 'Opcional. Si lo llenas, reemplaza las garantías generales de "Reglas de reserva" solo para este tour.'),
     faqs: f('Preguntas frecuentes', 'Se muestran en la ficha y ayudan al posicionamiento en Google.'),
-    waiverBody: f('Descargo de responsabilidad', 'Texto en Markdown que firma cada pasajero. Cada cambio PUBLICADO crea una versión nueva y los pasajeros firman la vigente al reservar. Revísalo antes de publicar; guardar un borrador no cambia nada.'),
     seoTitle: f('Título para Google', 'Déjalo vacío: se usa el nombre del tour y la web añade la marca. Solo escríbelo si el nombre es muy largo (Google muestra unos 60 caracteres)).'),
     seoDescription: f('Descripción para Google', 'Déjalo vacío: se usa el primer párrafo de la Descripción, cortado a unos 155 caracteres (lo que Google muestra). Solo escríbelo para un texto distinto.'),
   },

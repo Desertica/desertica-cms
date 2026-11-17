@@ -283,18 +283,6 @@
       },
       "type": "string"
     },
-    "waiverBody": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "type": "customField",
-      "customField": "plugin::ckeditor5.CKEditor",
-      "options": {
-        "preset": "defaultMarkdown"
-      }
-    },
     "faqs": {
       "pluginOptions": {
         "i18n": {

@@ -46,7 +46,7 @@ Localizados = un valor por idioma (`en` por defecto, `es`). El resto se sincroni
 | Tipo | Campos no localizados | Campos localizados |
 | --- | --- | --- |
 | `destination` | `slug`, `order`, `footerOrder`, `showInFooter`, `image`, `imageUrl` | `title`, `lead`, `allLabel` |
-| `tour` | `slug`, `order`, `destination`, `featured`, `imageFocus` (`center`/`top`/`bottom`/`left`/`right`, por defecto `center`: parte de la foto que queda visible al recortarla en la tarjeta), `image`, `imageUrl`, `gallery`, `galleryUrls`, `itineraryFile`, `itineraryFileUrl` | `title`, `seoTitle`, `seoDescription`, `assurances[]` (opcional, sustituye las globales), `description` (resumen para tarjetas), `body` (descripción completa: párrafos separados por línea en blanco; la ficha muestra el primero como entrada y el resto debajo, y el desplegable los repite), `lead`, `termsSummary`, `paragraphs[]`, `expandedParagraphs[]`, `practices[]`, `itinerary[]`, `videos[]`, `included[]`, `excluded[]`, `pack[]`, `notes[]`, `waiverBody` (Markdown), `faqs[]` (`shared.faq`) |
+| `tour` | `slug`, `order`, `destination`, `featured`, `imageFocus` (`center`/`top`/`bottom`/`left`/`right`, por defecto `center`: parte de la foto que queda visible al recortarla en la tarjeta), `image`, `imageUrl`, `gallery`, `galleryUrls`, `itineraryFile`, `itineraryFileUrl` | `title`, `seoTitle`, `seoDescription`, `assurances[]` (opcional, sustituye las globales), `description` (resumen para tarjetas), `body` (descripción completa: párrafos separados por línea en blanco; la ficha muestra el primero como entrada y el resto debajo, y el desplegable los repite), `lead`, `termsSummary`, `paragraphs[]`, `expandedParagraphs[]`, `practices[]`, `itinerary[]`, `videos[]`, `included[]`, `excluded[]`, `pack[]`, `notes[]`, `faqs[]` (`shared.faq`) |
 | `translation` | `key`, `group`, `page`, `section`, `label`, `note`, `kind` (`short`/`long`) | `value` |
 | `media-slot` | `key`, `page`, `section`, `description`, `image`, `imageUrl`, `video`, `videoUrl`, `videoWebmUrl`, `poster`, `posterUrl` | `alt` |
 | `page` | `slug`, `heroImage`, `heroImageUrl` | `title`, `lead`, `body` (Markdown), `seoTitle`, `seoDescription` |
@@ -94,7 +94,6 @@ Campos nuevos de `tour`:
 
 | Campo | Tipo | Localizado | Populate | Notas |
 | --- | --- | --- | --- | --- |
-| `waiverBody` | richtext (Markdown) | si | ninguno (campo plano) | texto del descargo de responsabilidad que firma cada pasajero; `null` = el tour no define uno |
 | `faqs[]` | componente repetible `shared.faq` {`question`, `answer`} | si | `populate[faqs]=true` | para la ficha y para datos estructurados (`FAQPage`) |
 
 Los campos planos nuevos se devuelven sin populate (con `fields[]` explicito hay que listarlos); solo `faqs` necesita `populate[faqs]=true` (el componente no contiene medios).
@@ -125,15 +124,14 @@ Terminos, privacidad, cancelacion, cookies y conducta (`TERMS`, `PRIVACY`, `CANC
 
 Siguen en el CMS `complaints` y `legal-mincetur` (sembradas en borrador) y los hubs `blog` y `products` (sembrados publicados). El texto va en `body` (Markdown) y es localizado (`en`, `es`).
 
-## Descargo de los tours (`waiverBody`)
+## Descargo de los tours
 
-Cada cambio **publicado** del `waiverBody` genera una version nueva en el API (que guarda el snapshot) y los pasajeros firman el texto vigente al reservar. El CMS no versiona: guardar un borrador no cambia nada para los pasajeros. La ayuda del campo en el admin lo explica.
+El descargo de responsabilidad **no vive en el CMS**: se escribe, versiona y publica en el backoffice (`LegalDocument` de tipo `WAIVER` en el API) y la web muestra el texto que devuelve el API. El campo `tour.waiverBody` ya no existe; al desplegar esta version Strapi borra su columna, asi que va despues del API, el backoffice y la web que dejan de usarlo.
 
 ## Paginas legales en el admin
 
 `complaints` y `legal-mincetur` son del tipo `page` (`title`, `lead`, `body`, SEO) y comparten lista con `blog` y `products`. Se siembran **en borrador**: no aparecen en la web hasta que alguien las redacte y pulse `Publish` en `en` y en `es`. Checklist en `docs/OPERACION.md` (seccion 7).
 
-Descargo de ejemplo NO LEGAL para desarrollo: `docs/DEV-LEGAL-SAMPLES.md`.
 
 ## Inconsistencia `translation.page` vs `media-slot.page`
 

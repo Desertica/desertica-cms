@@ -60,11 +60,11 @@ export const LegalWidget = view(({ legalDrafts = [] }) => (
 
 export const ToursWidget = view(({ tours = [] }) => (
   <Rows
-    empty="Todos los tours tienen foto y descargo."
-    rows={tours.map(({ documentId, locale, title, gaps }) => ({
+    empty="Todos los tours tienen foto."
+    rows={tours.map(({ documentId, locale, title }) => ({
       key: `${documentId}${locale}`,
       to: `/content-manager/collection-types/api::tour.tour/${documentId}?plugins[i18n][locale]=${locale}`,
-      text: `${title} (${LANGUAGE[locale]}): falta ${gaps.map((g) => (g === 'photo' ? 'foto' : 'descargo')).join(' y ')}`,
+      text: `${title} (${LANGUAGE[locale]}): falta foto`,
     }))}
   />
 ));
