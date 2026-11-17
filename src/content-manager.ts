@@ -48,7 +48,6 @@ export const EDIT_LAYOUTS: Record<string, Array<Array<{ name: string; size: numb
     row(['videos', 12]),
     row(['faqs', 12]),
     row(['termsSummary', 12]),
-    row(['waiverBody', 12]),
   ],
   'api::destination.destination': [
     row(['title', 8], ['slug', 4]),

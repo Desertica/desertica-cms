@@ -79,9 +79,8 @@ Las imagenes pueden venir de `imageUrl`/`galleryUrls`/`itineraryFileUrl` (URLs e
 
 Notas del modelo:
 
-- `tour` incluye ademas `waiverBody` (descargo de responsabilidad, localizado) y `faqs[]` (`shared.faq`, localizado); opcionales. Detalle y populate en `CONTRACT.md`.
+- `tour` incluye ademas `faqs[]` (`shared.faq`, localizado), opcional. El descargo de cada tour se escribe en el backoffice, no aqui. Detalle y populate en `CONTRACT.md`.
 - Precios, duracion, formato, idiomas y punto de encuentro de cada tour, las reglas de reserva (meses, minimos, maximo, deposito) y la identidad fiscal (RUC, razon social) viven en el backoffice (`desertica-api`), no aqui. Campos retirados y orden de despliegue en `CONTRACT.md`.
-- Para probar con un descargo de ejemplo NO LEGAL en un CMS de desarrollo: `docs/DEV-LEGAL-SAMPLES.md`.
 - Terminos, privacidad, cancelacion, cookies y conducta se escriben en el backoffice, no aqui; sus paginas se borran al arrancar (una vez). En el CMS quedan `complaints` y `legal-mincetur`. Detalle en `CONTRACT.md`.
 - Webhook de publicacion (opcional): `docs/WEBHOOKS.md`.
 

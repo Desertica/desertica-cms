@@ -118,7 +118,7 @@ export default {
     });
     app.widgets.register([
       widget('legal-drafts', 'Páginas legales por publicar', File, 'api::page.page', 'LegalWidget', { label: 'Ver páginas', href: '/content-manager/collection-types/api::page.page' }),
-      widget('tour-gaps', 'Tours sin foto o sin descargo', Image, 'api::tour.tour', 'ToursWidget', { label: 'Ver tours', href: '/content-manager/collection-types/api::tour.tour' }),
+      widget('tour-gaps', 'Tours sin foto', Image, 'api::tour.tour', 'ToursWidget', { label: 'Ver tours', href: '/content-manager/collection-types/api::tour.tour' }),
     ]);
   },
   bootstrap(app: StrapiApp) {
