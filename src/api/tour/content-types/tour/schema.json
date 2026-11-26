@@ -5,7 +5,7 @@
     "singularName": "tour",
     "pluralName": "tours",
     "displayName": "Catálogo — Tour",
-    "description": "Tours: prices, duration, galleries, itinerary, videos, inclusions and SEO. Belongs to one destination."
+    "description": "Tours: text, galleries, itinerary, videos, inclusions and SEO. Belongs to one destination."
   },
   "options": {
     "draftAndPublish": true
@@ -34,34 +34,6 @@
       "default": 1,
       "min": 1
     },
-    "durationHours": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      },
-      "type": "integer",
-      "required": true,
-      "min": 1
-    },
-    "priceFrom": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      },
-      "type": "float",
-      "min": 0
-    },
-    "pricePen": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      },
-      "type": "float",
-      "min": 0
-    },
     "featured": {
       "pluginOptions": {
         "i18n": {
@@ -70,29 +42,6 @@
       },
       "type": "boolean",
       "default": false
-    },
-    "format": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      },
-      "type": "customField",
-      "customField": "global::format-select",
-      "default": "both",
-      "regex": "^(shared|private|both)$"
-    },
-    "languages": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      },
-      "type": "json",
-      "default": [
-        "es",
-        "en"
-      ]
     },
     "imageUrl": {
       "pluginOptions": {
@@ -178,14 +127,6 @@
       "type": "text"
     },
     "body": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "type": "text"
-    },
-    "meeting": {
       "pluginOptions": {
         "i18n": {
           "localized": true
@@ -341,48 +282,6 @@
         }
       },
       "type": "string"
-    },
-    "meetingPointUrl": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      },
-      "type": "customField",
-      "customField": "global::map-link",
-      "regex": "^https?://\\S+$"
-    },
-    "latitude": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      },
-      "type": "decimal",
-      "min": -90,
-      "max": 90
-    },
-    "longitude": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      },
-      "type": "decimal",
-      "min": -180,
-      "max": 180
-    },
-    "waiverBody": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "type": "customField",
-      "customField": "plugin::ckeditor5.CKEditor",
-      "options": {
-        "preset": "defaultMarkdown"
-      }
     },
     "faqs": {
       "pluginOptions": {

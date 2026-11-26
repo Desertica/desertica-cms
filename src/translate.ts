@@ -6,8 +6,8 @@ const LOCALES = ['en', 'es'] as const;
 type Locale = (typeof LOCALES)[number];
 
 /** Text that is a value, not copy: icons, routes, kinds and media addresses stay as they are. */
-const KEEP = new Set(['waiverBody', 'slug', 'key', 'icon', 'path', 'fragment', 'kind', 'imageUrl', 'posterUrl', 'webmUrl', 'mp4Url', 'planTripPath']);
-/** Legal texts are written and reviewed by a person: pages (terms, privacy...) and, through KEEP, the tours' waiverBody never go to DeepL. */
+const KEEP = new Set(['slug', 'key', 'icon', 'path', 'fragment', 'kind', 'imageUrl', 'posterUrl', 'webmUrl', 'mp4Url', 'planTripPath']);
+/** Legal texts are written and reviewed by a person: pages never go to DeepL. */
 const NOT_TRANSLATED = new Set(['api::page.page']);
 const TEXT_TYPES = new Set(['string', 'text', 'richtext']);
 

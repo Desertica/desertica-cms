@@ -11,13 +11,8 @@ type Overview = {
 };
 
 const PAGE_NAMES: Record<string, string> = {
-  terms: 'Términos y condiciones',
-  privacy: 'Privacidad',
   complaints: 'Libro de reclamaciones',
-  conduct: 'Código de conducta',
   'legal-mincetur': 'Mincetur',
-  cancellation: 'Cancelación y reembolso',
-  cookies: 'Cookies',
 };
 const LANGUAGE: Record<string, string> = { es: 'español', en: 'inglés' };
 
@@ -56,7 +51,7 @@ const view = (render: (data: Overview) => JSX.Element) => () => {
 
 export const LegalWidget = view(({ legalDrafts = [] }) => (
   <Rows
-    empty="Las 7 páginas legales están publicadas."
+    empty="Libro de reclamaciones y Mincetur están publicadas."
     rows={legalDrafts.flatMap(({ locale, slugs }) =>
       slugs.map((slug) => ({ key: `${locale}${slug}`, to: `/content-manager/collection-types/api::page.page?plugins[i18n][locale]=${locale}`, text: `${PAGE_NAMES[slug]} (${LANGUAGE[locale]})` })),
     )}
@@ -65,11 +60,11 @@ export const LegalWidget = view(({ legalDrafts = [] }) => (
 
 export const ToursWidget = view(({ tours = [] }) => (
   <Rows
-    empty="Todos los tours tienen foto y descargo."
-    rows={tours.map(({ documentId, locale, title, gaps }) => ({
+    empty="Todos los tours tienen foto."
+    rows={tours.map(({ documentId, locale, title }) => ({
       key: `${documentId}${locale}`,
       to: `/content-manager/collection-types/api::tour.tour/${documentId}?plugins[i18n][locale]=${locale}`,
-      text: `${title} (${LANGUAGE[locale]}): falta ${gaps.map((g) => (g === 'photo' ? 'foto' : 'descargo')).join(' y ')}`,
+      text: `${title} (${LANGUAGE[locale]}): falta foto`,
     }))}
   />
 ));

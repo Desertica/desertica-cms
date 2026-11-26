@@ -43,7 +43,7 @@ Sin Docker: `npm ci && npm run build && NODE_ENV=production npm run start` con l
 ## Lista de primera puesta en marcha
 
 1. Crear el administrador (comando de arriba o `/admin` si no hay ninguno).
-2. Editar **Sitio — Datos de la empresa**: email, telefono, WhatsApp (solo digitos), redes y datos legales (el seed trae marcadores `XXXX`). Revisar Colores y estilo, Reglas de reserva, Formularios y Menús.
+2. Editar **Sitio — Datos de la empresa**: email, telefono, WhatsApp (solo digitos), redes (el seed trae marcadores `XXXX`). Revisar Colores y estilo, Reglas de reserva, Formularios y Menús. El RUC, la razon social, los precios y las reglas de reserva se cargan en el backoffice, no aqui.
 3. Subir los medios en **Media Library** y asignarlos (tours: `image`, `gallery`, `itineraryFile`, `itinerary[].image`, `videos`; destinos, `media-slot`, paginas, blog, productos, `shareImage`). Publicar cada idioma (`en` y `es`). Un medio subido tiene prioridad sobre su campo `*Url`.
 4. Poner `SEED_ON_EMPTY=false` y reiniciar (evita resembrar si algun dia la base queda vacia).
 5. No hace falta webhook ni reconstruir el frontend: todas sus rutas se renderizan por peticion y leen el CMS con una cache corta (30 s por defecto, `STRAPI_CACHE_TTL_MS` en el frontend).
@@ -61,10 +61,35 @@ En el servidor Angular (no en el navegador): `STRAPI_URL` (URL con la que el ser
 - Guardar fuera del servidor los 6 secretos: sin `ENCRYPTION_KEY`/`API_TOKEN_SALT` originales los tokens existentes dejan de valer.
 - Probar la restauracion en un entorno aparte al menos una vez.
 
+## Pasar los medios a R2 (una vez por entorno)
+
+Cambiar `UPLOAD_PROVIDER` solo afecta a lo que se sube despues: los archivos ya subidos siguen en `public/uploads` y la base guarda sus URLs `/uploads/...`. `scripts/migrate-uploads-to-s3.mjs` (incluido en la imagen) los copia al bucket y actualiza la base. Hacerlo primero en staging.
+
+1. **Respaldar** la base (`pg_dump`, ver "Respaldos"); es la vuelta atras. Avisar a los editores que no suban medios mientras dura.
+2. **Variables en Coolify** (servicio cms, "Environment Variables"), y redesplegar:
+   - `UPLOAD_PROVIDER=aws-s3`
+   - `S3_BUCKET=desertica-media`, `S3_REGION=auto`
+   - `S3_ENDPOINT=https://<ID de cuenta>.r2.cloudflarestorage.com`, `S3_FORCE_PATH_STYLE=true`
+   - `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`: token de API de R2 con "Object Read & Write" solo en `desertica-media` (marcarlas como secretas)
+   - `S3_PUBLIC_URL=https://media.desertica.pe` (dominio propio del bucket, sin barra final)
+   - `S3_ACL` y `S3_ROOT_PATH` vacias. No hace falta `MEDIA_HOSTS`: la CSP del panel ya anade `S3_PUBLIC_URL` a `img-src` y `media-src` (`config/middlewares.ts`).
+3. **Simulacion**: en Coolify, servicio cms > Terminal (contenedor del CMS):
+   ```bash
+   cd /opt/app && node scripts/migrate-uploads-to-s3.mjs --dry-run
+   ```
+   Lista cada archivo y cada texto que cambiaria y termina con `Resumen: {"migrados":…,"omitidos":…,"errores":…,"textos":…,"enlaces":…}`. No sube ni escribe nada. Un "no está en disco" es un archivo que falta en el volumen: queda en `local` y se informa como error.
+4. **Migracion**: el mismo comando sin `--dry-run`. Sube el original y sus formatos (thumbnail, small, medium, large) con la misma clave `<hash><ext>`, y luego cambia `url`, `provider` y las URLs de los formatos. Despues reescribe `/uploads/<archivo>` (relativa o con `PUBLIC_URL`) en los textos (`body`, `content`, `details` y demas campos de texto, en todos los idiomas y borradores) sin pasar por la traduccion automatica. No borra nada del volumen. Si se corta o hay errores, volver a ejecutarlo: solo procesa lo que sigue en `local` y los textos que aun apuntan a `/uploads/`.
+5. **Verificar**:
+   - Repetir `--dry-run`: debe dar `"migrados":0,"errores":0,"textos":0`.
+   - En el panel, Media Library muestra las miniaturas y al abrir una imagen su URL empieza por `https://media.desertica.pe/`.
+   - `curl -I https://media.desertica.pe/<archivo>` responde 200 con el tipo correcto; las paginas de la web muestran las imagenes y los videos.
+   - Subir una imagen nueva y comprobar que tambien queda en `media.desertica.pe`.
+6. **Volver atras**: poner `UPLOAD_PROVIDER=local` (o quitarla), redesplegar y restaurar el respaldo del paso 1 (`pg_restore --clean --if-exists`). Los archivos siguen en el volumen, asi que todo vuelve a verse como antes. Lo subido al bucket despues de la migracion no esta en ese respaldo. El volumen se puede vaciar solo cuando produccion lleve un tiempo funcionando con R2 (y con un respaldo `tar` guardado).
+
 ## Actualizaciones
 
 - Producción despliega solo lo que llega a la rama `prod` por PR desde `staging`; no usar etiquetas `latest` ni desplegar desde `main`. Respaldar la base antes de actualizar.
-- Cambios de esquema de Strapi se aplican solos al arrancar; no hay migraciones manuales salvo que `database/migrations` las incluya.
+- Cambios de esquema de Strapi se aplican solos al arrancar; no hay migraciones manuales salvo que `database/migrations` las incluya. Quitar un atributo **borra su columna** al arrancar: antes de desplegar una version que retira campos, seguir el "Orden de despliegue" de `CONTRACT.md`.
 - Actualizar Strapi: subir las tres dependencias `@strapi/*` juntas a la misma version, `npm install`, `npm run build`, probar en local con una copia de la base.
 - Cambiar un campo del contrato (ver `CONTRACT.md`) requiere desplegar tambien el frontend.
 
@@ -117,7 +142,7 @@ El `Dockerfile`, Postgres (incluido `DATABASE_URL`, con la semilla), las subidas
 
 ## Editor visual y traduccion automatica
 
-- Los textos largos (`body` de paginas, `content` del blog, `details` de productos y `waiverBody` de los tours) usan el editor visual CKEditor 5 con el preset Markdown: el editor ve negritas, listas y enlaces, y el CMS sigue guardando Markdown, asi que la API y la web no cambian. El contenido existente se abre tal cual.
+- Los textos largos (`body` de paginas, `content` del blog y `details` de productos) usan el editor visual CKEditor 5 con el preset Markdown: el editor ve negritas, listas y enlaces, y el CMS sigue guardando Markdown, asi que la API y la web no cambian. El contenido existente se abre tal cual.
 - `DEEPL_API_KEY` activa la traduccion automatica. En tours, destinos, articulos y productos, cada guardado de la version en espanol reescribe el borrador en ingles y el slug sale del nombre en ingles; con `SLUGS_LOCKED=true` (produccion, sitio ya publicado) el slug queda fijo desde la primera publicacion. Para textos, medios, reglas de reserva y menus queda el panel manual *Traduccion automatica* de la vista de edicion (traduce la version abierta al otro idioma y la guarda como **borrador**: nunca publica). Texto y componentes se traducen; precio, slug, iconos, rutas e imagenes se conservan. Una clave gratuita (`:fx`) cubre 500 000 caracteres al mes segun DeepL; verifica el limite vigente en su sitio.
 - El endpoint es `POST /desertica/translate`, solo para sesiones del panel con permiso de edicion en ese tipo de contenido.
 

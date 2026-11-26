@@ -88,8 +88,6 @@ export default {
     // Custom fields (server side twin: `register()` in src/index.ts). The stored value is a plain string.
     for (const [name, component, title, type] of [
       ['icon-picker', 'IconPicker', 'Icono', 'enumeration'],
-      ['map-link', 'MapLink', 'Enlace de mapa', 'string'],
-      ['format-select', 'FormatSelect', 'Formato del tour', 'string'],
       ['focus-select', 'FocusSelect', 'Enfoque de la imagen', 'string'],
     ] as const) {
       app.customFields.register({
@@ -120,7 +118,7 @@ export default {
     });
     app.widgets.register([
       widget('legal-drafts', 'Páginas legales por publicar', File, 'api::page.page', 'LegalWidget', { label: 'Ver páginas', href: '/content-manager/collection-types/api::page.page' }),
-      widget('tour-gaps', 'Tours sin foto o sin descargo', Image, 'api::tour.tour', 'ToursWidget', { label: 'Ver tours', href: '/content-manager/collection-types/api::tour.tour' }),
+      widget('tour-gaps', 'Tours sin foto', Image, 'api::tour.tour', 'ToursWidget', { label: 'Ver tours', href: '/content-manager/collection-types/api::tour.tour' }),
     ]);
   },
   bootstrap(app: StrapiApp) {
