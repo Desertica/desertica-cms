@@ -61,6 +61,31 @@ En el servidor Angular (no en el navegador): `STRAPI_URL` (URL con la que el ser
 - Guardar fuera del servidor los 6 secretos: sin `ENCRYPTION_KEY`/`API_TOKEN_SALT` originales los tokens existentes dejan de valer.
 - Probar la restauracion en un entorno aparte al menos una vez.
 
+## Pasar los medios a R2 (una vez por entorno)
+
+Cambiar `UPLOAD_PROVIDER` solo afecta a lo que se sube despues: los archivos ya subidos siguen en `public/uploads` y la base guarda sus URLs `/uploads/...`. `scripts/migrate-uploads-to-s3.mjs` (incluido en la imagen) los copia al bucket y actualiza la base. Hacerlo primero en staging.
+
+1. **Respaldar** la base (`pg_dump`, ver "Respaldos"); es la vuelta atras. Avisar a los editores que no suban medios mientras dura.
+2. **Variables en Coolify** (servicio cms, "Environment Variables"), y redesplegar:
+   - `UPLOAD_PROVIDER=aws-s3`
+   - `S3_BUCKET=desertica-media`, `S3_REGION=auto`
+   - `S3_ENDPOINT=https://<ID de cuenta>.r2.cloudflarestorage.com`, `S3_FORCE_PATH_STYLE=true`
+   - `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`: token de API de R2 con "Object Read & Write" solo en `desertica-media` (marcarlas como secretas)
+   - `S3_PUBLIC_URL=https://media.desertica.pe` (dominio propio del bucket, sin barra final)
+   - `S3_ACL` y `S3_ROOT_PATH` vacias. No hace falta `MEDIA_HOSTS`: la CSP del panel ya anade `S3_PUBLIC_URL` a `img-src` y `media-src` (`config/middlewares.ts`).
+3. **Simulacion**: en Coolify, servicio cms > Terminal (contenedor del CMS):
+   ```bash
+   cd /opt/app && node scripts/migrate-uploads-to-s3.mjs --dry-run
+   ```
+   Lista cada archivo y cada texto que cambiaria y termina con `Resumen: {"migrados":…,"omitidos":…,"errores":…,"textos":…,"enlaces":…}`. No sube ni escribe nada. Un "no está en disco" es un archivo que falta en el volumen: queda en `local` y se informa como error.
+4. **Migracion**: el mismo comando sin `--dry-run`. Sube el original y sus formatos (thumbnail, small, medium, large) con la misma clave `<hash><ext>`, y luego cambia `url`, `provider` y las URLs de los formatos. Despues reescribe `/uploads/<archivo>` (relativa o con `PUBLIC_URL`) en los textos (`body`, `content`, `details` y demas campos de texto, en todos los idiomas y borradores) sin pasar por la traduccion automatica. No borra nada del volumen. Si se corta o hay errores, volver a ejecutarlo: solo procesa lo que sigue en `local` y los textos que aun apuntan a `/uploads/`.
+5. **Verificar**:
+   - Repetir `--dry-run`: debe dar `"migrados":0,"errores":0,"textos":0`.
+   - En el panel, Media Library muestra las miniaturas y al abrir una imagen su URL empieza por `https://media.desertica.pe/`.
+   - `curl -I https://media.desertica.pe/<archivo>` responde 200 con el tipo correcto; las paginas de la web muestran las imagenes y los videos.
+   - Subir una imagen nueva y comprobar que tambien queda en `media.desertica.pe`.
+6. **Volver atras**: poner `UPLOAD_PROVIDER=local` (o quitarla), redesplegar y restaurar el respaldo del paso 1 (`pg_restore --clean --if-exists`). Los archivos siguen en el volumen, asi que todo vuelve a verse como antes. Lo subido al bucket despues de la migracion no esta en ese respaldo. El volumen se puede vaciar solo cuando produccion lleve un tiempo funcionando con R2 (y con un respaldo `tar` guardado).
+
 ## Actualizaciones
 
 - Producción despliega solo lo que llega a la rama `prod` por PR desde `staging`; no usar etiquetas `latest` ni desplegar desde `main`. Respaldar la base antes de actualizar.

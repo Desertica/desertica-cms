@@ -16,5 +16,6 @@ public/uploads/*
 .DS_Store
 docs
 scripts
+!scripts/migrate-uploads-to-s3.mjs
 Dockerfile
 docker-compose.yml
