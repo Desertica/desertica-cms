@@ -40,6 +40,8 @@ COPY --chown=node:node --from=prod-deps /opt/app/node_modules ./node_modules
 COPY --chown=node:node --from=build /opt/app/dist ./dist
 COPY --chown=node:node database ./database
 COPY --chown=node:node seed ./seed
+# One-off media migration to S3/R2 (docs/DEPLOY.md); it reads the compiled logic from dist/.
+COPY --chown=node:node scripts/migrate-uploads-to-s3.mjs ./scripts/
 COPY --chown=node:node public/favicon.png ./public/favicon.png
 # Writable state: media library and the sqlite file (only used when DATABASE_CLIENT=sqlite).
 RUN mkdir -p public/uploads .tmp && chown -R node:node public .tmp
