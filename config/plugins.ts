@@ -37,6 +37,9 @@ const config = ({ env }: Core.Config.Shared.ConfigParams) => {
   const provider = env('UPLOAD_PROVIDER', 'local');
   // The media library holds photos, videos and PDFs; SVG and HTML can run scripts when opened from the CMS origin.
   const security = { allowedTypes: ['image/*', 'video/*', 'application/pdf'], deniedTypes: ['image/svg+xml', 'text/html'] };
+  // Photos are stored as WebP of at most 2400 px (src/extensions/upload). The website reads only `url`, so no
+  // responsive copies (small/medium/large); Strapi still makes the WebP `thumbnail` for the media library.
+  const breakpoints = {};
   // Color picker custom field (theme colors): plugin::color-picker.color, stores hex strings.
   // CKEditor 5 (Markdown preset): visual editor for long texts; it still stores Markdown, so the API output is unchanged.
   const customFields = { 'color-picker': { enabled: true }, ckeditor5: { enabled: true } };
@@ -53,6 +56,7 @@ const config = ({ env }: Core.Config.Shared.ConfigParams) => {
           provider: 'aws-s3',
           sizeLimit,
           security,
+          breakpoints,
           providerOptions: {
             // Public base URL of the bucket or CDN (no trailing slash). Empty = the S3 object URL.
             baseUrl: env('S3_PUBLIC_URL', '') || undefined,
@@ -81,7 +85,7 @@ const config = ({ env }: Core.Config.Shared.ConfigParams) => {
     };
   }
 
-  return { ...customFields, ...mail(env), upload: { config: { sizeLimit, security } } };
+  return { ...customFields, ...mail(env), upload: { config: { sizeLimit, security, breakpoints } } };
 };
 
 export default config;

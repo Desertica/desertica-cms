@@ -326,7 +326,9 @@ async function uploadAll() {
       check(`deleted file ${m.key} returns 404`, gone.status === 404, `HTTP ${gone.status}`);
     });
     console.log(`      url=${file.url} mime=${file.mime} size=${file.size}KB provider=${file.provider} formats=${Object.keys(file.formats ?? {}).join(',') || '-'}`);
-    check(`${m.key} mime`, file.mime === m.type, file.mime);
+    // Photos are stored as WebP (src/webp-upload.ts); videos and PDFs keep their type.
+    const stored = m.type === 'image/jpeg' || m.type === 'image/png' ? 'image/webp' : m.type;
+    check(`${m.key} mime`, file.mime === stored, file.mime);
     check(`${m.key} url is ${PUBLIC_URL ? 'absolute under CMS_PUBLIC_URL' : 'relative (/uploads/...)'}`,
       PUBLIC_URL ? file.url.startsWith(`${PUBLIC_URL}/`) : file.url.startsWith('/uploads/') || file.url.startsWith('http'), file.url);
   }
