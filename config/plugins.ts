@@ -7,7 +7,7 @@ import type { Core } from '@strapi/strapi';
  * - `UPLOAD_PROVIDER=aws-s3`: S3 or any S3-compatible store (R2, MinIO, Spaces, Backblaze...) for
  *   hosts with an ephemeral disk. See docs/DEPLOY.md.
  *
- * `UPLOAD_MAX_FILE_SIZE_MB` (default 200) is the plugin limit; `strapi::body` in config/middlewares.ts
+ * `UPLOAD_MAX_FILE_SIZE_MB` (default 100) is the plugin limit; `strapi::body` in config/middlewares.ts
  * reads the same variable so both limits always agree.
  */
 /**
@@ -33,7 +33,7 @@ const mail = (env: Core.Config.Shared.ConfigParams['env']) =>
     : {};
 
 const config = ({ env }: Core.Config.Shared.ConfigParams) => {
-  const sizeLimit = env.int('UPLOAD_MAX_FILE_SIZE_MB', 200) * 1024 * 1024;
+  const sizeLimit = env.int('UPLOAD_MAX_FILE_SIZE_MB', 100) * 1024 * 1024;
   const provider = env('UPLOAD_PROVIDER', 'local');
   // The media library holds photos, videos and PDFs; SVG and HTML can run scripts when opened from the CMS origin.
   const security = { allowedTypes: ['image/*', 'video/*', 'application/pdf'], deniedTypes: ['image/svg+xml', 'text/html'] };

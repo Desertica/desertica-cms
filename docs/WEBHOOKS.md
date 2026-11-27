@@ -1,14 +1,20 @@
-# Webhook de publicacion (opcional)
+# Webhook de publicacion
 
-Hoy no hace falta: el frontend lee el CMS con una cache de servidor corta (`STRAPI_CACHE_TTL_MS`, 30 s) y lo publicado se ve solo. Un webhook sirve si mas adelante se quiere invalidar al instante la cache del API (`desertica-api`) y de la web. Este repo no incluye codigo para ello: es configuracion del admin mas un receptor en el servicio que invalida.
+Hay un receptor: el API (`desertica-api`, `POST /api/webhooks/cms`). Al publicar o despublicar un tour, el API sincroniza solo ese tour (lo crea inactivo si es nuevo, refresca su titulo y lo desactiva si ya no esta publicado en ningun idioma) y refresca su cache de tours. El boton "Sincronizar con el CMS" del backoffice sigue como respaldo: Strapi no reintenta.
 
-## Configurar en Strapi
+La web no necesita webhook: lee el CMS con una cache de servidor corta (`STRAPI_CACHE_TTL_MS`, 30 s, mas 10 s de `PAGE_CACHE_TTL_MS`) y lo publicado se ve solo en menos de un minuto. Si algun dia hace falta al instante, este mismo evento puede ir a un segundo receptor en la web.
 
-1. Admin > `Settings` > `Global settings` > `Webhooks` > `Create new webhook`.
-2. `Name`: por ejemplo `invalidate-caches`. `URL`: endpoint HTTPS del receptor (API o web). Tiene que ser alcanzable desde el CMS.
-3. `Headers`: anadir un secreto compartido, por ejemplo `X-Webhook-Secret: <valor largo aleatorio>`. El receptor debe rechazar peticiones sin el.
-4. `Events` (seccion `Entry`): marcar `Publish` y `Unpublish`. Marcar tambien `Update` solo si se quieren avisos de cambios en contenido sin Draft & Publish (`translation`, `media-slot`, `reservation` y `contact-message` no usan borrador; `site-setting`, `theme-setting`, `booking-setting`, `form-setting` y `navigation` son single types). `Create` y `Delete` rara vez hacen falta. No marcar eventos de `Media` salvo que se necesiten.
-5. `Save` y `Trigger` para probar; el panel muestra el codigo de respuesta.
+## Configurar en Strapi (staging)
+
+1. Generar el secreto: `openssl rand -hex 32`. Cargarlo en Coolify en la app del API como `CMS_WEBHOOK_SECRET` y redesplegar el API.
+2. Admin del CMS > `Settings` > `Global settings` > `Webhooks` > `Create new webhook`.
+3. `Name`: `api-sync-tours`. `URL`: `https://api-stg.<dominio>/api/webhooks/cms` (o la URL interna del API si el CMS la alcanza por la red de Coolify).
+4. `Headers`: `X-Webhook-Secret` = el mismo valor de `CMS_WEBHOOK_SECRET`. Sin esa cabecera, o con otro valor, el API responde 401.
+5. `Events` (seccion `Entry`): marcar solo `Publish` y `Unpublish`. El API ignora (200 `ignored`) cualquier modelo que no sea `tour`, asi que no hace falta filtrar por tipo.
+6. `Save` y `Trigger`: debe responder 200 (`{"ignored":true}`); 401 = secreto distinto, 503 = el API no tiene `CMS_WEBHOOK_SECRET`.
+7. Prueba real: despublicar y volver a publicar un tour de prueba; en el backoffice, Tours, cambia su fecha de sincronizacion sin pulsar el boton.
+
+En produccion, lo mismo con `https://api.<dominio>/api/webhooks/cms` y otro secreto.
 
 ## Que recibe el receptor
 
@@ -23,13 +29,12 @@ Hoy no hace falta: el frontend lee el CMS con una cache de servidor corta (`STRA
 - `entry` es la fila completa y sanitizada (relaciones y componentes poblados, sin campos privados). En `entry.unpublish` y `entry.delete` no se puebla: llegan solo los campos propios.
 - Con i18n llega un evento por idioma publicado/despublicado (`entry.locale`).
 - `entry.update` se emite tambien al guardar un **borrador**; para saber que es publico usar `entry.publish`.
-- No hay firma HMAC: la autenticacion es la cabecera secreta propia. El receptor tiene 10 s para responder, **no hay reintentos** (por eso la cache debe expirar por TTL) y Strapi procesa 5 envios a la vez.
+- No hay firma HMAC: la autenticacion es la cabecera secreta propia (el API la compara en tiempo constante y limita a 30 avisos por minuto). El receptor tiene 10 s para responder, **no hay reintentos** (por eso la cache debe expirar por TTL) y Strapi procesa 5 envios a la vez.
 - Solo `Publish` y `Unpublish` aparecen para tipos con borrador; los demas eventos (`Create`, `Update`, `Delete`, `Media`) son opcionales.
 
 Verificado contra el codigo de Strapi 5.59.0 instalado (`@strapi/core` `webhook-runner` y `document-service/events`), no contra docs.strapi.io (sin acceso desde esta sesion: el proxy lo bloquea). Antes de escribir el receptor, pulsar `Trigger` en el admin: su cuerpo es solo `{ "event": "trigger-test", "createdAt": "..." }` (sin `model` ni `entry`), asi que sirve para probar conectividad y secreto, no el formato de los eventos reales.
 
 ## Notas
 
-- Un webhook por destino (API y web) o uno solo que haga fan-out.
 - Si se usa Cloudflare delante del CMS, el webhook sale del CMS al receptor; no pasa por la cache del CMS.
-- Esta pensado como optimizacion: si el receptor falla, la cache expira sola por TTL.
+- Si el receptor falla, el aviso se pierde: la cache del API expira sola por TTL y el boton "Sincronizar con el CMS" pone todo al dia.
