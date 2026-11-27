@@ -20,12 +20,17 @@ Funciona igual con el disco local y con R2 (`UPLOAD_PROVIDER=aws-s3`): la conver
 Las fotos ya subidas **no se tocan solas**. Para convertirlas hay dos caminos:
 
 - **Una a una, desde el panel:** *Biblioteca de Multimedia* > abrir la foto > *Reemplazar* y elegir el mismo archivo (o el original de Drive). Se guarda en WebP con el mismo ID, así que los tours y páginas que la usan no cambian.
-- **Todas de una vez, con el script** `scripts/convert-photos-to-webp.mjs` (hace lo mismo que *Reemplazar*, foto por foto). Primero sin `APPLY`, que solo lista lo que convertiría:
+- **Todas de una vez, con el script** `scripts/convert-photos-to-webp.mjs` (hace lo mismo que *Reemplazar*, foto por foto). Necesita una clave de API temporal de acceso completo (*Configuración > Tokens de API*, la duración más corta) que se guarda en el llavero de macOS, nunca en el chat ni en archivos, y se borra al terminar:
 
   ```bash
-  CMS_URL=https://<cms> CMS_ADMIN_EMAIL=<admin> CMS_ADMIN_PASSWORD=<clave> node scripts/convert-photos-to-webp.mjs
+  security add-generic-password -a "$USER" -s strapi-stg-webp-temp -w   # pide la clave y la guarda
+  export CMS_URL=https://<cms> CMS_TOKEN="$(security find-generic-password -a "$USER" -s strapi-stg-webp-temp -w)"
+  BACKUP_DIR=~/desertica/respaldos/<cms>-uploads-<fecha> node scripts/convert-photos-to-webp.mjs   # copia de todo + lista
+  APPLY=true ONLY=<id> node scripts/convert-photos-to-webp.mjs   # prueba con una foto
+  APPLY=true node scripts/convert-photos-to-webp.mjs              # el resto
+  security delete-generic-password -a "$USER" -s strapi-stg-webp-temp
   ```
 
-  Si la lista está bien, repetir con `APPLY=true`. Conviene hacerlo primero en staging y con una copia de la base de datos.
+  El script se detiene si el CMS todavía no convierte a WebP (código sin desplegar). Hacerlo primero en staging.
 
 Detalle a saber: *Reemplazar* en Strapi conserva el nombre del archivo en el almacenamiento para que la dirección no cambie. Una foto antigua `..._abc123.jpg` queda con esa misma dirección terminada en `.jpg`, pero el contenido y el `mime` son WebP. En R2 se sirve como `image/webp`; con el disco local el servidor la anuncia como JPG y los navegadores la muestran igual. La web no se ve afectada: siempre pasa las fotos por `/_img`.
