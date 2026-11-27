@@ -46,6 +46,7 @@ jobs:
       - name: Start Strapi on an empty database, wait for /_health and check the Editor role
         env:
           NODE_ENV: production
+          PROXY: 'true'
         run: |
           npm start > smoke.log 2>&1 &
           pid=$!

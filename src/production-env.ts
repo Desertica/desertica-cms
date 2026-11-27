@@ -10,4 +10,11 @@ export function assertProductionEnv(env: Record<string, string | undefined>) {
 
   // Without it CORS falls back to localhost and the real origins fail with no hint of why.
   if (!env.CLIENT_URLS) throw new Error('CLIENT_URLS is required in production (the origins of the website and the admin).');
+
+  // Behind Traefik without it every client has the proxy's IP, so the admin login rate limit is shared by everyone.
+  if (env.PROXY !== 'true') throw new Error('PROXY=true is required in production (the CMS runs behind a TLS reverse proxy).');
+
+  // It signs draft-preview links: a short key could be brute-forced to forge them. Empty = preview off, which is fine.
+  if (env.FORMS_PROXY_SECRET && env.FORMS_PROXY_SECRET.length < 32)
+    throw new Error('FORMS_PROXY_SECRET must be at least 32 characters (openssl rand -hex 32), or empty to disable preview.');
 }
