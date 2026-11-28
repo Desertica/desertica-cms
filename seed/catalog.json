@@ -4691,10 +4691,10 @@
       "kind": "long",
       "i18n": {
         "en": {
-          "value": "No refunds if you cancel, including the deposit. You can change the date for free up to 24 h before the tour. If the tour can’t run because of the weather, an order from the authorities or the operator, you get a 100% refund or a new date. [Read the full policy]"
+          "value": "No refunds if you cancel, including the deposit. You can change the date for free up to 24 h before the tour; after that, no changes. If the tour can’t run because of the weather, an order from the authorities or the operator, you get a 100% refund or a new date. [Read the full policy]"
         },
         "es": {
-          "value": "Sin reembolsos si cancelas, tampoco del adelanto. Puedes cambiar la fecha gratis hasta 24 h antes del tour. Si el tour no sale por clima, orden de una autoridad o causa del operador, te devolvemos el 100 % o te damos otra fecha. [Ver la política completa]"
+          "value": "Sin reembolsos si cancelas, tampoco del adelanto. Puedes cambiar la fecha gratis hasta 24 h antes del tour; después ya no hay cambios. Si el tour no sale por clima, orden de una autoridad o causa del operador, te devolvemos el 100 % o te damos otra fecha. [Ver la política completa]"
         }
       }
     },
