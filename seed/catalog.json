@@ -1107,12 +1107,12 @@
         "assurances": [
           {
             "icon": "lucideCalendar",
-            "title": "Book now, pay later:",
-            "body": "Secure your spot"
+            "title": "Book with a deposit:",
+            "body": "Pay part today and the rest later"
           },
           {
             "icon": "lucideClock",
-            "title": "Free cancellation:",
+            "title": "Free date change:",
             "body": "Up to 24 hours before the tour"
           },
           {
@@ -1126,12 +1126,12 @@
         "assurances": [
           {
             "icon": "lucideCalendar",
-            "title": "Reserva ahora, paga después:",
-            "body": "Asegura tu lugar"
+            "title": "Reserva con un adelanto:",
+            "body": "Paga una parte hoy y el resto después"
           },
           {
             "icon": "lucideClock",
-            "title": "Cancelación gratis:",
+            "title": "Cambio de fecha gratis:",
             "body": "Hasta 24 horas antes del tour"
           },
           {
@@ -3819,22 +3819,6 @@
       }
     },
     {
-      "key": "tour.payLater",
-      "group": "tour",
-      "page": "tour-detail",
-      "section": "booking-form",
-      "label": "Tour booking form — \"Pay later\" payment option",
-      "kind": "short",
-      "i18n": {
-        "en": {
-          "value": "Book now, pay later"
-        },
-        "es": {
-          "value": "Reserva ahora, paga después"
-        }
-      }
-    },
-    {
       "key": "tour.shared",
       "group": "tour",
       "page": "tour-detail",
@@ -4047,14 +4031,14 @@
       "group": "tour",
       "page": "tour-detail",
       "section": "assurances",
-      "label": "Tour booking assurance — Pay later (title)",
+      "label": "Tour booking assurance — Deposit (title)",
       "kind": "short",
       "i18n": {
         "en": {
-          "value": "Book now, pay later:"
+          "value": "Book with a deposit:"
         },
         "es": {
-          "value": "Reserva ahora, paga después:"
+          "value": "Reserva con un adelanto:"
         }
       }
     },
@@ -4067,10 +4051,10 @@
       "kind": "short",
       "i18n": {
         "en": {
-          "value": "Secure your spot"
+          "value": "Pay part today and the rest later"
         },
         "es": {
-          "value": "Asegura tu lugar"
+          "value": "Paga una parte hoy y el resto después"
         }
       }
     },
@@ -4083,10 +4067,10 @@
       "kind": "short",
       "i18n": {
         "en": {
-          "value": "Free cancellation:"
+          "value": "Free date change:"
         },
         "es": {
-          "value": "Cancelación gratis:"
+          "value": "Cambio de fecha gratis:"
         }
       }
     },
@@ -4647,6 +4631,70 @@
         },
         "es": {
           "value": "Los precios incluyen impuestos."
+        }
+      }
+    },
+    {
+      "key": "booking.depositTitle",
+      "group": "booking",
+      "page": "booking",
+      "section": "flow",
+      "label": "Booking — Deposit option title ({percent} = deposit %)",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Book with {percent}% today"
+        },
+        "es": {
+          "value": "Reserva con el {percent} % hoy"
+        }
+      }
+    },
+    {
+      "key": "booking.depositRest",
+      "group": "booking",
+      "page": "booking",
+      "section": "flow",
+      "label": "Booking — Deposit option, what is left ({balance})",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "The rest ({balance}) is paid later."
+        },
+        "es": {
+          "value": "El resto ({balance}) se paga después."
+        }
+      }
+    },
+    {
+      "key": "booking.depositOption",
+      "group": "booking",
+      "page": "booking",
+      "section": "flow",
+      "label": "Booking — Deposit option in one line ({percent}, {deposit}, {balance})",
+      "kind": "short",
+      "i18n": {
+        "en": {
+          "value": "Book with {percent}% today ({deposit}) and pay the rest ({balance}) later"
+        },
+        "es": {
+          "value": "Reserva con el {percent} % hoy ({deposit}) y paga el resto ({balance}) después"
+        }
+      }
+    },
+    {
+      "key": "booking.cancellationShort",
+      "group": "booking",
+      "page": "booking",
+      "section": "flow",
+      "label": "Booking — Cancellation summary (same rule as the legal policy; the [link] opens it)",
+      "kind": "long",
+      "i18n": {
+        "en": {
+          "value": "No refunds if you cancel, including the deposit. You can change the date for free up to 24 h before the tour. If the tour can’t run because of the weather, an order from the authorities or the operator, you get a 100% refund or a new date. [Read the full policy]"
+        },
+        "es": {
+          "value": "Sin reembolsos si cancelas, tampoco del adelanto. Puedes cambiar la fecha gratis hasta 24 h antes del tour. Si el tour no sale por clima, orden de una autoridad o causa del operador, te devolvemos el 100 % o te damos otra fecha. [Ver la política completa]"
         }
       }
     },
