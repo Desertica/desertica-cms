@@ -1108,7 +1108,7 @@
           {
             "icon": "lucideCalendar",
             "title": "Book with a deposit:",
-            "body": "Pay part today and the rest later"
+            "body": "Pay part today and the rest on the day of the tour"
           },
           {
             "icon": "lucideClock",
@@ -1127,7 +1127,7 @@
           {
             "icon": "lucideCalendar",
             "title": "Reserva con un adelanto:",
-            "body": "Paga una parte hoy y el resto después"
+            "body": "Paga una parte hoy y el resto el día del tour"
           },
           {
             "icon": "lucideClock",
@@ -4051,10 +4051,10 @@
       "kind": "short",
       "i18n": {
         "en": {
-          "value": "Pay part today and the rest later"
+          "value": "Pay part today and the rest on the day of the tour"
         },
         "es": {
-          "value": "Paga una parte hoy y el resto después"
+          "value": "Paga una parte hoy y el resto el día del tour"
         }
       }
     },
@@ -4659,10 +4659,10 @@
       "kind": "short",
       "i18n": {
         "en": {
-          "value": "The rest ({balance}) is paid later."
+          "value": "The rest ({balance}) is paid on the day of the tour."
         },
         "es": {
-          "value": "El resto ({balance}) se paga después."
+          "value": "El resto ({balance}) se paga el día del tour."
         }
       }
     },
@@ -4675,10 +4675,10 @@
       "kind": "short",
       "i18n": {
         "en": {
-          "value": "Book with {percent}% today ({deposit}) and pay the rest ({balance}) later"
+          "value": "Book with {percent}% today ({deposit}) and pay the rest ({balance}) on the day of the tour"
         },
         "es": {
-          "value": "Reserva con el {percent} % hoy ({deposit}) y paga el resto ({balance}) después"
+          "value": "Reserva con el {percent} % hoy ({deposit}) y paga el resto ({balance}) el día del tour"
         }
       }
     },
